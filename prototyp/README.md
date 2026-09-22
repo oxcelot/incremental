@@ -173,24 +173,24 @@ Tinte nie unter 0,05 €. Das fängt Kombinationen ab, die beim Balancing entste
 
 ### Der Flächenstempel muss gezielt werden
 
-Der Abdruck hat eine **echte Fläche**, die am Mauszeiger klebt — es rastet
-nichts ein. Getroffen wird, wessen Platzmitte unter der Fläche liegt:
+Getroffen wird, was der **sichtbare Stempel tatsächlich überdeckt**. Sein
+Quadrat (74 px) wird gegen die Vorgänge geschnitten; wer am meisten darunter
+liegt, kommt zuerst dran. Mehr als `hitCount` Vorgänge gehen nie mit.
 
 | Stand des Stempels | mit „Breiter Stempel" | mit „Amtsstempel XXL" |
 |---|---|---|
-| mitten auf einem Platz | 1 Vorgang | 1 Vorgang |
-| über der Lücke zwischen zwei Plätzen | **2 Vorgänge** | 2 Vorgänge |
-| über dem Kreuzungspunkt von vier Plätzen | 0 (zu hoch/tief) | **4 Vorgänge** |
+| mitten auf einer Karte | 1 Vorgang | 1 Vorgang |
+| über der Lücke zwischen zwei Karten | **2 Vorgänge** | 2 Vorgänge |
+| über dem Kreuzungspunkt von vier Karten | 2 (gedeckelt) | **4 Vorgänge** |
 
-Wer die doppelte Ausbeute will, muss den Stempel also selbst über die Lücke
-halten; für vier über den Kreuzungspunkt. `CONFIG.areaSpread` steuert, wie
-großzügig das ist: bei 1,4 liegt das Trefferband bei 40 % einer Platzbreite
-rund um die Lücke.
+`CONFIG.areaMinOverlap` (0,10) legt fest, wie viel des Stempels über einer
+Karte liegen muss, damit sie zählt — ein Pixel Berührung reicht nicht.
+**Leere Plätze belegen keinen Treffer:** Liegt neben dem Kreuzungspunkt nur
+eine leere Ablage, werden trotzdem die drei vorhandenen Vorgänge bearbeitet.
 
-Der Stempel selbst behält dabei immer seine Größe — die Reichweite zeigen
-ausschließlich die **amber umrandeten Plätze**. Man sieht vor jedem Schlag
-genau, was getroffen wird, ohne dass ein riesiger Stempelumriss den Tisch
-verdeckt.
+Der Stempel behält immer seine Größe, die Reichweite zeigen die **amber
+umrandeten Plätze**. Da Trefferprüfung und sichtbarer Stempel jetzt dieselbe
+Fläche benutzen, stimmt die Markierung genau mit dem überein, was man sieht.
 
 Ein breiter Abdruck trifft **alle** Vorgänge unter sich, auch die, die einen
 anderen Stempel verlangen — die zählen als Beschwerde. Damit wird die Fläche

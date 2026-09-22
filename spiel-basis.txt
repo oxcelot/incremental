@@ -889,26 +889,32 @@ UEBERSTUNDEN wandert bewusst aus Ring 1 nach Ring 2. Ring 1 gehoert jetzt den
 Entscheidungen, die den Arbeitstag VERAENDERN (Kissen, Volltreffer, Flaeche,
 Wechsel, Takt) - mehr Zeit ist die langweiligste Verbesserung und darf warten.
 
-DER FLAECHENSTEMPEL MUSS GEZIELT WERDEN  [REVIDIERT 22.09.2026]
-Der Abdruck hat eine ECHTE FLAECHE, die am Zeiger klebt - es rastet nichts ein.
-Getroffen wird, wessen Platzmitte unter der Flaeche liegt:
+DER FLAECHENSTEMPEL MUSS GEZIELT WERDEN  [REVIDIERT 22.09.2026, 2. Fassung]
+Getroffen wird, was der SICHTBARE Stempel tatsaechlich ueberdeckt. Sein
+Quadrat (74 px) wird gegen die Vorgaenge geschnitten; wer am meisten darunter
+liegt, kommt zuerst. Mehr als hitCount Vorgaenge gehen nie mit, und ein Vorgang
+zaehlt erst ab CONFIG.areaMinOverlap (10 % der Stempelflaeche) - ein Pixel
+Beruehrung reicht nicht. Leere Plaetze belegen keinen Treffer.
 
   Stempel steht ...                       Breiter Stempel   Amtsstempel XXL
-  mitten auf einem Platz                        1                 1
-  ueber der Luecke zwischen zwei Plaetzen       2                 2
-  ueber dem Kreuzungspunkt von vier Plaetzen    0                 4
+  mitten auf einer Karte                        1                 1
+  ueber der Luecke zwischen zwei Karten         2                 2
+  ueber dem Kreuzungspunkt von vier Karten      2 (gedeckelt)     4
 
-Die doppelte Ausbeute muss man sich also selbst erzielen, indem man den Stempel
-ueber die Luecke haelt; fuer vier ueber den Kreuzungspunkt. CONFIG.areaSpread
-steuert die Grosszuegigkeit: bei 1,4 liegt das Trefferband bei 40 % einer
-Platzbreite rund um die Luecke.
+WARUM DIE ERSTE FASSUNG FALSCH WAR
+Sie pruefte, ob die PLATZMITTE unter einer gedachten Flaeche von
+Platzabstand x 1,4 liegt. Bei einem Platz von 269 px war diese Flaeche also
+rund 380 px breit - der sichtbare Stempel aber nur 74 px. Die Doppelauswahl
+loeste dadurch aus, obwohl der Stempel die zweite Karte gar nicht beruehrte.
+Solange der Stempel noch auf die Flaeche mitwuchs, fiel das nicht auf; seit er
+seine Groesse behaelt, war die Trefferpruefung von der Anzeige entkoppelt.
+=> MERKE: Trefferpruefung und sichtbare Darstellung muessen DIESELBE Geometrie
+   benutzen. Sobald eines von beiden waechst oder schrumpft, muss das andere
+   mitgehen - sonst entsteht genau dieses Gefuehl von Willkuer.
+
 Der Stempel behaelt immer seine Groesse. Die Reichweite zeigen ausschliesslich
-die AMBER UMRANDETEN PLAETZE - so sieht man vor dem Schlag, was getroffen wird,
-ohne dass ein riesiger Stempelumriss den Tisch verdeckt. Die Vorschau ist
-Pflicht: eine Flaeche ohne Vorschau waere Raterei.
-Hinweis: Mit dem breiten (nur einen Platz hohen) Stempel genau zwischen zwei
-ZEILEN zu stehen trifft nichts. Das ist gewollt - der Stempel liegt dann
-zwischen den Vorgaengen - und die Vorschau zeigt es sofort.
+die AMBER UMRANDETEN PLAETZE, und die stimmen jetzt exakt mit dem ueberein,
+was der Stempel verdeckt.
 
 Ein breiter Abdruck trifft weiterhin ALLE Vorgaenge unter sich, auch die mit
 einem anderen Sollstempel; die zaehlen als Beschwerde.
