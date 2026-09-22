@@ -1,0 +1,378 @@
+================================================================================
+SPIEL-BASIS / GAME DESIGN DOCUMENT (Arbeitsstand)
+Projekt:        [ARBEITSTITEL: OFFEN]
+Genre:          Aktives, rundenbasiertes Incremental fuer Steam
+Erstellt:       22.09.2026
+Status:         Entwurf - offene Punkte sind mit [OFFEN] markiert
+Begleitdatei:   vorbilder.txt (Analyse von Bills Must Be Paid, Incredicer,
+                Loot Loop + abgeleitete Design-Regeln R1-R7)
+================================================================================
+
+HINWEIS ZUM GEBRAUCH
+Diese Datei ist die EINE Quelle der Wahrheit fuer das Spiel. Jede beantwortete
+Frage wandert hier hinein und ersetzt das [OFFEN]. Nichts wird geloescht -
+verworfene Ideen kommen nach ganz unten in "Abgelehnt & warum". Das spart
+spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
+
+
+################################################################################
+# TEIL 0 - WAS BEREITS FESTSTEHT
+################################################################################
+
+0.1 Plattform:          Steam (PC). Spaeter optional Web-Demo + Mobile.
+0.2 Genre:              Active Incremental, RUNDENBASIERT.
+0.3 Struktur:           Runde spielen -> Runde endet -> Bauphase (Upgrades,
+                        Skill Tree) -> naechste Runde. Wie Bills Must Be Paid
+                        und Loot Loop.
+0.4 Pflicht-Systeme:    Skill Tree mit spannenden, benannten Upgrades;
+                        Werkzeug-/Ausruestungs-Upgrades; Meta-Progression.
+0.5 Zielgefuehl:        Kurzweilig, "nur noch eine Runde", staendiges
+                        Entdecken neuer Nodes und Inhalte.
+0.6 Leitbild:           Bills Must Be Paid - bewaehrtes Mechanik-Skelett,
+                        komplett neue Fiktion UND eine eigene Mechanik-Drehung.
+0.7 Nicht-Ziel:         Kein Klon eines existierenden Steam-Spiels. Gleiche
+                        GENRE-FAMILIE, andere Kern-Handlung.
+
+
+################################################################################
+# TEIL 1 - MECHANIK-KANDIDATEN (Ideen, noch nicht entschieden)
+################################################################################
+
+Das Muster hinter Bills Must Be Paid:
+   [alltaegliche, leicht absurde, koerperlich befriedigende Handlung]
+ + [Ressource, die die Runde beendet]
+ + [Deadline-Druck von aussen]
+ + [Ironie zwischen Thema und Handlung]
+Alle Kandidaten unten folgen diesem Muster, aber mit ANDERER Kern-Handlung
+als "Objekte zerschlagen".
+
+--------------------------------------------------------------------------------
+K1  PERLENTAUCHER  ("Luft ist deine Uhr")
+--------------------------------------------------------------------------------
+Handlung:   Abtauchen, Muscheln aufhebeln, Perlen bergen, rechtzeitig auftauchen.
+Runden-Uhr: ATEMLUFT. Jede Aktion kostet Luft; auftauchen kostet Zeit.
+Druck:      Wer ohne Luft unten bleibt, verliert die Beute der Runde (nicht
+            den Fortschritt). Spaeter: Tiefenrausch, Haie, Stroemung.
+Ironie:     Man riskiert das Leben fuer Dekoration.
+Skill Tree: Lungenvolumen, Tauchreflex, Messerschliff, Flossen, Netzgroesse,
+            Perlen-Auge (Erkennen wertvoller Muscheln), Kaltwasser-Toleranz.
+Werkzeuge:  Messer (schnell/schwach) vs. Brecheisen (langsam/sicher) vs.
+            Saugrohr (Flaeche).
+Staerke:    "Luft" ist die eleganteste Runden-Uhr, die es gibt: sie erzeugt
+            von selbst Spannung ("schaffe ich noch eine Muschel?").
+Risiko:     Tauch-Thema ist visuell aufwendiger (Wasser, Licht, Tiefe).
+
+--------------------------------------------------------------------------------
+K2  DAS AMT  ("Antraege muessen bearbeitet werden")
+--------------------------------------------------------------------------------
+Handlung:   Aktenstapel abarbeiten: stempeln, sortieren, ablegen, abheften.
+Runden-Uhr: DIENSTSCHLUSS (Arbeitstag = Runde) + Geduld/Nerven-Leiste.
+Druck:      Unbearbeitete Antraege stapeln sich in den naechsten Tag; ab einem
+            Schwellenwert kommt der Vorgesetzte / eine Dienstaufsichts-
+            beschwerde und nimmt dir einen Anteil deiner Leistungspunkte.
+Ironie:     Buerokratie als Action-Spiel. Sehr deutsch, sehr teilbar.
+Skill Tree: Stempel-Technik, Handgelenk, Kaffeekueche, Aktenzeichen-Gedaechtnis,
+            Formular-Blindlesen, Dienstweg abkuerzen, Gummiband-Meisterschaft,
+            "Zustaendigkeit abgeben" (Antrag weiterreichen = Instant-Cash).
+Werkzeuge:  Stempel-Typen (Rundstempel = Flaeche, Datumstempel = Combo,
+            Rollstempel = Speed), Locher, Aktenwagen.
+Staerke:    Humor + Wiedererkennung; Objekt-Typen (Antraege) lassen sich
+            beliebig erweitern und sind billig zu produzieren (2D, Papier).
+Risiko:     "Papier abstempeln" muss sich haptisch GUT anfuehlen - steht und
+            faellt mit Sound/Animation.
+
+--------------------------------------------------------------------------------
+K3  ENTWIRREN  ("Der Knoten muss geloest werden")
+--------------------------------------------------------------------------------
+Handlung:   Kabelsalat / Ketten / Kopfhoerer entknoten - ziehen, loesen,
+            Knoten oeffnen. Aktive Zielgenauigkeit statt Zerstoerung.
+Runden-Uhr: GEDULD (Nerven-Leiste). Fehlgriffe ziehen den Knoten enger.
+Druck:      Auftraege mit Frist; verpasst = Ruf sinkt = schlechtere Auftraege.
+Ironie:     Entspannung als Hochleistungssport.
+Skill Tree: Fingerspitzengefuehl, Ruhepuls, Lupe, Pinzette, Knotenkunde,
+            "Gordischer Ansatz" (einmal pro Runde einfach durchschneiden).
+Staerke:    Sehr eigenstaendige Kern-Handlung (loesen statt zerstoeren),
+            angenehm "cozy", gutes ASMR-Potenzial.
+Risiko:     Schwerer zu automatisieren/skalieren - wie fuehlt sich Node 200 an?
+
+--------------------------------------------------------------------------------
+K4  FUNDBUERO / SCHROTTPRESSE  ("Alles hat einen Restwert")
+--------------------------------------------------------------------------------
+Handlung:   Elektroschrott zerlegen und Wertstoffe TRENNEN (Kupfer, Gold,
+            Plastik). Nicht bloss zerstoeren - richtig zerlegen bringt mehr.
+Runden-Uhr: SCHICHTZEIT oder Werkzeug-Verschleiss.
+Druck:      Umweltauflagen/Abnahmequoten mit Frist; verfehlt = Bussgeld-Malus.
+Ironie:     Muell als Goldmine.
+Skill Tree: Schraubgefuehl, Materialkunde, Magnetfinger, Loetkolben,
+            Zerlegereihenfolge, "Garantie erlischt" (schneller, aber Verlust
+            von Feinmaterial).
+Staerke:    Trennen statt Zerstoeren = echte Entscheidung pro Objekt; die
+            Objekte (Geraete) sind ein natuerlicher Content-Strom.
+Risiko:     Naeher an bestehenden "Zerleg-Simulatoren" - Abgrenzung pruefen.
+
+--------------------------------------------------------------------------------
+K5  WINTERDIENST  ("Die Strasse muss frei sein")
+--------------------------------------------------------------------------------
+Handlung:   Schnee raeumen / Eis aufhacken auf einer Flaeche, bevor es hell wird.
+Runden-Uhr: DIE NACHT (feste Zeit) + Kraft.
+Druck:      Es schneit WAEHREND der Runde weiter - der Gegner ist die
+            Nachschub-Rate, nicht ein Gegner. Nicht geraeumte Abschnitte
+            vereisen und kosten naechste Runde doppelt.
+Ironie:     Sisyphos mit Schneeschieber.
+Skill Tree: Rueckenmuskulatur, Thermo-Handschuhe, Streusalz-Chemie,
+            Schaufelbreite, Fraese, Wetterfuehligkeit (Vorhersage).
+Staerke:    "Es kommt waehrend der Runde nach" ist eine sehr gute
+            Spannungsquelle und unterscheidet sich klar von statischen Feldern.
+Risiko:     Weiss-in-Weiss ist visuell schwer lesbar.
+
+--------------------------------------------------------------------------------
+K6  NUESSE KNACKEN / EICHHOERNCHEN  ("Der Winter kommt")
+--------------------------------------------------------------------------------
+Handlung:   Nuesse knacken und einlagern; jede Nuss hat Schale + Kern.
+Runden-Uhr: TAGESLICHT pro Herbsttag.
+Druck:      Der Winter (Zaehler) verlangt eine Mindestmenge; zu wenig = harter
+            Winter-Malus. Diebe (Haeher) klauen aus dem Lager.
+Ironie:     Sparen erzwingen statt ausgeben.
+Staerke:    Charmant, sehr gut fuer Sammel-Ebene (Nuss-Arten), leicht zu
+            bebildern.
+Risiko:     Naehe zu "Objekt aufschlagen" = mechanisch dicht an BMBP.
+
+--------------------------------------------------------------------------------
+K7  RESTAURATOR  ("Unter dem Rost liegt Wert")
+--------------------------------------------------------------------------------
+Handlung:   Schicht fuer Schicht freilegen: Rost, Farbe, Dreck - darunter das
+            Objekt. Zu aggressiv = man beschaedigt den Wert.
+Runden-Uhr: MATERIALVERBRAUCH (Strahlgut, Poliermittel) statt Zeit.
+Druck:      Auktionstermin mit Frist; beschaedigte Stuecke bringen weniger.
+Ironie:     Zerstoeren, um zu bewahren - Praezision statt Wucht.
+Skill Tree: Fingerspitzengefuehl, Chemie, Duesen-Druck, Roentgenblick
+            (zeigt, was darunter liegt), Patina-Kunde.
+Staerke:    Das "Enthuellen" ist psychologisch stark (Rubbellos-Effekt) und
+            gibt jedem Objekt eine kleine Ueberraschung.
+Risiko:     Braucht pro Objekt zwei Zustaende (vorher/nachher) = mehr Art.
+
+--------------------------------------------------------------------------------
+K8  WELTRAUMSCHROTT  ("Der Orbit muss frei sein")
+--------------------------------------------------------------------------------
+Handlung:   Trueemmer mit Greifarm/Magnet einfangen, bevor sie kollidieren.
+Runden-Uhr: TREIBSTOFF.
+Druck:      Kollisionen erzeugen NEUEN Schrott (Kessler-Effekt) - das Problem
+            waechst, wenn man langsam ist. Sehr elegante Eskalation.
+Skill Tree: Triebwerk, Traegheitsdaempfer, Magnetstaerke, Bahnvorhersage,
+            Laser, Bergungsrecht (hoeherer Preis).
+Staerke:    Eskalationsmechanik eingebaut; Sci-Fi verkauft sich gut.
+Risiko:     Weniger "alltaeglich" - der Wiedererkennungs-Witz von BMBP fehlt.
+
+--------------------------------------------------------------------------------
+K9  PFANDAUTOMAT  ("Leergut ist Bargeld")
+--------------------------------------------------------------------------------
+Handlung:   Flaschen sortieren und einwerfen - richtige Sorte, richtiger Schacht.
+Runden-Uhr: OEFFNUNGSZEIT / Automaten-Stau.
+Druck:      Schlange hinter dir wird ungeduldig; Fehlwuerfe blockieren.
+Ironie:     Mikro-Betraege bis zum Vermoegen.
+Staerke:    Sehr klarer, verstaendlicher Sortier-Skill; hoher Wiedererkennung.
+Risiko:     Sortieren allein traegt vielleicht keine 3 Stunden.
+
+--------------------------------------------------------------------------------
+K10 KAUGUMMI-ABKRATZER  ("Unter jedem Tisch ein Schatz")
+--------------------------------------------------------------------------------
+Handlung:   Kaugummis unter Tischen/Straszen abkratzen, nach Alter bewertet.
+Runden-Uhr: EKEL-LEISTE oder Handgelenk-Kraft.
+Druck:      Der Hausmeister macht Feierabend; Gesundheitsamt-Kontrolle.
+Ironie:     Maximal eklig, maximal viral - perfektes Streamer-Futter.
+Staerke:    Der Satz allein verkauft das Spiel. Sehr guenstig zu bauen.
+Risiko:     Ekel schreckt einen Teil der Kundschaft ab.
+
+--------------------------------------------------------------------------------
+MECHANIK-DREHUNGEN (unabhaengig vom Thema kombinierbar)
+--------------------------------------------------------------------------------
+D1  SORTIEREN STATT ZERSTOEREN: Der Wert entsteht durch die richtige
+    Zuordnung, nicht durch Schlagen. -> Mehr Kopf, weniger Klicken.
+D2  ENTHUELLEN IN SCHICHTEN: Jedes Objekt hat verdeckte Schichten; Timing
+    entscheidet ueber den Ertrag. -> Rubbellos-Spannung pro Objekt.
+D3  NACHSCHUB WAEHREND DER RUNDE: Das Feld fuellt sich waehrend du arbeitest.
+    Deine Effizienz muss die Rate ueberholen. -> Eingebaute Eskalation.
+D4  KETTEN/COMBO: Gleichartige Objekte hintereinander = Multiplikator.
+    -> Belohnt Planung der Reihenfolge, nicht Reaktionsgeschwindigkeit.
+D5  RISIKO-OBJEKTE: Manche Objekte geben viel, kosten aber die Runden-Uhr
+    doppelt oder bestrafen bei Fehlschlag. -> Echte Entscheidung pro Klick.
+D6  LADUNGSSYSTEM: Statt Stamina eine Werkzeug-Aufladung, die sich durch
+    RICHTIGES Spielen wieder fuellt. -> Belohnt Koennen statt Ausdauer.
+D7  VERSCHLEISS: Werkzeuge nutzen sich ab und muessen in der Bauphase
+    repariert/ersetzt werden. -> Zwingt zu Ausgaben-Entscheidungen.
+
+
+################################################################################
+# TEIL 2 - FRAGENKATALOG (das hier muss beantwortet werden)
+################################################################################
+Antworten bitte direkt hinter die Frage schreiben und [OFFEN] ersetzen.
+
+--- A. VISION & FANTASIE --------------------------------------------------------
+A1  Der Ein-Satz-Pitch: "Man ____, um ____." ......................... [OFFEN]
+A2  Welche Kern-Handlung (K1-K10 oder eigene)? ....................... [OFFEN]
+A3  Welche Emotion soll dominieren: Befriedigung, Humor, Cozy,
+    Stress/Hektik, Stolz? ............................................ [OFFEN]
+A4  Wie viel Ironie/Satire? Absurd-komisch (BMBP) oder ernst-cozy
+    (Loot Loop)? ..................................................... [OFFEN]
+A5  Ton der Texte: trocken-buerokratisch, albern, sarkastisch? ....... [OFFEN]
+A6  Wer ist die Spielfigur - hat sie eine Geschichte oder ist sie
+    nur eine Hand? ................................................... [OFFEN]
+
+--- B. KERN-MECHANIK -------------------------------------------------------------
+B1  Was genau macht der Spieler pro Sekunde? (Klicken, Zielen,
+    Ziehen, Timing treffen, Sortieren?) .............................. [OFFEN]
+B2  Ist die Eingabe geschicklichkeitsbasiert (Praezision/Timing) oder
+    entscheidungsbasiert (was zuerst)? ............................... [OFFEN]
+B3  Maus, Tastatur oder beides? Controller-Support geplant? .......... [OFFEN]
+B4  Was ist die RUNDEN-UHR (die Ressource, die die Runde beendet)?
+    Stamina / Zeit / Luft / Treibstoff / Verschleiss / Wuerfe? ........ [OFFEN]
+B5  Kann der Spieler die Runde freiwillig frueh beenden (Cash-out)?
+    (Sehr starke Spannungsquelle: bleiben oder sichern?) .............. [OFFEN]
+B6  Welche Mechanik-Drehung aus D1-D7 ist DEIN Alleinstellungsmerkmal? [OFFEN]
+B7  Gibt es Fehlschlaege in der Runde (Missklick bestraft)? .......... [OFFEN]
+B8  Gibt es aktive Faehigkeiten mit Cooldown waehrend der Runde? ...... [OFFEN]
+
+--- C. RUNDENSTRUKTUR -------------------------------------------------------------
+C1  Wie lange dauert eine Runde am Anfang? (10-30 s / 1-2 min / 3-5 min) [OFFEN]
+C2  Wie lange am Ende des Spiels? Waechst die Rundenlaenge? .......... [OFFEN]
+C3  Wie lange dauert die Bauphase zwischen Runden? ................... [OFFEN]
+C4  Hat jede Runde ein ZIEL (Quote erfuellen) oder ist sie offen
+    (so viel wie moeglich)? .......................................... [OFFEN]
+C5  Kann man eine Runde VERLIEREN? Was passiert dann genau? .......... [OFFEN]
+C6  Aendert sich das Spielfeld pro Runde (zufaellig/handgebaut)? ...... [OFFEN]
+C7  Gibt es Runden-Modifikatoren ("heute regnet es", "Feiertag")? .... [OFFEN]
+
+--- D. DRUCK & SPANNUNG (das BMBP-Rechnungssystem-Aequivalent) --------------------
+D1F Was ist deine "Rechnung" - die wiederkehrende Forderung von aussen? [OFFEN]
+D2F Was passiert bei Nichterfuellung? (Anteil-Abzug wie Inkasso? Verlust
+    von Upgrades? Nur langsamer?) ................................... [OFFEN]
+D3F Soll die Strafe schneeballen (hart, spannend) oder gedeckelt sein
+    (fair, entspannt)? .............................................. [OFFEN]
+D4F Ist der Fortschrittsbalken gleichzeitig die Bedrohung? (Empfehlung: ja) [OFFEN]
+D5F Gibt es ein Gambling-/Risiko-Ventil wie Piggy Shuffle? ........... [OFFEN]
+
+--- E. WAEHRUNGEN & OEKONOMIE ------------------------------------------------------
+E1  Waehrung 1 (schnell, in-Run, wird ausgegeben): Name? ............. [OFFEN]
+E2  Waehrung 2 (knapp, permanent, Skill Tree): Name + Quelle? ........ [OFFEN]
+E3  Waehrung 3 (Prestige, sehr knapp): Name + Quelle? ................ [OFFEN]
+E4  Wird Waehrung 1 beim Rundenende zurueckgesetzt? ................. [OFFEN]
+E5  Gibt es einen Opfer-/Extraktions-Mechanismus (etwas Gutes aufgeben,
+    um Meta-Waehrung zu bekommen, wie Dark Matter)? .................. [OFFEN]
+E6  Welche Zahlen-Groessenordnung am Ende? (Tausender / Millionen /
+    wissenschaftliche Notation?) Das bestimmt den Ton des Spiels. .... [OFFEN]
+
+--- F. SKILL TREE ------------------------------------------------------------------
+F1  Wie viele Nodes insgesamt? (Richtwert 60-120 fuer 3-5 h) ......... [OFFEN]
+F2  Wie viele Haupt-Aeste und wie heissen sie? (Namen zuerst!) ....... [OFFEN]
+F3  Gibt es gegenseitige Ausschluesse / "entweder-oder"-Knoten?
+    (Incredicer-Lektion: ohne Entscheidungen wirkt der Tree flach) ... [OFFEN]
+F4  Wie viele Nodes sind reine Prozente, wie viele veraendern REGELN?
+    (Richtwert: mindestens jeder 5. Node aendert eine Regel) ......... [OFFEN]
+F5  Werden Nodes zurueckgesetzt beim Prestige? Gibt es Respec? ....... [OFFEN]
+F6  Sieht man gesperrte Nodes (Neugier) oder sind sie verdeckt
+    (Ueberraschung)? ................................................ [OFFEN]
+F7  Wie stellst du sicher, dass der Tree LESBAR bleibt? (Incredicer
+    brauchte eine Accessibility-Option dafuer) ...................... [OFFEN]
+F8  Liste 10 Node-NAMEN, die schon beim Lesen Lust machen. ........... [OFFEN]
+
+--- G. WERKZEUGE & AUSRUESTUNG ------------------------------------------------------
+G1  Wie viele Werkzeuge? Sind sie Upgrades (besser) oder Trade-offs
+    (anders)? BMBP macht bewusst Trade-offs. ........................ [OFFEN]
+G2  Wechselt man Werkzeuge waehrend der Runde oder davor? ........... [OFFEN]
+G3  Gibt es Verschleiss/Reparatur? ................................. [OFFEN]
+G4  Gibt es Slots/Ausruestung (Ringe & Armbaender bei BMBP)? ........ [OFFEN]
+
+--- H. OBJEKT-/GEGNER-TYPEN (der Content-Motor) --------------------------------------
+H1  Wie viele Objekt-Typen zum Release? (BMBP lebt davon) ........... [OFFEN]
+H2  Nenne 5 Typen mit eigenem VERHALTEN, nicht nur mehr HP.
+    (z.B. flieht, versteckt sich, explodiert, tarnt sich, lockt an) .. [OFFEN]
+H3  Wie werden neue Typen freigeschaltet - an welchen Fortschritt
+    gekoppelt? ..................................................... [OFFEN]
+H4  Gibt es seltene "Jackpot"-Objekte? Wie selten? .................. [OFFEN]
+H5  Gibt es Bosse / besondere Runden? ............................... [OFFEN]
+
+--- I. META & PRESTIGE ---------------------------------------------------------------
+I1  Wie heisst dein Reset thematisch? (BMBP: "Bankruptcy" - kein Fail,
+    sondern Story-Beat) ............................................. [OFFEN]
+I2  Was BLEIBT ueber den Reset hinweg? ............................. [OFFEN]
+I3  Wie schnell ist der zweite Durchlauf? (Ziel: 3-5x schneller,
+    sonst fuehlt sich Prestige wie Strafe an - Loot-Loop-Lektion) .... [OFFEN]
+I4  Wie oft soll man prestigen? (2-3 mal / 10+ mal?) ............... [OFFEN]
+I5  Welche NEUE Systemebene oeffnet sich ab ca. Minute 60-90?
+    (Das ist die Antwort auf die Haupt-Kritik an BMBP) .............. [OFFEN]
+I6  Gibt es ein Endgame / "alles maxen"-Ziel? ...................... [OFFEN]
+
+--- J. AUTOMATISIERUNG ---------------------------------------------------------------
+J1  Wird irgendwann automatisiert (Incredicer: Helper Hands)? ....... [OFFEN]
+J2  Wenn ja: Wohin verschiebt sich dann die aktive Aufgabe des
+    Spielers? (WICHTIG - sonst wird das Spiel zum Idle-Game und
+    verliert seine Agency, siehe Loot-Loop-Kritik) .................. [OFFEN]
+J3  Gibt es Offline-Fortschritt? ................................... [OFFEN]
+
+--- K. FEEL / JUICE / PRAESENTATION ---------------------------------------------------
+K1F Was ist der EINE befriedigende Moment, den man 5.000 mal erlebt?
+    Beschreibe Sound + Animation + Zahl. ........................... [OFFEN]
+K2F Grafikstil: Pixel, 2D-Cartoon, 3D, Vektor? ..................... [OFFEN]
+K3F Wer macht Art & Sound? (selbst / Asset-Packs / Auftrag) ......... [OFFEN]
+K4F Gibt es eine Anti-Sehnenscheiden-Loesung (Halten statt Klicken)? . [OFFEN]
+
+--- L. UMFANG & TECHNIK -------------------------------------------------------------
+L1  Zielspielzeit bis "durch": 2 h / 4 h / 10 h / endlos? ........... [OFFEN]
+L2  Engine: Godot / Unity / Web (HTML5+Electron) / anderes? ......... [OFFEN]
+L3  Arbeitest du allein? Wie viele Stunden pro Woche? ............... [OFFEN]
+L4  Ziel-Releasedatum? Gibt es einen Termin, der wackelt? ........... [OFFEN]
+L5  Speicherstand-Format + Cloud-Saves? Was passiert bei Patches
+    (Save-Migration)? .............................................. [OFFEN]
+L6  Sprachen zum Release? (DE/EN mindestens) ....................... [OFFEN]
+
+--- M. MARKT & RELEASE ---------------------------------------------------------------
+M1  Preis? (Vergleich: Loot Loop ca. 4-5 USD, Incredicer guenstig) .. [OFFEN]
+M2  Kostenlose Steam-Demo? (Empfehlung: ja, war bei BMBP der Motor) . [OFFEN]
+M3  Zusaetzlich Web-Version (CrazyGames/itch) als Funnel? ........... [OFFEN]
+M4  Achievements: wie viele? (BMBP: 27) ............................ [OFFEN]
+M5  Steam-Tags & Capsule-Text - was steht im ersten Satz? .......... [OFFEN]
+M6  Wie kommunizierst du die Kuerze ehrlich? (Das hat Incredicer
+    vor schlechten Reviews gerettet) ............................... [OFFEN]
+M7  Gibt es Content-Updates nach Release? .......................... [OFFEN]
+
+--- N. RISIKEN ----------------------------------------------------------------------
+N1  Welches bestehende Steam-Spiel koennte man dir als Klon vorwerfen
+    und wie unterscheidest du dich in einem Satz? .................. [OFFEN]
+N2  Was ist der langweiligste Moment im aktuellen Entwurf? .......... [OFFEN]
+N3  Was passiert in Minute 90, wenn nichts Neues mehr kommt? ........ [OFFEN]
+N4  Wird die Kern-Handlung nach 500 Wiederholungen zur Arbeit? Was
+    ist der Gegenplan? ............................................. [OFFEN]
+
+
+################################################################################
+# TEIL 3 - ENTSCHEIDUNGEN (wird gefuellt, sobald beantwortet)
+################################################################################
+3.1 Kern-Handlung:              [OFFEN]
+3.2 Runden-Uhr:                 [OFFEN]
+3.3 Druck-System:               [OFFEN]
+3.4 Waehrungen:                 [OFFEN]
+3.5 Skill-Tree-Aeste:           [OFFEN]
+3.6 Prestige-Name & Regeln:     [OFFEN]
+3.7 Zweite Systemebene:         [OFFEN]
+3.8 Engine & Scope:             [OFFEN]
+3.9 Preis & Release:            [OFFEN]
+
+
+################################################################################
+# TEIL 4 - ABGELEHNT & WARUM
+################################################################################
+(noch leer - hier landen verworfene Ideen samt Begruendung, damit sie nicht
+ in drei Monaten erneut diskutiert werden)
+
+
+################################################################################
+# TEIL 5 - NAECHSTE SCHRITTE
+################################################################################
+S1  Fragen aus Teil 2 Block A + B beantworten (Thema & Kern-Handlung).
+S2  Danach: Prototyp NUR der Kern-Handlung, ohne Upgrades, ohne Tree.
+    Test: Macht die Handlung 60 Sekunden lang ohne jede Belohnung Spass?
+    Wenn nein -> Thema wechseln, nicht Upgrades draufpacken.
+S3  Erst danach Runden-Uhr + Druck-System einbauen und erneut testen.
+S4  Erst danach Skill Tree - und zwar zuerst die NAMEN, dann die Zahlen.
+S5  Danach Objekt-Typen als Content-Strom.
+S6  Demo bauen, frueh oeffentlich testen.

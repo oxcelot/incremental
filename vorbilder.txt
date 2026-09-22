@@ -1,0 +1,279 @@
+================================================================================
+VORBILDER-ANALYSE
+Recherche-Stand: 22.09.2026
+Zweck: Verstehen, WARUM diese Spiele funktionieren - als Blaupause fuer ein
+       eigenes, rundenbasiertes Active-Incremental-Game fuer Steam.
+Quellen: Steam-Storeseiten & Reviews, Fan-Wikis, Guides, Presse-Reviews,
+         Steam-Stats (siehe Quellenliste am Ende).
+================================================================================
+
+
+################################################################################
+# 1) BILLS MUST BE PAID  (RikeGames, Release 29.07.2026)  -- HAUPT-ORIENTIERUNG
+################################################################################
+
+--- EINORDNUNG / ERFOLG ---
+* Active Incremental, kurz, Premium-Preis + separate kostenlose Demo.
+* >100.000 verkaufte Exemplare in unter 72 Stunden nach Release.
+* "Overwhelmingly Positive", ca. 96% positiv (bei mehreren Tausend Reviews).
+* Zusaetzlich Web-Versionen (CrazyGames, Armor Games, itch.io) + Google Play
+  -> die Demo/Web-Version war ein massiver Funnel fuer den Steam-Verkauf.
+
+--- DER KERN-TRICK (WICHTIGSTE LEKTION) ---
+Das Spiel nimmt eine uralte, verstandene Mechanik ("Gegner zerschlagen -> Geld
+-> Upgrades -> staerkere Gegner") und tauscht NUR die Fiktion aus:
+        Gegner zerstoeren  ->  SPARSCHWEINE zerschlagen
+        Gold farmen        ->  RECHNUNGEN bezahlen
+Die Mechanik ist bekannt und sofort verstaendlich. Die Fiktion ist neu, absurd,
+alltagsnah und sofort erzaehlbar ("Ich zerschlage Sparschweine, um meine
+Rechnungen zu bezahlen"). Das ist der komplette Hook. Kein neues Genre, eine
+neue Metapher.
+=> Die Neuheit liegt im THEMA + der Reibung zwischen Thema und Handlung
+   (Sparschwein = sparen, Spieler = zerstoeren). Diese Ironie ist der Humor.
+
+--- KERN-LOOP (eine Runde) ---
+1. Man bewegt einen Hammer ueber einen Schreibtisch und schlaegt Sparschweine.
+2. JEDER Schlag kostet Ausdauer (Stamina). Stamina ist die universelle Uhr.
+3. Sparschweine platzen -> Muenzen/Loot -> Geld.
+4. Waehrend der Runde trudeln RECHNUNGEN ein, jede mit Betrag + Deadline.
+5. Ist die Hand erschoepft (Stamina leer), ist die Runde vorbei.
+
+--- DRUCK-SYSTEM: RECHNUNGEN & INKASSO (das eigentliche Salz) ---
+* Rechnungen erscheinen nach Zeitplan, jede mit Summe und Frist.
+* Ignoriert man eine Frist, beginnt der Schuldeneintreiber (Debt Collector),
+  einen ANTEIL VON ALLEM zu kassieren, was man verdient.
+* Dieser Malus schneeballt -> Erholung wird immer schwerer.
+* Bezahlte Rechnungen schalten dagegen PERKS frei, mit denen man noch schneller
+  Rechnungen bezahlen kann -> positiver Schneeball.
+=> Genial: Der Fortschrittsbalken (Rechnungen) ist GLEICHZEITIG die Bedrohung
+   und der Content-Unlock. Eine einzige Zahl erzeugt Spannung, Struktur,
+   Pacing und Belohnung.
+=> Es gibt eine echte Entscheidung in jeder Runde: Jetzt Rechnung zahlen
+   (sicher) oder Geld in Verbesserung stecken (Risiko)?
+
+--- DREI GETRENNTE PROGRESSIONS-SCHICHTEN ---
+(A) IN-RUN, temporaer: Perks / Upgrades, die nur die aktuelle Runde formen.
+    Regel der Guides: Waehle den Perk, der DEIN AKTUELLES Problem loest
+    (Einkommen, Stamina oder Schaden).
+(B) ZWISCHEN-RUN, permanent: der SKILL TREE.
+(C) META / PRESTIGE: "Bankruptcy" (Privatinsolvenz) ist KEIN Fail-State,
+    sondern der Prestige-Reset. Man erhaelt LEGACY POINTS und kauft davon
+    RINGE und ARMBAENDER, die die Hand dauerhaft verbessern.
+=> Wichtig: Der Reset ist thematisch eingebettet (Insolvenz statt "Prestige").
+   Der Fail-State ist als Story-Beat umgedeutet. Das nimmt den Frust raus.
+
+--- SKILL TREE (Aeste & Namensgebung) ---
+Aeste bzw. Node-Richtungen (die Namen sind Teil des Witzes):
+* GRIP STRENGTH (Griffkraft) - Sparschweine brechen schneller, weniger
+  Stamina-Kosten pro Schwein. Gilt als bester Erst-Ast.
+* CAFFEINE (Koffein-Abhaengigkeit) - groesserer Stamina-Pool + schnellere
+  Regeneration => laengere Runden. Zweiter Ast, weil Stamina der Run-Timer ist.
+* GYM (ins Fitnessstudio gehen) - Schwunggeschwindigkeit & Koerperwerte.
+* WRIST / WRIST POWER (Handgelenk aufpumpen) - Kontrolle, Schaden.
+* LUCK (Glueck) - skaliert erst, wenn man viele Schweine pro Runde schafft.
+* AKTIVE FAEHIGKEITEN: ROCK RAIN (Steinregen), ELECTRIFY HAMMER
+  (Hammer elektrifizieren) u.a. - bewusst spaetere Investitionen.
+Empfohlene Route der Community: Grip Strength -> Caffeine -> 1 Punkt Wrist.
+=> LEKTIONEN ZUR TREE-QUALITAET:
+   - Jeder Ast ist an eine GEFUEHLTE Koerper-Fantasie gekoppelt (Griff, Koffein,
+     Muckis, Handgelenk, Glueck). Man versteht ohne Text, was er tut.
+   - Die Aeste haben eine natuerliche REIHENFOLGE-LOGIK: Schaden -> Zeit ->
+     Geschwindigkeit -> Glueck -> Spektakel. Daraus entstehen "Builds" und
+     Guides, ohne dass die Aeste kompliziert sein muessten.
+   - Aktive Faehigkeiten sind NICHT der Einstieg, sondern die Belohnung.
+   - Namen sind ueberzogen und witzig ("get addicted to caffeine") - das macht
+     Lust, den naechsten Node aufzudecken. GENAU DAS willst du auch.
+
+--- CONTENT & ENTDECKUNG (der "was kommt als naechstes"-Motor) ---
+* SPARSCHWEIN-TYPEN als Content-Drops: manche laufen weg, manche sind zu faul
+  sich zu bewegen, manche tragen "das Schwarzgeld, das du nie hattest",
+  Tourist-Schwein, Bomben-Schwein usw.
+  -> Jeder Typ verlangt eine andere Antwort (anderer Hammer, anderes Timing).
+  -> Neue Schweine schalten sich frei, wenn der Fortschritt steigt und die
+     Rechnungs-Sequenz weiterlaeuft.
+* HAMMER-TYPEN mit echten Trade-offs: hoher Crit + kleiner Radius vs.
+  sehr schnell + grosser Radius + weniger Schaden.
+* SAMMEL-EBENE: Muenzen-Sammlung ("alle Coins finden" = 100%-Ziel), Ringe,
+  Armbaender, Schweine, Haemmer. 27 Achievements.
+* MINISPIELE auf dem Schreibtisch als Gambling-Ventil: Coinflip, All-in-Bets,
+  Double or Nothing, PIGGY SHUFFLE (Schwein durch Mischen verfolgen, Gewinn
+  verdoppelt den Einsatz).
+  -> Design-Anekdote mit Lehrwert: Spieler lernten, am "Wackeln" vor dem
+     Mischen zu erkennen, welches Schwein das Geld hat. Die Entwickler haben
+     diesen Tell ABSICHTLICH entfernt, weil das Minispiel "richtig unwitzig"
+     wird, sobald man es geloest hat. Merke: Ein Glueckselement, das man
+     durchschaut, ist tot.
+
+--- KRITIK (was man BESSER machen muss) ---
+* Presse: "der Loop zieht, aber das Ganze geht schnell die Luft aus";
+  "Wiederholung setzt ein, sobald der Reiz verpufft - es fehlen Systeme,
+  die tief genug sind, um das Interesse zu erneuern".
+* "Guter satirischer Stress-Abbau in kleinen Dosen, kein Incremental, das
+  dich Dutzende Stunden haelt."
+=> Die Schwaeche ist nicht die Laenge an sich, sondern dass in der zweiten
+   Haelfte keine NEUE SYSTEMEBENE mehr dazukommt. Wenn du hier besser bist
+   (eine echte neue Mechanik-Schicht ab ca. Stunde 2), hast du einen Vorteil.
+
+
+################################################################################
+# 2) INCREDICER  (Steam, Kurz-Incremental, ca. 85-86% positiv, ~1.800+ Reviews)
+################################################################################
+
+--- KERN-LOOP ---
+1. Wuerfel werfen -> Geld.
+2. Geld -> Upgrades + HELPER HANDS (Helfer-Haende), die das Werfen
+   automatisieren und das Einkommen steigern.
+3. AKTIVE SKILLS freischalten, um mehr Wuerfel gleichzeitig zu werfen.
+4. DARK MATTER (Dunkle Materie) aus Wuerfeln extrahieren -> Waehrung fuer den
+   SKILL TREE, dort werden die Wuerfel selbst verbessert.
+5. Spielzeit ca. 1-3 Stunden, danach optionales "alles maxen".
+
+--- WAS ES SPANNEND MACHT ---
+* HAPTIK/JUICE: Wuerfelrollen ist von Natur aus befriedigend - Sound, Farben,
+  Zufall, kleine Zahlen-Explosionen. Reviews loben explizit die knalligen
+  Visuals und die satten Wuerfel-Sounds. Der Reiz liegt im Anfassen.
+* ZWEI WAEHRUNGEN MIT KLARER ROLLENTRENNUNG:
+  Geld = breite, schnelle Progression (Kaufen, Automatisieren)
+  Dark Matter = knappe, tiefe Progression (Skill Tree, Wuerfel-Qualitaet)
+  -> Extraktion ("Dark Matter aus Wuerfeln ziehen") ist ein Opfer-Mechanismus:
+     man gibt etwas Gutes auf, um etwas Besseres zu bekommen. Das erzeugt
+     Entscheidungen statt nur Zahlen.
+* AUTOMATISIERUNG ALS BELOHNUNG, NICHT ALS ABKUERZUNG: Helper Hands nehmen
+  einem die Klick-Arbeit ab, sobald sie langweilig wird - der aktive Teil
+  verschiebt sich dann auf die aktiven Skills (Timing, Kombinieren).
+  => Das ist die Loesung fuer "aktives Spiel wird zur Arbeit".
+* NIEDRIGE EINSTIEGSHUERDE: eine Aktion (wuerfeln), sofort verstaendlich,
+  ideal fuer kurze Sessions.
+* Es gibt eine Accessibility-Option speziell FUER DEN SKILL TREE
+  (Skill-Tree-Lesbarkeit war ein Thema) -> Tree-UX ist ein echtes Risiko.
+
+--- KRITIK (die teuerste Lektion dieses Spiels) ---
+* Haupt-Beschwerden: zu kurz, kaum Replay-Value, SKILL TREE UND UPGRADES ZU
+  EINFACH, und vor allem: KEINE PRESTIGE-MECHANIK -> nach dem Ende gibt es
+  keinen Grund weiterzuspielen.
+* "Fehlende bedeutungsvolle Entscheidungen" wird mehrfach genannt.
+* Preis/Wert wurde deshalb diskutiert (guenstig, und die Kuerze ist ehrlich
+  kommuniziert - das hat das Spiel gerettet).
+=> DIREKTE VORGABEN FUER DICH:
+   (a) Prestige/NG+ von Anfang an mitdenken, nicht nachtraeglich.
+   (b) Der Skill Tree muss ENTSCHEIDUNGEN enthalten (Exklusivitaet,
+       gegenseitige Ausschluesse, Opportunitaetskosten), nicht nur +10%.
+   (c) Kuerze ist okay - wenn sie ehrlich kommuniziert und guenstig bepreist ist.
+
+
+################################################################################
+# 3) LOOT LOOP  (Solo-Entwickler "Patryk", ca. 93% positiv, ~1.300-1.700 Reviews)
+################################################################################
+
+--- KERN-LOOP ---
+1. Party aus Helden zusammenstellen -> in den Dungeon schicken.
+2. RUNS DAUERN NUR SEKUNDEN. Monster kaempfen, Loot sammeln.
+3. Nach dem Run: Upgrades + SKILL TREE ausbauen ("deep skill tree").
+4. Naechster Run, sofort, staerker. "Instant action, constant reward."
+5. Durchspielzeit ca. 3 Stunden. Faire Preisspanne laut Community 4-5 USD.
+
+--- WAS ES SPANNEND MACHT ---
+* RUNDEN-RHYTHMUS ALS DESIGN-ZIEL: Ein Run dauert Sekunden. Dadurch ist die
+  Feedback-Schleife brutal kurz: Upgrade -> sofort sichtbarer Effekt ->
+  naechstes Upgrade. Das ist der eigentliche Suchtfaktor.
+  => Fuer dich: Runden-Laenge ist ein DESIGN-PARAMETER, keine Nebenwirkung.
+     Kurz (10-60 s) = Upgrade-Rhythmus. Lang (3-5 min) = Planung & Spannung.
+* "ZERO STRESS / CHILL" ALS POSITIONIERUNG: bewusst entspannt, cozy,
+  Pixel-Dungeons im 80er-Stil, winzige Figuren, dunkle Gaenge, gemuetliche
+  Stimmung. Die Atmosphaere ist ein Kaufargument, nicht Deko.
+* SICHTBARES WACHSTUM: "Man sieht winzige Abenteurer zu goettlichen Helden
+  werden." Progression wird VISUELL erzaehlt, nicht nur numerisch.
+* Sehr hohe Review-Quote fuer ein simples Spiel -> Charme + Ehrlichkeit
+  ueber den Umfang schlagen Komplexitaet.
+
+--- KRITIK ---
+* ZU WENIG SPIELER-AGENCY: Die Party marschiert weiter, "ob du interagierst
+  oder nicht". Fuer ein AKTIVES Spiel ist das der Kardinalfehler.
+* Das PRESTIGE-SYSTEM wird als unnoetig kritisiert, weil es Charakter-
+  Fortschritt zuruecksetzt und sich wie Bestrafung anfuehlt.
+* "Fehlende Tiefe", Loop "nicht verlockend genug", zu kurz.
+=> LEKTIONEN:
+   (a) Wenn du "aktiv" versprichst, muss die Spieler-Eingabe in JEDER Sekunde
+       das Ergebnis messbar veraendern. Sonst ist es ein Idle-Game mit
+       Klick-Deko.
+   (b) Prestige muss sich wie ein AUFSTIEG anfuehlen, nicht wie Loeschen.
+       Bills Must Be Paid loest das besser (Insolvenz + Legacy Points +
+       sichtbare Schmuck-Upgrades an der Hand).
+
+
+################################################################################
+# 4) QUERSCHNITT: DIE GEMEINSAME ERFOLGS-FORMEL
+################################################################################
+
+1. EINE EINZIGE AKTIVE HANDLUNG, in 3 Sekunden verstanden.
+   (Hammer schwingen / wuerfeln / Party losschicken)
+2. EINE HARTE RESSOURCE, DIE DIE RUNDE BEENDET.
+   (Stamina / Runde endet automatisch) -> Das erzeugt Rundenstruktur und
+   macht jedes Upgrade spuerbar ("ich komme jetzt weiter als vorher").
+3. RUNDE ENDET -> BAUPHASE -> NAECHSTE RUNDE.
+   Die Bauphase ist der Ort, an dem der Spieler sich klug fuehlt.
+4. MEHRSCHICHTIGE WAEHRUNGEN MIT GETRENNTEN ROLLEN.
+   In-Run-Waehrung (schnell, verpufft) / Meta-Waehrung (knapp, permanent) /
+   Prestige-Waehrung (sehr knapp, dauerhaft, Identitaet).
+5. SKILL TREE MIT FANTASIE-NAMEN STATT STAT-NAMEN.
+   Nicht "+5% Schaden", sondern "Koffeinsucht", "Ins Gym gehen",
+   "Steinregen", "Hammer elektrifizieren".
+6. ENTDECKUNG ALS ZUGKRAFT: neue Gegner-/Objekt-TYPEN mit eigenem Verhalten,
+   neue Werkzeuge mit Trade-offs, Sammlungen, Achievements.
+7. THEMATISCH VERPACKTER RESET (Insolvenz) statt technischem "Prestige".
+8. KURZ, EHRLICH, GUENSTIG. 1-3 h Kern, klar kommuniziert, niedriger Preis,
+   plus kostenlose Demo/Web-Version als Funnel.
+9. JUICE: Sound, Screenshake, Zahlen-Popups, Partikel. Bei diesen Spielen
+   ist das Anfassgefuehl die halbe Wertung.
+
+--- DIE DREI HAEUFIGSTEN TODESURSACHEN (aus allen drei Kritik-Bloecken) ---
+A) Nach ~60-90 Minuten kommt keine NEUE SYSTEMEBENE mehr dazu -> Leerlauf.
+B) Skill Tree ist nur eine Prozent-Liste ohne echte Entscheidungen.
+C) Prestige fehlt, oder fuehlt sich wie Strafe an.
+=> Dein Spiel muss auf alle drei eine Antwort haben, bevor du Content baust.
+
+
+################################################################################
+# 5) WAS DAS FUER DEIN SPIEL BEDEUTET (abgeleitete Design-Regeln)
+################################################################################
+
+R1  Waehle eine ALLTAGS-HANDLUNG mit eingebauter Ironie, die jeder in einem
+    Satz erzaehlen kann. Der Satz ist dein Marketing.
+R2  Nimm eine bewaehrte Mechanik-Skelett-Struktur (Runde mit harter Ressource
+    -> Bauphase -> Meta) und tausche NUR die Fiktion + eine Mechanik-Drehung.
+    Kein bestehendes Spiel kopieren: dieselbe FAMILIE, andere Handlung.
+R3  Deine Runde braucht eine "Uhr", die der Spieler durch Upgrades verlaengern
+    kann (bei BMBP: Stamina). Das ist der wichtigste Zahlen-Hebel im Spiel.
+R4  Dein Fortschrittsbalken sollte gleichzeitig eine BEDROHUNG sein
+    (bei BMBP: Rechnungen + Inkasso-Malus).
+R5  Plane von Tag 1: 3 Waehrungen, 3 Progressionsschichten, 1 thematischer
+    Reset, 1 zweite Systemebene ab ca. Minute 60-90.
+R6  Skill-Tree-Nodes zuerst BENENNEN, dann bewerten. Wenn der Name keine Lust
+    macht, ist der Node falsch.
+R7  Baue frueh eine kostenlose Web-Demo. Bei Bills Must Be Paid war das
+    nachweislich der Verkaufs-Motor.
+
+
+################################################################################
+# QUELLEN (Stand 22.09.2026)
+################################################################################
+Bills Must Be Paid (Steam):    https://store.steampowered.com/app/4421010/
+Bills Must Be Paid (Demo):     https://store.steampowered.com/app/4577620/
+Entwickler RikeGames:          https://rikegames.com/bills-must-be-paid
+Fan-Wiki (Skill Tree/Perks):   https://www.bills-must-be-paid.wiki/
+Fan-Wiki (Guides):             https://billsmustbepaid.wiki/guides/
+Skill-Tree-Guide:              https://billsmustbepaid.net/wiki/skill-tree
+Beginner-Guide:                https://www.onehitkill.space/bills-must-be-paid/beginner-guide/
+Guide/Route:                   https://www.whisperofthehouse.com/bills-must-be-paid
+Piggy-Shuffle-Mechanik:        https://billsmustbepaid.art/mechanics/bills-must-be-paid-piggy-shuffle/
+Presse-Review (Kritik):        https://insertcoins.press/en/articles/bills-must-be-paid-test
+Steam-Stats:                   https://gamalytic.com/game/4421010
+Launch-News (100k in 72h):     https://store.steampowered.com/news/app/4421010/view/708904817558292194
+Incredicer (Steam):            https://store.steampowered.com/app/3929760/Incredicer/
+Incredicer Reviews-Analyse:    https://raijin.gg/app/3929760/Incredicer/reviews
+Incredicer Review:             https://www.missitheachievementhuntress.com/incredicer-review/
+Incredicer (IncrementalDB):    https://www.incrementaldb.com/game/incredicer
+Loot Loop (Steam):             https://store.steampowered.com/app/3972320/Loot_Loop/
+Loot Loop Review:              https://higherplaingames.com/pc/loot-loop-review/
+Loot Loop Sentiment:           https://vaporlens.app/app/3972320/loot_loop
+Loot Loop Stats:               https://raijin.gg/app/3972320/Loot_Loop
