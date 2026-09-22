@@ -45,6 +45,7 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
 
 --- ENTSCHIEDEN AM 22.09.2026 (Runde 2) ---
 0.12 Runden-Uhr:        [REVIDIERT am 22.09.2026 - siehe Teil 1C]
+                        Ausloesung: AUTOMATISCH IM TAKT (entschieden).
                         ECHTZEIT-UHR (Arbeitstag zaehlt herunter) plus fester
                         STEMPELTAKT von 1,5 s. Ein 60-Sekunden-Tag hat damit
                         40 Takte. Der Takt deckelt die Aktionen pro Minute -
@@ -406,22 +407,40 @@ Wechseln = auf das Kissen des gewuenschten Stempels stempeln. Kostet:
 => Die zentrale Frage des Spiels lautet damit in jeder Sekunde:
    "Lohnt sich der Wechsel fuer diesen einen Vorgang?"
 
-OPTIONAL (fuer den Prototyp weglassen): Auf das EIGENE Kissen stempeln =
-NACHTINTEN. Nach ca. 10 Drucken wird der Abdruck blass und bringt weniger;
-ein Takt aufs eigene Kissen stellt ihn wieder her.
+NACHTINTEN (jetzt PFLICHT im Prototyp, siehe Ausloese-Modell): Auf das EIGENE
+Kissen stempeln frischt den Abdruck auf. Nach ca. 10 Drucken wird er blass und
+bringt weniger. Diese Mechanik ist zugleich der PARKPLATZ fuer Denkpausen.
 
---- OFFEN: AUSLOESE-MODELL (entscheidet ueber das ganze Spielgefuehl) ---
-Variante A "COOLDOWN":  Klick -> Stempel knallt sofort -> 1,5 s gesperrt.
-                        Berechenbar und fehlerarm, aber man verfehlt praktisch
-                        nie -> das Fehldruck-System haette keine Grundlage.
-Variante B "AUSHOLEN":  Stempel ansetzen, er senkt sich 1,5 s und trifft, WAS
-                        IN DIESEM MOMENT DARUNTER LIEGT. Wird das Formular
-                        vorher weggezogen (Frist abgelaufen, Bote holt es,
-                        Ausreisser-Formular rutscht weg), trifft man den Tisch.
-EMPFEHLUNG: Variante B. Nur damit wird Verfehlen eine lernbare Faehigkeit statt
-eines Vertippers, nur damit funktionieren SICH BEWEGENDE Formulartypen (das
-Gegenstueck zu den weglaufenden Sparschweinen), und es entsteht Antizipation:
-man stempelt dorthin, wo das Formular gleich sein WIRD.
+--- AUSLOESE-MODELL: AUTOMATISCH IM TAKT (entschieden 22.09.2026) ---
+Der Stempel feuert VON SELBST alle 1,5 Sekunden auf seine aktuelle Position.
+Der Spieler steuert nur die POSITION, nicht die Ausloesung. Spielgefuehl wie
+der durchgehend schwingende Hammer in Bills Must Be Paid: hypnotisch,
+handgelenkschonend, trag- faehig ueber tausende Runden.
+
+FOLGE 1 - PARKEN MUSS DESIGNT WERDEN (Pflicht, nicht optional):
+Bei Auto-Feuer wird jede Denkpause automatisch zum Fehldruck. Das wuerde genau
+das Nachdenken bestrafen, auf dem das Spiel aufgebaut ist. Loesung: NACHTINTEN
+wird zum Parkplatz. Wer einen Takt zum Lesen braucht, parkt auf dem EIGENEN
+Stempelkissen - der Takt verpufft nicht, sondern frischt den Abdruck auf.
+=> Nachtinten gehoert damit IN DEN PROTOTYP, nicht in ein spaeteres Update.
+Optional zusaetzlich: eine SCHREIBUNTERLAGE / ein LOESCHBLATT als neutrale
+Parkflaeche, die Tinte kostet, aber nicht als Fehldruck gezaehlt wird.
+
+FOLGE 2 - SICHTBARER TAKT (Pflicht):
+Bei Auto-Feuer muss der naechste Schlag vorhersehbar sein, sonst fuehlt sich
+jeder Fehldruck ungerecht an. Ein Ring, der sich um den Stempel schliesst, plus
+ein Tickgeraeusch. Bei Cooldown haette man die Sperre am Stempel gesehen - hier
+muss die Vorhersage explizit gebaut werden.
+
+FOLGE 3 - DER TAKTRATE-AST BEKOMMT EINE ECHTE KEHRSEITE:
+Schneller stempeln = mehr Drucke pro Tag = mehr Ertrag, ABER auch mehr
+Tintenkosten und weniger Zeit pro Entscheidung. Ein Skill-Tree-Node mit echtem
+Nachteil ist selten und wertvoll - hier entsteht er von allein.
+
+FOLGE 4 - AFK-ABSICHERUNG:
+Wer mitten in der Runde weggeht, wuerde durchgehend Geld verbrennen. Nach ca.
+drei Takten ohne Mausbewegung hebt die Hand den Stempel an: der Takt laeuft
+weiter, es wird aber nichts gestempelt.
 
 --- TINTE ALS KOSTENPOSTEN ---
 Jeder Stempeldruck kostet Tinte - Treffer wie Fehldruck. Am Tagesende wird der
