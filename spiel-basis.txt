@@ -1044,3 +1044,35 @@ NICHT UEBERNOMMEN (aus dem Vorschlag vom selben Tag, fuer spaeter)
 Zwei davon sind heikel: Aktenkunde nimmt dem Spiel das Lernen der
 Vorgangstypen ab, also die Wissensachse des Kern-Skills. Der Feierabendbonus
 arbeitet gegen den Rueckstand, also gegen die zentrale Druckquelle.
+
+
+################################################################################
+# TEIL 1H - DER SERIEN-ZWEIG (22.09.2026, ersetzt die Aufteilung aus 1G)
+################################################################################
+Kombo UND Volltreffer haengen jetzt in EINEM zusammenhaengenden Zweig rechts
+vom Zentrum. Vorher lag die Kombo an der Ergonomie-Speiche und die Volltreffer
+an einer eigenen - das war zwei Zweige fuer denselben Gedanken.
+
+DIE WURZEL: SERIENBEARBEITUNG (70 EUR)
+"Erst jetzt entstehen ueberhaupt Kombos. Vorher wird jede Serie sofort wieder
+verworfen." Ohne diesen Knoten bleibt STATS.comboOn auf 0: bumpCombo() zaehlt
+gar nicht hoch, multFor() gibt konstant x1,0 zurueck.
+=> Die Kopfzeile zeigt dem Spieler von Beginn an eine Kombo-Anzeige, die sich
+   NIE bewegt. Das ist Absicht: der Koeder steht von der ersten Sekunde an auf
+   dem Bildschirm, und der erste Kauf loest ihn ein.
+
+VIER AESTE AB DER WURZEL
+  Volltreffer     Geuebter Blick -> Routiniertes Auge -> Glueckliche Hand
+                                 -> Sechster Sinn -> Durchschlagpapier
+  Kombo-Deckel    Aktenzeichen-Gedaechtnis -> Beharrlichkeit
+  Kombo-Zuwachs   Schwung -> Warmgelaufen
+  Kombo-Wechsel   Der kurze Dienstweg -> Getrennte Registratur
+
+VON HAND GESETZTE KOORDINATEN
+Der Zweig ist mit zwoelf Knoten zu gross fuer das Radialschema. Knoten mit
+eigenem x/y ueberspringen die Polarberechnung; dasselbe gilt fuer die drei
+Ertragsknoten oben links.
+=> PFLICHT NACH JEDER VERSCHIEBUNG: alle Knotenpaare auf Ueberlappung pruefen.
+   Kaestchen 76 px, Preisschild 27 px darunter - also mindestens 80 px
+   waagerecht ODER 106 px senkrecht Abstand. Beim ersten Umbau kollidierten
+   fuenf Paare, ohne dass es im Ueberblick auffiel.

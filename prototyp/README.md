@@ -32,7 +32,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan: 34 Icon-Knoten, zoom- und verschiebbar |
+| Homescreen | Fortbildungsplan: 35 Icon-Knoten, zoom- und verschiebbar |
 | Voraussetzungen | Ring 2 ist gesperrt, bis der Knoten davor freigeschaltet ist |
 | Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
@@ -76,12 +76,38 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | Speiche | Ring 1 | Gabelung A | Gabelung B |
 |---|---|---|---|
 | Kissen & Tinte | Volles Kissen (2 Vorgänge) | XXL (4) → Fasspumpe (6) | Sparsames Kissen (0,35 €) → Großbestellung (0,22 €) |
-| Volltreffer | Geübter Blick (20 %, ×2) | **Routiniertes Auge ×5** → Glückliche Hand | **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
+| *(Volltreffer und Kombo bilden einen eigenen Zweig, siehe unten)* | | | |
 | Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | **Flinker Bote ×4** → **Zweiter Bote ×4** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
 | Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
-| Kombo *(an Ergonomie)* | — | Der kurze Dienstweg → Getrennte Registratur | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit, **Schwung ×5** → **Warmgelaufen ×5** |
+
+### Der Serien-Zweig
+
+Kombo und Volltreffer hängen in **einem** zusammenhängenden Zweig rechts vom
+Zentrum. Seine Wurzel schaltet die Kombo überhaupt erst frei:
+
+**Serienbearbeitung** (70 €) — *„Erst jetzt entstehen überhaupt Kombos. Vorher
+wird jede Serie sofort wieder verworfen."*
+
+Ohne diesen Knoten bleibt `STATS.comboOn` auf 0: `bumpCombo()` zählt gar nicht
+hoch und `multFor()` gibt konstant ×1,0 zurück. Die Kopfzeile zeigt dem Spieler
+also von Beginn an eine Kombo-Anzeige, die sich nie bewegt — das ist der Köder.
+
+Von der Wurzel gehen vier Äste ab:
+
+| Ast | Knoten |
+|---|---|
+| Volltreffer | Geübter Blick → **Routiniertes Auge ×5** → Glückliche Hand · **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
+| Kombo-Deckel | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit |
+| Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** |
+| Kombo-Wechsel | Der kurze Dienstweg → Getrennte Registratur |
+
+Dieser Zweig ist zu groß für das Radialschema und wird deshalb **von Hand
+gesetzt**: Knoten mit eigenem `x`/`y` überspringen die Polarberechnung. Dasselbe
+gilt für die drei Ertragsknoten oben links. Nach jeder Verschiebung prüft ein
+Testlauf alle Knotenpaare auf Überlappung — Kästchen 76 px, Preisschild 27 px
+darunter, also mindestens 80 px waagerecht oder 106 px senkrecht Abstand.
 
 ### Ertrag nach Stempelart
 
