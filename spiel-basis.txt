@@ -44,11 +44,16 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
                         plus kostenlose Steam-Demo.
 
 --- ENTSCHIEDEN AM 22.09.2026 (Runde 2) ---
-0.12 Runden-Uhr:        STEMPELKISSEN-TINTE. Diskretes Aktionsbudget pro Tag,
-                        keine Echtzeit-Uhr. Jede Bearbeitung kostet Tinte;
-                        Weiterleiten und Liegenlassen kosten weniger oder
-                        nichts. -> Der Spieler kauft sich mit Tinte
-                        Entscheidungen, nicht Geschwindigkeit.
+0.12 Runden-Uhr:        [REVIDIERT am 22.09.2026 - siehe Teil 1C]
+                        ECHTZEIT-UHR (Arbeitstag zaehlt herunter) plus fester
+                        STEMPELTAKT von 1,5 s. Ein 60-Sekunden-Tag hat damit
+                        40 Takte. Der Takt deckelt die Aktionen pro Minute -
+                        schnelleres Klicken hilft nicht, nur bessere
+                        Entscheidungen. TINTE ist jetzt ein KOSTENPOSTEN:
+                        jeder Druck (Treffer wie Fehldruck) kostet Geld, das
+                        am Tagesende abgerechnet wird.
+                        Stempelwechsel = auf das Kissen des anderen Stempels
+                        stempeln, kostet einen vollen Takt.
 0.13 Zweite Ebene:      MITARBEITER (ab ca. Min. 60): arbeiten selbststaendig,
                         machen aber Fehler, die gefunden und korrigiert werden
                         muessen. Die aktive Aufgabe verschiebt sich von
@@ -375,6 +380,108 @@ Z3 ABTEILUNGEN: Mehrere Schreibtische/Referate gleichzeitig, zwischen denen
    du wechselst. Klassische Incremental-Breite, aber weniger originell.
 
 ################################################################################
+# TEIL 1C - RUNDEN-SPEZIFIKATION (Stand 22.09.2026, Revision 2)
+################################################################################
+ACHTUNG: Diese Fassung ersetzt Punkt 0.12. Tinte ist NICHT mehr die Runden-Uhr,
+sondern ein KOSTENPOSTEN. Die Runden-Uhr ist eine Echtzeit-Uhr.
+
+--- DER TAKT (das Herzstueck) ---
+Der Stempel arbeitet in einem festen Takt von 1,5 Sekunden.
+Ein Arbeitstag von 60 Sekunden hat damit exakt 40 TAKTE.
+Jeder Takt ist genau eine von drei Moeglichkeiten:
+  (1) Formular treffen und richtig stempeln  -> Ertrag x Kombo
+  (2) Auf ein fremdes Stempelkissen stempeln -> Stempel gewechselt, Kombo bricht
+  (3) Auf den Tisch stempeln (Fehldruck)     -> nichts, Tinte weg, Takt weg
+
+WARUM DAS WICHTIG IST: Der Takt deckelt die Aktionen pro Minute. Man kann
+NICHT durch schnelleres Klicken gewinnen, nur durch bessere Entscheidungen.
+Damit bleibt das entscheidungsbasierte Design (0.9) trotz Echtzeit-Uhr intakt.
+
+--- STEMPELWECHSEL ---
+Die Stempel liegen auf dem Tisch. Ihre Stempelkissen sind Ziele wie Formulare.
+Wechseln = auf das Kissen des gewuenschten Stempels stempeln. Kostet:
+  * einen vollen Takt (1/40 des Arbeitstages)
+  * eine Portion Tinte
+  * die laufende Kombo
+=> Die zentrale Frage des Spiels lautet damit in jeder Sekunde:
+   "Lohnt sich der Wechsel fuer diesen einen Vorgang?"
+
+OPTIONAL (fuer den Prototyp weglassen): Auf das EIGENE Kissen stempeln =
+NACHTINTEN. Nach ca. 10 Drucken wird der Abdruck blass und bringt weniger;
+ein Takt aufs eigene Kissen stellt ihn wieder her.
+
+--- OFFEN: AUSLOESE-MODELL (entscheidet ueber das ganze Spielgefuehl) ---
+Variante A "COOLDOWN":  Klick -> Stempel knallt sofort -> 1,5 s gesperrt.
+                        Berechenbar und fehlerarm, aber man verfehlt praktisch
+                        nie -> das Fehldruck-System haette keine Grundlage.
+Variante B "AUSHOLEN":  Stempel ansetzen, er senkt sich 1,5 s und trifft, WAS
+                        IN DIESEM MOMENT DARUNTER LIEGT. Wird das Formular
+                        vorher weggezogen (Frist abgelaufen, Bote holt es,
+                        Ausreisser-Formular rutscht weg), trifft man den Tisch.
+EMPFEHLUNG: Variante B. Nur damit wird Verfehlen eine lernbare Faehigkeit statt
+eines Vertippers, nur damit funktionieren SICH BEWEGENDE Formulartypen (das
+Gegenstueck zu den weglaufenden Sparschweinen), und es entsteht Antizipation:
+man stempelt dorthin, wo das Formular gleich sein WIRD.
+
+--- TINTE ALS KOSTENPOSTEN ---
+Jeder Stempeldruck kostet Tinte - Treffer wie Fehldruck. Am Tagesende wird der
+Verbrauch als Geldbetrag abgezogen. Die Ertraege der bearbeiteten Vorgaenge
+gleichen ihn aus.
+BALANCING-REGEL: Tintenpreis auf 10-15 % des durchschnittlichen Vorgangswerts
+setzen. Die Zeile muss in der Abrechnung SICHTBAR sein, aber die eigentliche
+Strafe fuer einen Fehldruck ist der VERLORENE TAKT, nicht die Tinte. Wird die
+Tinte zu billig, ist das System Dekoration; wird sie zu teuer, bestraft sie
+Experimentieren.
+REGEL: Die Tagesbilanz darf in den ersten Tagen NICHT negativ werden (Deckel
+bei 0 EUR). Ein Minustag fuehlt sich in einem Spiel ohne Fail-State wie ein
+Fehler an.
+
+--- ABRECHNUNGSBOGEN AM TAGESENDE (Beispiel Tag 1) ---
+   Bearbeitete Vorgaenge (32)      +128,00 EUR
+   Kombo-Bonus                      +18,40 EUR
+   Tintenverbrauch (40 Drucke)      -20,00 EUR
+     davon Fehldrucke (3)            -1,50 EUR
+   Dienstaufsicht (Rueckstand 12 %) -15,41 EUR
+   ----------------------------------------------
+   Tagesbilanz                      111,00 EUR
+
+--- ZAHLEN-SKIZZE TAG 1 ---
+Rundendauer            60 s
+Takt                   1,5 s  -> 40 Takte pro Tag
+Tischplaetze           12
+Nachrueckrate          alle 0,8 s ein Formular auf einen freien Platz
+Tagesszulauf           ca. 60 Vorgaenge (mehr als 40 Takte schaffen koennen)
+Standardvorgang        4,00 EUR
+Tinte pro Druck        0,50 EUR
+Kombo                  x1,1 pro Stufe, Deckel x3
+
+--- DIE STEMPEL ---
+  GENEHMIGT      vollstaendige Antraege
+  ABGELEHNT      aussichtslose Antraege
+  NACHFORDERUNG  unvollstaendige Antraege (rot umrandetes Leerfeld)
+  WEITERLEITEN   fremde Zustaendigkeit (fremdes Amtssiegel oben rechts)
+  EILT           Fristsachen (rotes Fristband mit Countdown)
+
+--- KOMBO ---
+Gleicher Stempel auf ein Formular, das ihn auch verlangt -> Kombo +1.
+Stempelwechsel -> Kombo bricht (keine Strafe).
+Falscher Stempel -> Kombo bricht UND erzeugt eine Beschwerde.
+=> Kernspannung: erst alle Genehmigungen abraeumen (hohe Kombo) oder den
+   Eilantrag greifen, dessen Frist laeuft?
+
+--- AUSWIRKUNGEN AUF DEN SKILL TREE (aendert Teil 1B) ---
+T2 "BESCHAFFUNG" bedeutet jetzt BILLIGERE Tinte statt MEHR Tinte. Besser,
+   weil die Wirkung direkt in Euro sichtbar wird.
+NEUER AST "TAKTRATE": 1,5 s -> 1,3 s -> 1,1 s -> 1,0 s. Die Hauptmachtkurve,
+   das Aequivalent zu BMBPs Schwunggeschwindigkeit. Bei 1,0 s hat ein Tag 60
+   statt 40 Takte - 50 % mehr Spiel, ohne dass eine einzige Zahl groesser wird.
+NEUER AST "WECHSELKOSTEN":
+   "Zweiter Stempelhalter"  - Kissen liegen naeher / zentraler
+   "Handgelenkdrehung"      - Wechsel kostet nur einen halben Takt
+   "Beidhaendig"            - zwei Stempel gleichzeitig, Wechsel entfaellt
+                              fuer zwei Sorten (Endgame-Node)
+
+################################################################################
 # TEIL 2 - FRAGENKATALOG (das hier muss beantwortet werden)
 ################################################################################
 Antworten bitte direkt hinter die Frage schreiben und [OFFEN] ersetzen.
@@ -400,8 +507,8 @@ B2  Ist die Eingabe geschicklichkeitsbasiert (Praezision/Timing) oder
     (entschieden). Konsequenz: Upgrades muessen REGELN aendern, nicht nur
     Zahlen - sonst hat der Spieler nichts zu entscheiden.
 B3  Maus, Tastatur oder beides? Controller-Support geplant? .......... [OFFEN]
-B4  Was ist die RUNDEN-UHR? ......... STEMPELKISSEN-TINTE (entschieden).
-    Diskretes Aktionsbudget pro Arbeitstag, keine Echtzeit.
+B4  Was ist die RUNDEN-UHR? ......... ECHTZEIT + STEMPELTAKT 1,5 s
+    (revidiert 22.09.2026, siehe Teil 1C). Tinte ist Kostenposten, nicht Uhr.
 B5  Kann der Spieler die Runde freiwillig frueh beenden (Cash-out)?
     (Sehr starke Spannungsquelle: bleiben oder sichern?) .............. [OFFEN]
 B6  Alleinstellungsmerkmal? ..... D3 (Nachschub waehrend der Runde) +
@@ -528,7 +635,7 @@ N4  Wird die Kern-Handlung nach 500 Wiederholungen zur Arbeit? Was
 # TEIL 3 - ENTSCHEIDUNGEN (wird gefuellt, sobald beantwortet)
 ################################################################################
 3.1 Kern-Handlung:              DAS AMT - Vorgaenge bearbeiten (entschieden)
-3.2 Runden-Uhr:                 Stempelkissen-Tinte (entschieden)
+3.2 Runden-Uhr:                 Echtzeit + Takt 1,5 s; Tinte = Kosten
 3.3 Druck-System:               Rueckstand + Dienstaufsicht, kein Fail-State
 3.4 Waehrungen:                 Zulagen (EUR) / Fortbildungspunkte / Besoldung
 3.5 Skill-Tree-Aeste:           T1-T7 (Arbeitsnamen stehen in Teil 1B)
