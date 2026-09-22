@@ -208,6 +208,62 @@
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.01ms !important;}
   }
+
+  /* ---------- Homescreen ---------- */
+  #home{
+    position:fixed; inset:0; z-index:55; background:var(--bg); color:var(--text);
+    display:flex; flex-direction:column; gap:10px;
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));
+    box-sizing:border-box; overflow:hidden;
+  }
+  .homehead{display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; border-bottom:2px solid var(--line); padding-bottom:10px;}
+  .homehead .amt{font-family:var(--font-stamp); font-size:22px; font-weight:700; letter-spacing:.04em; line-height:1;}
+  .homehead .amtsub{font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-top:3px;}
+  .homehead .spacer{flex:1 1 auto;}
+  .stat{text-align:right;}
+  .stat b{display:block; font-family:var(--font-stamp); font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1;}
+  .stat span{display:block; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600;}
+  .stat.fp b{color:var(--s-amber);}
+
+  .treewrap{flex:1 1 auto; min-height:0; overflow:hidden;}
+  #tree{display:block; width:100%; height:100%;}
+  #tree .link{stroke:var(--line); stroke-width:3;}
+  #tree .link.open{stroke:var(--s-amber); stroke-dasharray:7 5;}
+  #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2; rx:3;}
+  #tree .nd.unlocked .box{fill:color-mix(in srgb, var(--s-green) 20%, var(--surface)); stroke:var(--s-green); stroke-width:3;}
+  #tree .nd.open .box{stroke:var(--s-amber); stroke-dasharray:6 4;}
+  #tree .nd.locked .box{opacity:.45;}
+  #tree .nd text{font-family:var(--font-ui); font-weight:600; fill:var(--text); text-anchor:middle;}
+  #tree .nd.locked text{opacity:.5;}
+  #tree .nd .t1{font-size:14px;}
+  #tree .nd .t2{font-size:12.5px; font-weight:500;}
+  #tree .nd .cost{font-family:var(--font-stamp); font-size:12px; font-weight:700; fill:var(--s-amber); text-anchor:middle;}
+  #tree .nd .costbg{fill:var(--bg); stroke:var(--s-amber); stroke-width:2;}
+  #tree .nd{cursor:pointer;}
+  #tree .nd:hover .box, #tree .nd:focus-visible .box{stroke-width:3.5;}
+  #tree .nd:focus-visible{outline:none;}
+  #tree .nd:focus-visible .box{stroke:var(--s-blue);}
+
+  .homefoot{display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;}
+  .detail{
+    flex:1 1 260px; min-width:0; max-width:560px; margin-right:auto; background:var(--surface); border:1px solid var(--line);
+    border-left:4px solid var(--c,var(--line)); border-radius:3px; padding:9px 12px;
+  }
+  .detail .dn{font-family:var(--font-stamp); font-size:15px; font-weight:700; letter-spacing:.03em;}
+  .detail .de{font-size:12.5px; color:var(--text); margin-top:2px; line-height:1.4;}
+  .detail .dc{font-size:10.5px; color:var(--muted); margin-top:4px;}
+  .gostart{
+    flex:0 0 auto; padding:15px 26px; cursor:pointer; border:none; border-radius:2px;
+    font-family:var(--font-stamp); font-size:16px; font-weight:700; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--paper); background:var(--ink);
+  }
+  .gostart:hover{background:#3A434E;}
+  .gostart:focus-visible{outline:3px solid var(--s-amber); outline-offset:2px;}
+  @media (max-width:620px){
+    .homehead .amt{font-size:17px;}
+    .stat b{font-size:16px;}
+    .gostart{width:100%; padding:14px;}
+  }
 </style>
 
 <div id="app">
@@ -241,6 +297,24 @@
   <div class="body" id="stampBody">GENEHMIGT</div>
 </div>
 
+<div id="home" hidden>
+  <div class="homehead">
+    <div>
+      <div class="amt">Amt f&uuml;r Verwaltungsangelegenheiten</div>
+      <div class="amtsub">Referat III b &middot; Sachbearbeitung</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="stat"><b id="hDay">1</b><span>Diensttage</span></div>
+    <div class="stat"><b id="hAcct">0,00</b><span>Kontostand &euro;</span></div>
+    <div class="stat fp"><b id="hFp">0</b><span>Fortbildungs&shy;punkte</span></div>
+  </div>
+  <div class="treewrap"><svg id="tree" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Fortbildungsplan"></svg></div>
+  <div class="homefoot">
+    <div class="detail" id="detail"></div>
+    <button class="gostart" id="goDay">Dienst antreten</button>
+  </div>
+</div>
+
 <div class="veil" id="veil">
   <div class="sheet" id="sheet"></div>
 </div>
@@ -253,9 +327,10 @@
 // ============================================================================
 
 const CONFIG = {
-  roundSeconds:   60,     // Laenge eines Arbeitstages
+  roundSeconds:   40,     // Laenge eines Arbeitstages (spaeter aufruestbar)
   beatMs:         1500,   // Stempeltakt - der Stempel schlaegt von selbst zu
-  spawnMs:        800,    // Nachrueckrate vom Stapel auf einen freien Platz
+  startDelayMs:   2000,   // Aufwaermphase: erst schauen, dann schlaegt er zu
+  spawnMs:        1600,   // Nachrueckrate vom Stapel (spaeter aufruestbar)
   inflowMs:       1000,   // Zulauf in den Posteingang
   startQueue:     20,     // Posteingang zu Dienstbeginn
   slots:          12,     // Tischplaetze
@@ -295,6 +370,65 @@ const LEGEND = [
   ['Unzul&auml;ssiges Anliegen (rotes &sect;)',   'ABGELEHNT'],
 ];
 
+// Laufende Werte. Upgrades aus dem Fortbildungsplan schreiben spaeter hier
+// hinein - CONFIG bleibt der Startwert, STATS ist der aktuelle Stand.
+const STATS = {};
+function resetStats(){
+  STATS.roundMs      = CONFIG.roundSeconds * 1000;
+  STATS.beatMs       = CONFIG.beatMs;
+  STATS.startDelayMs = CONFIG.startDelayMs;
+  STATS.spawnMs      = CONFIG.spawnMs;
+  STATS.inflowMs     = CONFIG.inflowMs;
+  STATS.slots        = CONFIG.slots;
+  STATS.inkCost      = CONFIG.inkCost;
+}
+resetStats();
+
+// ---------------------------------------------------------------- Fortbildungsplan
+const TREE = [
+  { id:'start', x:500, y:350, state:'unlocked', cost:0,
+    name:['Dienstantritt'],
+    eff:'Ein Tisch, vier Stempel und keine Wahl.' },
+
+  { id:'ueber', x:500, y:215, state:'open', cost:2, name:['Überstunden'],
+    eff:'Dienstzeit 40 s → 46 s.' },
+  { id:'gleit', x:500, y:85,  state:'locked', cost:5, name:['Gleitzeit'],
+    eff:'Dienstzeit 46 s → 54 s.' },
+
+  { id:'routi', x:742, y:248, state:'open', cost:2, name:['Routine'],
+    eff:'Stempeltakt 1,50 s → 1,35 s.' },
+  { id:'blind', x:862, y:140, state:'locked', cost:6, name:['Blindstempeln'],
+    eff:'Stempeltakt 1,35 s → 1,15 s. Mehr Takte, mehr Tinte, weniger Bedenkzeit.' },
+
+  { id:'bote1', x:742, y:452, state:'open', cost:2, name:['Flinker Bote'],
+    eff:'Vorgänge rücken alle 1,3 s statt 1,6 s nach.' },
+  { id:'bote2', x:862, y:560, state:'locked', cost:5, name:['Zweiter Bote'],
+    eff:'Vorgänge rücken alle 1,0 s nach. Der Tisch bleibt voll.' },
+
+  { id:'radar', x:500, y:485, state:'open', cost:3, name:['Posteingang-','Radar'],
+    eff:'Die nächsten drei Vorgänge im Stapel sind sichtbar.' },
+  { id:'unbek', x:500, y:615, state:'hidden', cost:null, name:['???'],
+    eff:'Dafür sind Sie noch nicht aktenkundig genug.' },
+
+  { id:'hand',  x:258, y:452, state:'open', cost:4, name:['Handgelenk-','drehung'],
+    eff:'Stempelwechsel kostet nur noch einen halben Takt.' },
+  { id:'beid',  x:138, y:560, state:'locked', cost:12, name:['Beidhändig'],
+    eff:'Zwei Stempel gleichzeitig in der Hand. Kein Wechsel mehr nötig.' },
+
+  { id:'spar',  x:258, y:248, state:'open', cost:2, name:['Sparsames','Kissen'],
+    eff:'Tinte kostet 0,38 € statt 0,50 € pro Druck.' },
+  { id:'vorsc', x:138, y:140, state:'locked', cost:4, name:['Dienst nach','Vorschrift'],
+    eff:'Beschwerden kosten nur noch die Hälfte.' },
+];
+const LINKS = [
+  ['start','ueber'],['ueber','gleit'],
+  ['start','routi'],['routi','blind'],
+  ['start','bote1'],['bote1','bote2'],
+  ['start','radar'],['radar','unbek'],
+  ['start','hand'], ['hand','beid'],
+  ['start','spar'], ['spar','vorsc'],
+];
+
 // ---------------------------------------------------------------- Elemente
 const el = {
   desk: document.getElementById('desk'),
@@ -302,6 +436,13 @@ const el = {
   pile: document.getElementById('pile'),
   queueCnt: document.getElementById('queueCnt'),
   stage: document.getElementById('stage'),
+  home: document.getElementById('home'),
+  tree: document.getElementById('tree'),
+  detail: document.getElementById('detail'),
+  goDay: document.getElementById('goDay'),
+  hDay: document.getElementById('hDay'),
+  hAcct: document.getElementById('hAcct'),
+  hFp: document.getElementById('hFp'),
   stamp: document.getElementById('stamp'),
   stampBody: document.getElementById('stampBody'),
   ringFg: document.querySelector('#ring .fg'),
@@ -325,7 +466,8 @@ let running = false;
 let pointer = { x:-999, y:-999 };
 let lastMove = 0;
 let rafId = 0;
-let meta = { day:1, best:0 };
+let roundToken = 0;
+let meta = { day:1, best:0, fp:0, account:0 };
 
 const eur = n => n.toFixed(2).replace('.', ',');
 
@@ -387,7 +529,7 @@ const SFX = {
 // ---------------------------------------------------------------- Aufbau
 function buildDesk(){
   el.desk.innerHTML = '';
-  for(let i=0;i<CONFIG.slots;i++){
+  for(let i=0;i<STATS.slots;i++){
     const s = document.createElement('div');
     s.className = 'slot'; s.dataset.slot = String(i);
     el.desk.appendChild(s);
@@ -449,17 +591,21 @@ function startRound(){
     combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
+    graceLeft:STATS.startDelayMs,
   };
   buildDesk(); buildRack(); renderRack(); renderQueue();
   for(let i=0;i<6;i++) spawnForm();
   el.veil.hidden = true;
+  el.home.hidden = true;
   el.stamp.hidden = false;
   setStampColor();
   running = true; lastMove = performance.now();
   let prev = performance.now();
   cancelAnimationFrame(rafId);
+  const token = ++roundToken;
   const loop = now => {
-    const dt = Math.min(now - prev, 100); prev = now;
+    if(token !== roundToken) return;          // veraltete Schleife stilllegen
+    const dt = Math.max(0, Math.min(now - prev, 100)); prev = now;
     tick(dt, now);
     if(running) rafId = requestAnimationFrame(loop);
   };
@@ -474,24 +620,32 @@ function setStampColor(){
 
 function tick(dt, now){
   S.t += dt;
-  const left = Math.max(0, CONFIG.roundSeconds*1000 - S.t);
+  const left = Math.max(0, STATS.roundMs - S.t);
 
-  S.accBeat += dt;
+  if(S.graceLeft > 0){
+    S.graceLeft = Math.max(0, S.graceLeft - dt);
+    if(S.graceLeft === 0){ S.accBeat = STATS.beatMs; S.preticked = true; }
+  } else {
+    S.accBeat += dt;
+  }
   S.accSpawn += dt;
   S.accInflow += dt;
 
-  if(S.accInflow >= CONFIG.inflowMs){ S.accInflow -= CONFIG.inflowMs; S.queue++; renderQueue(); }
-  if(S.accSpawn  >= CONFIG.spawnMs ){ S.accSpawn  -= CONFIG.spawnMs;  spawnForm(); renderQueue(); }
+  if(S.accInflow >= STATS.inflowMs){ S.accInflow -= STATS.inflowMs; S.queue++; renderQueue(); }
+  if(S.accSpawn  >= STATS.spawnMs ){ S.accSpawn  -= STATS.spawnMs;  spawnForm(); renderQueue(); }
 
-  const p = S.accBeat / CONFIG.beatMs;
+  const p = S.graceLeft > 0
+    ? 1 - S.graceLeft / STATS.startDelayMs
+    : S.accBeat / STATS.beatMs;
   if(p >= 0.82 && !S.preticked){ S.preticked = true; SFX.pretick(); }
-  if(S.accBeat >= CONFIG.beatMs){
-    S.accBeat -= CONFIG.beatMs; S.preticked = false;
+  if(S.graceLeft === 0 && S.accBeat >= STATS.beatMs){
+    S.accBeat -= STATS.beatMs; S.preticked = false;
     strike(now);
   }
 
-  // Taktring
-  el.ringFg.style.strokeDashoffset = RING_LEN * (1 - Math.min(1, S.accBeat/CONFIG.beatMs));
+  // Taktring - laeuft auch waehrend der Aufwaermphase, damit der erste
+  // Schlag genauso vorhersehbar ist wie jeder spaetere
+  el.ringFg.style.strokeDashoffset = RING_LEN * (1 - Math.min(1, p));
   el.stamp.style.transform = 'translate(' + pointer.x + 'px,' + pointer.y + 'px) translate(-50%,-50%)';
 
   const lifted = isLifted(now);
@@ -502,8 +656,10 @@ function tick(dt, now){
   const secs = Math.ceil(left/1000);
   el.clock.textContent = String(Math.floor(secs/60)).padStart(2,'0')
     + ':' + String(secs%60).padStart(2,'0');
-  el.clockBar.style.transform = 'scaleX(' + (left/(CONFIG.roundSeconds*1000)) + ')';
-  el.beats.textContent = Math.ceil(left / CONFIG.beatMs);
+  el.clockBar.style.transform = 'scaleX(' + (left/(STATS.roundMs)) + ')';
+  const untilNext = S.graceLeft > 0 ? S.graceLeft : (STATS.beatMs - S.accBeat);
+  el.beats.textContent = left < untilNext
+    ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs);
   el.combo.textContent = '×' + mult().toFixed(1).replace('.',',');
   el.earned.textContent = eur(S.earned);
   el.ink.textContent = eur(S.inkSpent);
@@ -516,7 +672,7 @@ const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).leng
 const mult = () => Math.min(1 + S.combo*CONFIG.comboStep, CONFIG.comboCap);
 
 function isLifted(now){
-  if(now - lastMove > CONFIG.afkBeats * CONFIG.beatMs) return true;
+  if(now - lastMove > CONFIG.afkBeats * STATS.beatMs) return true;
   const r = el.stage.getBoundingClientRect();
   return pointer.x < r.left || pointer.x > r.right || pointer.y < r.top || pointer.y > r.bottom;
 }
@@ -575,7 +731,7 @@ function strike(now){
   renderRack();
 }
 
-function charge(){ S.presses++; S.inkSpent += CONFIG.inkCost; }
+function charge(){ S.presses++; S.inkSpent += STATS.inkCost; }
 function wear(){ S.freshness = Math.max(0, S.freshness - 1); }
 
 function finish(form, ok){
@@ -611,7 +767,10 @@ function endRound(){
   const complaints = S.wrongs * CONFIG.wrongPenalty;
   const raw = S.earned - inkTotal - complaints;
   const net = CONFIG.floorAtZero ? Math.max(0, raw) : raw;
+  const fp = 1 + Math.floor(S.done / 12);
   meta.best = Math.max(meta.best, net);
+  meta.account += net;
+  meta.fp += fp;
 
   el.sheet.innerHTML =
     '<h1>Abrechnungsbogen</h1>'
@@ -622,23 +781,90 @@ function endRound(){
   + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
   + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
+  + row('Fortbildungspunkte', '+' + fp)
   + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'
   + '</table>'
   + '<div class="note">'
   + (raw < 0 && CONFIG.floorAtZero ? 'Fehlbetrag von ' + eur(-raw) + ' &euro; wurde erlassen.<br>' : '')
   + 'R&uuml;ckstand im Posteingang: <b>' + backlog + '</b> Vorg&auml;nge. '
-  + 'Zulauf heute: ' + CONFIG.roundSeconds + ', geschafft: ' + S.done + '.'
+  + 'Zulauf heute: ' + Math.round(STATS.roundMs/STATS.inflowMs) + ', geschafft: ' + S.done + '.'
   + (meta.day > 1 ? '<br>Bester Tag bisher: ' + eur(meta.best) + ' &euro;.' : '')
   + '</div>'
-  + '<button class="btn" id="go">N&auml;chster Tag</button>';
+  + '<button class="btn" id="go">Weiter</button>';
 
   el.veil.hidden = false;
   const b = document.getElementById('go');
-  b.onclick = () => { meta.day++; startRound(); };
+  b.onclick = showHome;
   b.focus();
 }
 const row = (k,v) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
 const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
+
+// ---------------------------------------------------------------- Homescreen
+const NODE_W = 176, NODE_H = 54;
+const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
+
+function renderTree(){
+  let out = '';
+  for(const [a,b] of LINKS){
+    const A = byId[a], B = byId[b];
+    out += '<line class="link' + (B.state === 'open' ? ' open' : '') + '"'
+         + ' x1="' + A.x + '" y1="' + A.y + '" x2="' + B.x + '" y2="' + B.y + '"></line>';
+  }
+  for(const n of TREE){
+    const cls = n.state === 'unlocked' ? 'unlocked'
+              : n.state === 'open'     ? 'open' : 'locked';
+    const txt = n.name.length === 1
+      ? '<text class="t1" x="' + n.x + '" y="' + (n.y + 5) + '">' + n.name[0] + '</text>'
+      : '<text class="t2" x="' + n.x + '" y="' + (n.y - 3) + '">' + n.name[0] + '</text>'
+        + '<text class="t2" x="' + n.x + '" y="' + (n.y + 15) + '">' + n.name[1] + '</text>';
+    const badge = n.cost
+      ? '<circle class="costbg" cx="' + (n.x + NODE_W/2) + '" cy="' + (n.y - NODE_H/2) + '" r="14"></circle>'
+        + '<text class="cost" x="' + (n.x + NODE_W/2) + '" y="' + (n.y - NODE_H/2 + 4) + '">' + n.cost + '</text>'
+      : '';
+    out += '<g class="nd ' + cls + '" data-node="' + n.id + '" tabindex="0" role="button"'
+         + ' aria-label="' + n.name.join(' ') + '">'
+         + '<rect class="box" x="' + (n.x - NODE_W/2) + '" y="' + (n.y - NODE_H/2) + '"'
+         + ' width="' + NODE_W + '" height="' + NODE_H + '"></rect>'
+         + txt + badge + '</g>';
+  }
+  el.tree.innerHTML = out;
+  for(const g of el.tree.querySelectorAll('.nd')){
+    const n = byId[g.dataset.node];
+    const show = () => showDetail(n);
+    g.addEventListener('mouseenter', show);
+    g.addEventListener('focus', show);
+    g.addEventListener('click', show);
+  }
+}
+
+function showDetail(n){
+  const color = n.state === 'unlocked' ? 'var(--s-green)'
+              : n.state === 'open'     ? 'var(--s-amber)' : 'var(--line)';
+  el.detail.style.setProperty('--c', color);
+  const status =
+      n.state === 'unlocked' ? 'Freigeschaltet.'
+    : n.state === 'open'     ? n.cost + ' Fortbildungspunkte — Freischalten ist noch nicht eingebaut.'
+    : n.state === 'hidden'   ? 'Noch verborgen.'
+    : 'Gesperrt — erst die Stufe davor.';
+  el.detail.innerHTML = '<div class="dn">' + n.name.join(' ') + '</div>'
+                      + '<div class="de">' + n.eff + '</div>'
+                      + '<div class="dc">' + status + '</div>';
+}
+
+function showHome(){
+  el.veil.hidden = true;
+  el.stamp.hidden = true;
+  el.home.hidden = false;
+  el.hDay.textContent = meta.day;
+  el.hAcct.textContent = eur(meta.account);
+  el.hFp.textContent = meta.fp;
+  renderTree();
+  showDetail(byId.start);
+  el.goDay.textContent = 'Tag ' + (meta.day + 1) + ' antreten';
+  el.goDay.onclick = () => { meta.day++; startRound(); };
+  el.goDay.focus();
+}
 
 // ---------------------------------------------------------------- Startseite
 function showIntro(){

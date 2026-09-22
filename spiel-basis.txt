@@ -69,10 +69,12 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
                         Web-Demo (itch/CrazyGames) faellt als Funnel ab.
 
 --- ENTSCHIEDEN AM 22.09.2026 (Runde 3) ---
-0.17 Rundenlaenge:      Start 45-90 Sekunden, waechst im Spielverlauf auf
-                        2-3 Minuten. Die wachsende Rundenlaenge ist selbst
-                        ein spuerbares Fortschrittsgefuehl und schafft
-                        spaeter Platz fuer die Mitarbeiter-Ebene.
+0.17 Rundenlaenge:      [REVIDIERT 22.09.2026 nach dem ersten Spieltest]
+                        Start 40 Sekunden inkl. 2 Sekunden Aufwaermphase.
+                        Waechst ueber Fortbildungspunkte. Die wachsende
+                        Rundenlaenge ist selbst ein spuerbares
+                        Fortschrittsgefuehl und schafft spaeter Platz fuer
+                        die Mitarbeiter-Ebene.
 0.18 Fail-State:        KEINER. Man verliert nie einen Tag. Der Rueckstand
                         waechst, die Dienstaufsicht kassiert einen wachsenden
                         Anteil - aber man arbeitet sich immer selbst heraus.
@@ -388,7 +390,10 @@ sondern ein KOSTENPOSTEN. Die Runden-Uhr ist eine Echtzeit-Uhr.
 
 --- DER TAKT (das Herzstueck) ---
 Der Stempel arbeitet in einem festen Takt von 1,5 Sekunden.
-Ein Arbeitstag von 60 Sekunden hat damit exakt 40 TAKTE.
+Ein Arbeitstag dauert 40 Sekunden, davon 2 Sekunden AUFWAERMPHASE, in der man
+sich einen Ueberblick ueber die liegenden Vorgaenge verschafft. Damit hat ein
+Tag 26 TAKTE. Rundendauer und Nachrueckrate sind spaeter ueber den
+Fortbildungsplan aufruestbar.
 Jeder Takt ist genau eine von drei Moeglichkeiten:
   (1) Formular treffen und richtig stempeln  -> Ertrag x Kombo
   (2) Auf ein fremdes Stempelkissen stempeln -> Stempel gewechselt, Kombo bricht
@@ -464,12 +469,16 @@ Fehler an.
    ----------------------------------------------
    Tagesbilanz                      111,00 EUR
 
---- ZAHLEN-SKIZZE TAG 1 ---
-Rundendauer            60 s
-Takt                   1,5 s  -> 40 Takte pro Tag
+--- ZAHLEN-SKIZZE TAG 1 (Stand Prototyp, 22.09.2026) ---
+Rundendauer            40 s   (aufruestbar)
+Aufwaermphase          2 s    (erst schauen, dann schlaegt der Stempel zu)
+Takt                   1,5 s  -> 26 Takte pro Tag
 Tischplaetze           12
-Nachrueckrate          alle 0,8 s ein Formular auf einen freien Platz
-Tagesszulauf           ca. 60 Vorgaenge (mehr als 40 Takte schaffen koennen)
+Nachrueckrate          alle 1,6 s ein Formular auf einen freien Platz
+                              (aufruestbar) -> ca. 25 Vorgaenge pro Tag
+Tagesszulauf           ca. 40 Vorgaenge in den Posteingang
+=> Angebot (25 auf dem Tisch) und Takte (26) liegen fast gleichauf. Jeder
+   verschenkte Takt ist damit unmittelbar spuerbar.
 Standardvorgang        4,00 EUR
 Tinte pro Druck        0,50 EUR
 Kombo                  x1,1 pro Stufe, Deckel x3
@@ -729,3 +738,38 @@ O9  Steam-Seite live ab:     Vorschlag so frueh wie moeglich (Wunschlisten
                              sammeln ab Monat 3-4).
 O10 Save-Format/Migration:   Vorschlag versionierter JSON-Save mit
                              Migrationsfunktion ab Tag 1.
+
+
+################################################################################
+# TEIL 1D - HOMESCREEN / FORTBILDUNGSPLAN (Stand 22.09.2026)
+################################################################################
+ABLAUF: Arbeitstag -> Abrechnungsbogen -> "Weiter" -> HOMESCREEN -> naechster Tag.
+Der Abrechnungsbogen ist damit nur noch die Quittung; der Homescreen ist der
+Ort, an dem der Spieler sich klug fuehlt.
+
+AUFBAU DES HOMESCREENS
+  Kopfzeile   Amt und Referat, Diensttage, Kontostand, Fortbildungspunkte
+  Mitte       DER FORTBILDUNGSPLAN - radialer Baum wie in Bills Must Be Paid
+  unten links Detailkarte zum angetippten Knoten (Name, Wirkung, Kosten)
+  unten rechts Knopf "Tag N antreten"
+
+AUFBAU DES BAUMS
+  Zentrum:    "Dienstantritt" - freigeschaltet, gruen.
+  Ring 1:     sechs Knoten, gestrichelt/amber, mit sichtbarem Preis.
+  Ring 2:     sechs Knoten, gedimmt, darunter ein "???" als Koeder.
+  Die sechs Speichen sind die Aeste aus Teil 1B, auf konkrete Wirkungen
+  heruntergebrochen:
+    Dienstzeit    Ueberstunden (2)        -> Gleitzeit (5)
+    Taktrate      Routine (2)             -> Blindstempeln (6)
+    Nachschub     Flinker Bote (2)        -> Zweiter Bote (5)
+    Aktenkunde    Posteingang-Radar (3)   -> ??? (verborgen)
+    Stempeltechnik Handgelenkdrehung (4)  -> Beidhaendig (12)
+    Beschaffung   Sparsames Kissen (2)    -> Dienst nach Vorschrift (4)
+
+WAEHRUNG: FORTBILDUNGSPUNKTE. Im Prototyp: 1 pro Tag plus 1 je 12 bearbeiteten
+Vorgaengen. Der endgueltige Schluessel steht noch aus (Frage E2).
+
+NOCH NICHT GEBAUT: das Freischalten selbst. Der Baum zeigt, was kommt - kaufen
+kann man noch nichts. Das ist bewusst so: Phase P1 beantwortet, ob die
+Kern-Handlung ohne Belohnung traegt. Kommt das Freischalten zu frueh dazu,
+misst man nur noch die Belohnung und nicht mehr die Handlung.
