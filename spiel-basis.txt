@@ -1,6 +1,6 @@
 ================================================================================
 SPIEL-BASIS / GAME DESIGN DOCUMENT (Arbeitsstand)
-Projekt:        [ARBEITSTITEL: OFFEN] - Arbeitsthema: DAS AMT
+Projekt:        "STAMP DUTY" (Arbeitstitel) - Thema: DAS AMT
 Genre:          Aktives, rundenbasiertes Incremental fuer Steam
 Erstellt:       22.09.2026
 Status:         Entwurf - offene Punkte sind mit [OFFEN] markiert
@@ -61,6 +61,38 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
                         nicht nur hoehere Zahlen. Kein Fail-State, Karriere.
 0.16 Technik:           Web-Stack, TypeScript. Steam-Build via Tauri/Electron,
                         Web-Demo (itch/CrazyGames) faellt als Funnel ab.
+
+--- ENTSCHIEDEN AM 22.09.2026 (Runde 3) ---
+0.17 Rundenlaenge:      Start 45-90 Sekunden, waechst im Spielverlauf auf
+                        2-3 Minuten. Die wachsende Rundenlaenge ist selbst
+                        ein spuerbares Fortschrittsgefuehl und schafft
+                        spaeter Platz fuer die Mitarbeiter-Ebene.
+0.18 Fail-State:        KEINER. Man verliert nie einen Tag. Der Rueckstand
+                        waechst, die Dienstaufsicht kassiert einen wachsenden
+                        Anteil - aber man arbeitet sich immer selbst heraus.
+                        (BMBP-Inkasso-Modell.)
+0.19 Setting:           Zeitloses Amt in 80er-Optik: Roehrenmonitor,
+                        Neonroehre, Karteikaesten, Resopal. International
+                        lesbar; der deutsche Humor lebt in den TEXTEN.
+0.20 Grafikstil:        Papier-Look - saubere Vektorformen plus echte
+                        Papier-, Stempel- und Kaffeefleck-Texturen.
+                        Bleibt bei hunderten Formularen lesbar, skaliert
+                        scharf, hebt sich vom Pixel-Standard des Genres ab.
+
+--- ENTSCHIEDEN AM 22.09.2026 (Runde 4) ---
+0.21 Arbeitstitel:      "STAMP DUTY" - echter Verwaltungsbegriff
+                        (Stempelsteuer) und Wortspiel auf Stempel-Pflicht.
+                        Steam-Titel englisch, Humor bleibt buerokratisch.
+0.22 Kern-Skill:        TYP-WISSEN + KOMBOS. Jeder Vorgangstyp hat eine
+                        richtige Antwort, die man erst lernen muss; gleiche
+                        Typen hintereinander bauen einen Multiplikator auf.
+                        -> Zwei Achsen: Wissen (Entdeckung) + Planung
+                        (Reihenfolge). Beide haengen direkt an Tree-Aesten.
+0.23 Risiko-Ventil:     BLIND DURCHWINKEN. Ein Vorgang ohne Pruefung
+                        abstempeln: kostet kaum Tinte, kann aber als
+                        Beschwerde zurueckkommen. Das Risiko sitzt im
+                        Kern-Loop, nicht in einem Nebenfenster.
+0.24 Zeitbudget:        5-15 Stunden pro Woche (Feierabend-Projekt).
 
 
 ################################################################################
@@ -360,8 +392,9 @@ A6  Wer ist die Spielfigur - hat sie eine Geschichte oder ist sie
     nur eine Hand? ................................................... [OFFEN]
 
 --- B. KERN-MECHANIK -------------------------------------------------------------
-B1  Was genau macht der Spieler pro Sekunde? (Klicken, Zielen,
-    Ziehen, Timing treffen, Sortieren?) .............................. [OFFEN]
+B1  Was macht der Spieler pro Sekunde? ..... Vorgang auswaehlen und eine
+    von mehreren Aktionen zuweisen: GENEHMIGEN / ABLEHNEN / WEITERLEITEN /
+    BLIND DURCHWINKEN / LIEGEN LASSEN (entschieden).
 B2  Ist die Eingabe geschicklichkeitsbasiert (Praezision/Timing) oder
     entscheidungsbasiert (was zuerst)? ....... ENTSCHEIDUNGSBASIERT
     (entschieden). Konsequenz: Upgrades muessen REGELN aendern, nicht nur
@@ -371,28 +404,32 @@ B4  Was ist die RUNDEN-UHR? ......... STEMPELKISSEN-TINTE (entschieden).
     Diskretes Aktionsbudget pro Arbeitstag, keine Echtzeit.
 B5  Kann der Spieler die Runde freiwillig frueh beenden (Cash-out)?
     (Sehr starke Spannungsquelle: bleiben oder sichern?) .............. [OFFEN]
-B6  Welche Mechanik-Drehung aus D1-D7 ist DEIN Alleinstellungsmerkmal? [OFFEN]
+B6  Alleinstellungsmerkmal? ..... D3 (Nachschub waehrend der Runde) +
+    D4 (Kombos) + D5 (Risiko-Objekte via Blind durchwinken) - entschieden.
+    Die Kombination Typ-Wissen x Kombo-Reihenfolge ist der Kern-Skill.
 B7  Gibt es Fehlschlaege in der Runde (Missklick bestraft)? .......... [OFFEN]
 B8  Gibt es aktive Faehigkeiten mit Cooldown waehrend der Runde? ...... [OFFEN]
 
 --- C. RUNDENSTRUKTUR -------------------------------------------------------------
-C1  Wie lange dauert eine Runde am Anfang? (10-30 s / 1-2 min / 3-5 min) [OFFEN]
-C2  Wie lange am Ende des Spiels? Waechst die Rundenlaenge? .......... [OFFEN]
+C1  Rundenlaenge am Anfang? .................. 45-90 s (entschieden)
+C2  Am Ende? ............ 2-3 min, waechst mit (entschieden)
 C3  Wie lange dauert die Bauphase zwischen Runden? ................... [OFFEN]
 C4  Hat jede Runde ein ZIEL (Quote erfuellen) oder ist sie offen
     (so viel wie moeglich)? .......................................... [OFFEN]
-C5  Kann man eine Runde VERLIEREN? Was passiert dann genau? .......... [OFFEN]
+C5  Kann man verlieren? ...... NEIN, nur Schneeball-Malus (entschieden)
 C6  Aendert sich das Spielfeld pro Runde (zufaellig/handgebaut)? ...... [OFFEN]
 C7  Gibt es Runden-Modifikatoren ("heute regnet es", "Feiertag")? .... [OFFEN]
 
 --- D. DRUCK & SPANNUNG (das BMBP-Rechnungssystem-Aequivalent) --------------------
-D1F Was ist deine "Rechnung" - die wiederkehrende Forderung von aussen? [OFFEN]
-D2F Was passiert bei Nichterfuellung? (Anteil-Abzug wie Inkasso? Verlust
-    von Upgrades? Nur langsamer?) ................................... [OFFEN]
+D1F Die "Rechnung"? ..... DER RUECKSTAND (Aktenberg) + Eilvorgaenge mit
+    harter Frist (entschieden).
+D2F Bei Nichterfuellung? ..... DIENSTAUFSICHTSBESCHWERDE: der Vorgesetzte
+    behaelt einen wachsenden ANTEIL der Tagesleistung ein (entschieden).
 D3F Soll die Strafe schneeballen (hart, spannend) oder gedeckelt sein
     (fair, entspannt)? .............................................. [OFFEN]
-D4F Ist der Fortschrittsbalken gleichzeitig die Bedrohung? (Empfehlung: ja) [OFFEN]
-D5F Gibt es ein Gambling-/Risiko-Ventil wie Piggy Shuffle? ........... [OFFEN]
+D4F Fortschritt = Bedrohung? ..... JA, der Rueckstand ist beides (entschieden)
+D5F Risiko-Ventil? ..... JA: "Blind durchwinken" im Kern-Loop
+    (entschieden). Kein separates Minispiel.
 
 --- E. WAEHRUNGEN & OEKONOMIE ------------------------------------------------------
 E1  Waehrung 1 (schnell, in-Run, wird ausgegeben): Name? ............. [OFFEN]
@@ -455,14 +492,14 @@ J3  Gibt es Offline-Fortschritt? ................................... [OFFEN]
 --- K. FEEL / JUICE / PRAESENTATION ---------------------------------------------------
 K1F Was ist der EINE befriedigende Moment, den man 5.000 mal erlebt?
     Beschreibe Sound + Animation + Zahl. ........................... [OFFEN]
-K2F Grafikstil: Pixel, 2D-Cartoon, 3D, Vektor? ..................... [OFFEN]
+K2F Grafikstil: ......... Papier-Look, Vektor + Texturen (entschieden)
 K3F Wer macht Art & Sound? (selbst / Asset-Packs / Auftrag) ......... [OFFEN]
 K4F Gibt es eine Anti-Sehnenscheiden-Loesung (Halten statt Klicken)? . [OFFEN]
 
 --- L. UMFANG & TECHNIK -------------------------------------------------------------
 L1  Zielspielzeit bis "durch": ........................ 3-4 h (entschieden)
 L2  Engine: ............... WEB-STACK, TypeScript (entschieden)
-L3  Arbeitest du allein? Wie viele Stunden pro Woche? ............... [OFFEN]
+L3  Stunden pro Woche? ................... 5-15 h (entschieden)
 L4  Ziel-Releasedatum? Gibt es einen Termin, der wackelt? ........... [OFFEN]
 L5  Speicherstand-Format + Cloud-Saves? Was passiert bei Patches
     (Save-Migration)? .............................................. [OFFEN]
@@ -492,9 +529,9 @@ N4  Wird die Kern-Handlung nach 500 Wiederholungen zur Arbeit? Was
 ################################################################################
 3.1 Kern-Handlung:              DAS AMT - Vorgaenge bearbeiten (entschieden)
 3.2 Runden-Uhr:                 Stempelkissen-Tinte (entschieden)
-3.3 Druck-System:               [OFFEN]
-3.4 Waehrungen:                 [OFFEN]
-3.5 Skill-Tree-Aeste:           [OFFEN]
+3.3 Druck-System:               Rueckstand + Dienstaufsicht, kein Fail-State
+3.4 Waehrungen:                 Zulagen (EUR) / Fortbildungspunkte / Besoldung
+3.5 Skill-Tree-Aeste:           T1-T7 (Arbeitsnamen stehen in Teil 1B)
 3.6 Prestige-Name & Regeln:     Befoerderung + Versetzung (entschieden)
 3.7 Zweite Systemebene:         Mitarbeiter m. Fehlern, dann Paragraphen-Editor
 3.8 Engine & Scope:             TypeScript/Web, 3-4 h Spielzeit (entschieden)
@@ -519,3 +556,50 @@ S3  Erst danach Runden-Uhr + Druck-System einbauen und erneut testen.
 S4  Erst danach Skill Tree - und zwar zuerst die NAMEN, dann die Zahlen.
 S5  Danach Objekt-Typen als Content-Strom.
 S6  Demo bauen, frueh oeffentlich testen.
+
+
+################################################################################
+# TEIL 6 - GROBER ZEITPLAN (bei 5-15 h pro Woche)
+################################################################################
+P1  Woche 1-3    PROTOTYP der Kern-Handlung. Nur: Vorgaenge auf dem Tisch,
+                 vier Aktionen, Tinte als Budget, 3 Vorgangstypen. KEINE
+                 Upgrades, KEIN Skill Tree, keine Grafik.
+                 ABNAHME-TEST: Macht das 60 Sekunden lang Spass, ohne dass
+                 irgendetwas belohnt wird? Wenn nein -> Kern aendern, NICHT
+                 Upgrades draufpacken.
+P2  Woche 4-6    Rundenstruktur + Druck: Arbeitstag, Rueckstand,
+                 Dienstaufsicht, Tagesabrechnung. Erneut testen.
+P3  Woche 7-12   Skill Tree. Zuerst alle NAMEN, dann die Zahlen. Mindestens
+                 jeder fuenfte Node muss eine REGEL aendern, nicht nur einen
+                 Prozentwert.
+P4  Woche 13-18  Vorgangstypen ausbauen (Ziel: 12-18 Typen mit eigenem
+                 Verhalten) + Kombo-System + Blind durchwinken.
+P5  Woche 19-24  Mitarbeiter-Ebene (zweite Systemebene) und Befoerderung /
+                 Versetzung (Prestige). Ab hier ist das Spiel "ganz".
+P6  Woche 25-30  Art-Pass (Papier-Look), Sound, Juice, Balancing.
+P7  Woche 31-34  DEMO bauen und oeffentlich testen (itch + Steam-Demo).
+                 Feedback einarbeiten. Steam-Seite frueh live schalten.
+P8  Woche 35-40  Paragraphen-Editor (dritte Ebene), Achievements, Lokali-
+                 sierung, Release-Vorbereitung.
+=> Richtwert Release: ca. 9-10 Monate. Bei Engpass zuerst P8 kuerzen,
+   NIEMALS P1-P3.
+
+
+################################################################################
+# TEIL 7 - NOCH OFFEN (Vorschlaege, bitte bestaetigen oder widersprechen)
+################################################################################
+O1  Sprachen zum Release:    Vorschlag DE + EN zum Start.
+O2  Achievements:            Vorschlag ca. 25-30 (BMBP hat 27).
+O3  Offline-Fortschritt:     Vorschlag NEIN - das Spiel ist aktiv und
+                             rundenbasiert, Offline-Ertrag wuerde die
+                             Rundenstruktur entwerten.
+O4  Respec im Skill Tree:    Vorschlag JA, einmal pro Befoerderung gratis.
+O5  Anzahl Skill-Tree-Nodes: Vorschlag 70-90 fuer 3-4 Stunden Spielzeit.
+O6  Art & Sound:             Wer macht es? (selbst / Auftrag / Asset-Packs)
+O7  Zielspielzeit Demo:      Vorschlag 20-30 Minuten, Ende bei der ersten
+                             Befoerderung - das ist der natuerliche Cliff.
+O8  Releasedatum:            [OFFEN]
+O9  Steam-Seite live ab:     Vorschlag so frueh wie moeglich (Wunschlisten
+                             sammeln ab Monat 3-4).
+O10 Save-Format/Migration:   Vorschlag versionierter JSON-Save mit
+                             Migrationsfunktion ab Tag 1.
