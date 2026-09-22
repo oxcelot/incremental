@@ -25,7 +25,8 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Stempel | GENEHMIGT, NACHFORDERUNG, WEITERLEITEN, ABGELEHNT |
 | Stempelwechsel | auf das fremde Kissen stempeln — kostet einen Takt und die Kombo |
 | Nachtinten | auf das eigene Kissen stempeln — kostet einen Takt, **hält** die Kombo |
-| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel komplett grau, zeigt „TINTE LEER" und ein rotes Warnabzeichen — er stempelt **gar nicht** mehr |
+| Kissenkapazität | **1 Vorgang**. Ein Balken unter dem Stempel zeigt den Füllstand und leert sich mit jedem Abdruck |
+| Leerer Stempel | komplett grau, Aufschrift „TINTE LEER", rotes Warnabzeichen — er stempelt **gar nicht** mehr |
 | Hand gehoben | Maus außerhalb des Tisches — keine Tinte, Takt trotzdem weg |
 | Tinte | Kostenposten, 0,50 € pro Druck, Abrechnung bei Dienstschluss |
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |

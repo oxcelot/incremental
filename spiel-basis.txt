@@ -777,10 +777,14 @@ baut die Werte bei jedem Rundenstart aus CONFIG plus allen gekauften Knoten
 neu auf. Neue Upgrades brauchen nur einen Eintrag in TREE.
 
 DAS STEMPELKISSEN ALS ZENTRALE ACHSE  [REVIDIERT 22.09.2026]
-Das Kissen traegt anfangs GENAU EINEN VORGANG. Danach wird der Stempel
-KOMPLETT GRAU, seine Beschriftung wechselt auf "TINTE LEER", ein rotes
-Warnabzeichen pulsiert daneben und das Kissen im Halter meldet "TROCKEN" -
-drei Signale, damit niemand uebersieht, dass er handeln muss. Er hinterlaesst
+Das Kissen traegt anfangs GENAU EINEN VORGANG. Unter dem Stempel sitzt ein
+TINTENBALKEN, der zu Rundenbeginn voll ist und sich mit jedem Abdruck um eine
+Stufe leert; Trennstriche zeigen die Kapazitaet, sodass man die verbleibenden
+Abdruecke abzaehlen kann, ohne nachzudenken.
+Ist er leer, wird der Stempel KOMPLETT GRAU, seine Beschriftung wechselt auf
+"TINTE LEER", ein rotes Warnabzeichen pulsiert daneben und das Kissen im
+Halter meldet "TROCKEN" - vier Signale, damit niemand uebersieht, dass er
+handeln muss. Er hinterlaesst
 GAR NICHTS mehr: der Takt verpufft, Tinte kostet er keine, der Vorgang bleibt liegen.
 Der Spieler stempelt also anfangs im Wechsel: Vorgang, nachtinten, Vorgang,
 nachtinten. Wer das nicht einplant, SETZT AUS. Das halbiert den Durchsatz -

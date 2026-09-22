@@ -156,6 +156,28 @@
   }
   #stamp.faded #ring .fg{stroke:var(--muted);}
   #stamp.faded #ring .bg{stroke:color-mix(in srgb, var(--muted) 30%, #0000);}
+  #inkbar{
+    position:absolute; left:50%; top:calc(50% + 43px); transform:translateX(-50%);
+    width:74px; height:8px; border-radius:4px; overflow:hidden; box-sizing:border-box;
+    background:color-mix(in srgb, var(--ink) 26%, #0000);
+    border:1px solid color-mix(in srgb, var(--c) 60%, #0000);
+  }
+  #inkbar i{
+    display:block; height:100%; background:var(--c);
+    transform-origin:left; transition:transform .18s ease-out;
+  }
+  #inkbar span{
+    position:absolute; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(90deg,
+      #0000 0, #0000 calc(var(--seg,100%) - 2px),
+      color-mix(in srgb, var(--paper) 65%, #0000) calc(var(--seg,100%) - 2px),
+      color-mix(in srgb, var(--paper) 65%, #0000) var(--seg,100%));
+  }
+  #stamp.faded #inkbar{
+    border-color:var(--bad);
+    background:color-mix(in srgb, var(--bad) 26%, #0000);
+  }
+
   #warn{
     position:absolute; left:calc(50% + 46px); top:calc(50% - 40px);
     width:28px; height:28px; border-radius:50%; box-sizing:border-box;
@@ -346,6 +368,7 @@
     <circle class="fg" cx="46" cy="46" r="43"></circle>
   </svg>
   <div class="body" id="stampBody">GENEHMIGT</div>
+  <div id="inkbar"><i id="inkfill"></i><span></span></div>
   <div id="warn" hidden>!</div>
 </div>
 
@@ -618,6 +641,8 @@ const el = {
   demoHint: document.getElementById('demoHint'),
   goDay: document.getElementById('goDay'),
   warn: document.getElementById('warn'),
+  inkBar: document.getElementById('inkbar'),
+  inkFill: document.getElementById('inkfill'),
   hDay: document.getElementById('hDay'),
   hAcct: document.getElementById('hAcct'),
   hBest: document.getElementById('hBest'),
@@ -825,6 +850,7 @@ function startRound(){
   el.veil.hidden = true;
   el.home.hidden = true;
   el.stamp.hidden = false;
+  el.inkBar.style.setProperty('--seg', (100 / STATS.freshnessMax) + '%');
   setStampColor();
   running = true; lastMove = performance.now();
   let prev = performance.now();
@@ -879,6 +905,8 @@ function tick(dt, now){
   const lifted = isLifted(now);
   el.stamp.classList.toggle('lifted', lifted);
   const dry = S.freshness <= 0;
+  el.inkFill.style.transform =
+    'scaleX(' + Math.max(0, S.freshness / STATS.freshnessMax) + ')';
   el.stamp.classList.toggle('faded', dry);
   el.warn.hidden = !dry || lifted;
   if(dry !== S.wasDry){
