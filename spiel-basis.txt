@@ -1,6 +1,6 @@
 ================================================================================
 SPIEL-BASIS / GAME DESIGN DOCUMENT (Arbeitsstand)
-Projekt:        [ARBEITSTITEL: OFFEN]
+Projekt:        [ARBEITSTITEL: OFFEN] - Arbeitsthema: DAS AMT
 Genre:          Aktives, rundenbasiertes Incremental fuer Steam
 Erstellt:       22.09.2026
 Status:         Entwurf - offene Punkte sind mit [OFFEN] markiert
@@ -32,6 +32,35 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
                         komplett neue Fiktion UND eine eigene Mechanik-Drehung.
 0.7 Nicht-Ziel:         Kein Klon eines existierenden Steam-Spiels. Gleiche
                         GENRE-FAMILIE, andere Kern-Handlung.
+
+--- ENTSCHIEDEN AM 22.09.2026 (Runde 1) ---
+0.8 Kern-Handlung:      K2 "DAS AMT" - Antraege/Vorgaenge bearbeiten.
+0.9 Spielgefuehl:       ENTSCHEIDUNGSBASIERT. Reihenfolge und Wahl der Aktion
+                        bestimmen den Ertrag, NICHT Klickgeschwindigkeit.
+0.10 Ton:               ABSURD-KOMISCH. Satire, ueberzogene Upgrade-Namen,
+                        Ironie zwischen Thema (Buerokratie) und Handlung
+                        (Hochleistungssport).
+0.11 Umfang:            ca. 3-4 Stunden Kernspielzeit, Zielpreis ca. 5 EUR,
+                        plus kostenlose Steam-Demo.
+
+--- ENTSCHIEDEN AM 22.09.2026 (Runde 2) ---
+0.12 Runden-Uhr:        STEMPELKISSEN-TINTE. Diskretes Aktionsbudget pro Tag,
+                        keine Echtzeit-Uhr. Jede Bearbeitung kostet Tinte;
+                        Weiterleiten und Liegenlassen kosten weniger oder
+                        nichts. -> Der Spieler kauft sich mit Tinte
+                        Entscheidungen, nicht Geschwindigkeit.
+0.13 Zweite Ebene:      MITARBEITER (ab ca. Min. 60): arbeiten selbststaendig,
+                        machen aber Fehler, die gefunden und korrigiert werden
+                        muessen. Die aktive Aufgabe verschiebt sich von
+                        "bearbeiten" zu "delegieren + pruefen".
+0.14 Dritte Ebene:      PARAGRAPHEN-EDITOR (spaeter): eigene Vorschriften mit
+                        Bonus und Nebenwirkung schreiben.
+0.15 Prestige:          BEFOERDERUNG + VERSETZUNG. Eine Besoldungsstufe hoch
+                        (A9 -> A10 -> ...), dafuer neue Abteilung mit eigenen
+                        Vorgangstypen. Der Reset liefert also NEUEN INHALT,
+                        nicht nur hoehere Zahlen. Kein Fail-State, Karriere.
+0.16 Technik:           Web-Stack, TypeScript. Steam-Build via Tauri/Electron,
+                        Web-Demo (itch/CrazyGames) faellt als Funnel ab.
 
 
 ################################################################################
@@ -203,17 +232,129 @@ D7  VERSCHLEISS: Werkzeuge nutzen sich ab und muessen in der Bauphase
 
 
 ################################################################################
+# TEIL 1B - AUSARBEITUNG DES GEWAEHLTEN KONZEPTS: "DAS AMT"
+################################################################################
+
+--- DER EIN-SATZ-PITCH (Entwurf, A1 noch offen) ---
+"Du bist Sachbearbeiter. Der Aktenberg waechst schneller als du stempeln kannst -
+ und Feierabend ist keine Option."
+
+--- WARUM DIESES THEMA TRAEGT (Abgleich mit den Vorbildern) ---
+* IRONIE: Buerokratie ist das Gegenteil von Action. Genau diese Reibung ist
+  derselbe Witz wie "Sparschweine zerschlagen, um Rechnungen zu bezahlen".
+* WIEDERERKENNUNG: Jeder hat eine Amts-Geschichte. Der Pitch erzaehlt sich
+  von selbst weiter - das ist kostenloses Marketing.
+* CONTENT IST BILLIG: Vorgaenge sind Papier. Neue "Gegner-Typen" = neue
+  Formulare = ein Sprite + eine Regel. Das ist das BMBP-Sparschwein-Prinzip
+  zum Bruchteil der Art-Kosten.
+* SPRACHE IST DER HUMOR: Amtsdeutsch liefert Upgrade-Namen praktisch gratis
+  ("Zustaendigkeit abgeben", "Dienst nach Vorschrift", "Ablage P").
+* PASST ZU "ENTSCHEIDEN": Ein Vorgang hat mehrere moegliche Antworten
+  (genehmigen / ablehnen / weiterleiten / liegen lassen). Das ist von Natur
+  aus eine Entscheidung, kein Klick.
+
+--- TITEL-KANDIDATEN (A1 / Arbeitstitel noch offen) ---
+Deutsch:  "Dienst nach Vorschrift" | "Der Aktenberg" | "Ablage P"
+          "In dreifacher Ausfertigung" | "Bearbeitungsstand: Offen"
+          "Amtsschimmel" | "Vorgang laeuft" | "Nicht zustaendig"
+Englisch: "Stamp Duty" (echter Verwaltungsbegriff + Wortspiel auf duty)
+          "In Triplicate" | "Red Tape" | "Backlog" | "Rubber Stamp"
+          "Pending" | "Form 27B/6"
+Hinweis:  Der Steam-Titel sollte englisch sein (Reichweite), der Humor darf
+          trotzdem deutsch-buerokratisch bleiben. "Stamp Duty" und "Backlog"
+          sind die beiden stimmigsten Kandidaten.
+
+--- KERN-LOOP (Entwurf) ---
+1. Eine RUNDE = ein ARBEITSTAG.
+2. Auf dem Schreibtisch liegen Vorgaenge (Formulare). Jeder hat einen Typ,
+   einen Wert und verlangt eine Aktion.
+3. Der Spieler waehlt pro Vorgang: GENEHMIGEN / ABLEHNEN / WEITERLEITEN /
+   LIEGEN LASSEN. Jede Aktion kostet unterschiedlich viel Runden-Uhr und
+   bringt unterschiedlich viel Ertrag.
+4. Waehrend des Tages kommt NEUE POST (Nachschub-Mechanik D3): der Stapel
+   fuellt sich weiter. Deine Effizienz muss die Zulaufrate ueberholen.
+5. Runden-Uhr leer oder Dienstschluss -> Tag vorbei.
+6. BAUPHASE: Auswertung, Zulagen kassieren, Skill Tree, Ausruestung.
+7. Naechster Tag. Unerledigtes wandert mit.
+
+--- DRUCK-SYSTEM (das Rechnungs-Aequivalent, Entwurf) ---
+* DER RUECKSTAND (Aktenberg): Alles, was du liegen laesst, kommt morgen
+  wieder - plus neuer Zulauf. Der Berg ist gleichzeitig dein
+  Fortschrittsbalken UND deine Bedrohung (Design-Regel R4).
+* DIENSTAUFSICHTSBESCHWERDE: Ab einem Rueckstands-Schwellenwert greift der
+  Vorgesetzte ein und behaelt einen ANTEIL deiner Tagesleistung ein - exakt
+  die Inkasso-Mechanik aus Bills Must Be Paid, nur in Amtsdeutsch. Der Malus
+  schneeballt.
+* EILVORGAENGE: Einzelne Akten haben eine harte Frist (sichtbarer Countdown)
+  und erzeugen akute Spitzen im sonst gleichmaessigen Druck.
+
+--- WAEHRUNGEN (Entwurf) ---
+W1 In-Run:    ERLEDIGTE VORGAENGE -> am Tagesende ausgezahlt als ZULAGEN (EUR).
+W2 Meta:      FORTBILDUNGSPUNKTE (Skill Tree). Quelle: Tagesziele, neue
+              Vorgangstypen zum ersten Mal korrekt bearbeiten, Achievements.
+W3 Prestige:  BESOLDUNGSSTUFEN (A9, A10, A11 ...). Der Reset ist die
+              BEFOERDERUNG bzw. VERSETZUNG - kein Fail-State, sondern
+              Karriere. Thematisch perfekt: Du verlierst deine Abteilung,
+              faengst neu an, verdienst aber dauerhaft mehr.
+
+--- SKILL-TREE-AESTE (Arbeitsnamen, Reihenfolge = Spielgefuehl) ---
+T1 STEMPELTECHNIK   - Durchsatz pro Vorgang. Der "Grip Strength"-Ast.
+T2 BESCHAFFUNG      - Verlaengert die Runden-Uhr (Tinte/Zeit/Nerven).
+                      Das "Caffeine"-Aequivalent, aber eigenstaendig.
+T3 AKTENKUNDE       - Information: Typen frueher erkennen, Werte sehen,
+                      Vorsortierung, Posteingang-Vorschau.
+T4 DIENSTWEG        - Weiterleiten & Delegieren wird profitabel.
+T5 PARAGRAPHEN      - Regel-Ausnutzung, Combos, Multiplikatoren.
+T6 AMTSAUTORITAET   - Beschwerden abwehren, Rueckstands-Malus senken.
+T7 VITAMIN B        - Glueck, seltene Vorgaenge, Beziehungen.
+
+--- NODE-NAMEN (Kandidaten - Namen zuerst, Zahlen spaeter, Regel R6) ---
+"Blindstempeln" | "Gummiband-Meisterschaft" | "Zustaendigkeit abgeben"
+"Dienst nach Vorschrift" | "Ablage P" | "Der kurze Dienstweg"
+"Aktenzeichen-Gedaechtnis" | "Kaffeefleck-Immunitaet" | "Stempelkissen XXL"
+"In dreifacher Ausfertigung" | "Das Hintertuerchen (Par. 42 Abs. 3)"
+"Mittagspause verkuerzen" | "Posteingang-Radar" | "Zwei Haende, ein Ziel"
+"Unzustaendig, aber freundlich" | "Ermessensspielraum"
+
+--- VORGANGS-TYPEN (Content-Motor: Verhalten statt mehr HP) ---
+V1  Der Standardantrag      - Basis, schnell, wenig Ertrag.
+V2  Die Sammelakte          - mehrere Schritte, hoher Ertrag am Ende.
+V3  Der Unvollstaendige     - fehlt eine Seite: zurueckschicken (sicher,
+                              wenig) oder durchwinken (Risiko: Beschwerde).
+V4  Der Eilantrag           - harte Frist, tickt sichtbar.
+V5  Der Ping-Pong-Vorgang   - kommt zurueck, wenn falsch entschieden.
+V6  Der Falschzustaendige   - gehoert einer anderen Abteilung: Weiterleiten
+                              = sofortige Belohnung, Bearbeiten = Verschwendung.
+V7  Der Beschwerdebrief     - bestraft aktiv, solange er liegen bleibt.
+V8  Der Foerdermittelantrag - Jackpot, selten, hoher Zeitkosten.
+V9  Der Verklebte           - blockiert benachbarte Vorgaenge im Stapel.
+V10 Die Altakte             - liegt seit Runden da, Wert steigt mit Alter.
+
+--- KANDIDATEN FUER DIE ZWEITE SYSTEMEBENE (Minute 60-90, Regel R5) ---
+Z1 MITARBEITER: Du stellst Sachbearbeiter ein, die selbststaendig arbeiten -
+   aber FEHLER machen, die du finden und korrigieren musst. Die aktive
+   Aufgabe verschiebt sich von "bearbeiten" zu "delegieren + pruefen".
+   -> Loest gleichzeitig die Automatisierungs-Frage (J1/J2) und das
+      Agency-Problem von Loot Loop.
+Z2 PARAGRAPHEN-EDITOR: Du schreibst eigene Vorschriften, die Boni geben,
+   aber Nebenwirkungen haben ("Alle Eilantraege zaehlen doppelt - erzeugen
+   aber doppelt so viele Beschwerden"). Sehr eigenstaendig, sehr thematisch.
+Z3 ABTEILUNGEN: Mehrere Schreibtische/Referate gleichzeitig, zwischen denen
+   du wechselst. Klassische Incremental-Breite, aber weniger originell.
+
+################################################################################
 # TEIL 2 - FRAGENKATALOG (das hier muss beantwortet werden)
 ################################################################################
 Antworten bitte direkt hinter die Frage schreiben und [OFFEN] ersetzen.
 
 --- A. VISION & FANTASIE --------------------------------------------------------
 A1  Der Ein-Satz-Pitch: "Man ____, um ____." ......................... [OFFEN]
-A2  Welche Kern-Handlung (K1-K10 oder eigene)? ....................... [OFFEN]
+A2  Welche Kern-Handlung (K1-K10 oder eigene)? ....... K2 DAS AMT (entschieden)
 A3  Welche Emotion soll dominieren: Befriedigung, Humor, Cozy,
-    Stress/Hektik, Stolz? ............................................ [OFFEN]
+    Stress/Hektik, Stolz? ........................ HUMOR (entschieden), dazu
+    die Befriedigung des Abarbeitens. Stress bewusst dosiert, nicht dominant.
 A4  Wie viel Ironie/Satire? Absurd-komisch (BMBP) oder ernst-cozy
-    (Loot Loop)? ..................................................... [OFFEN]
+    (Loot Loop)? ............................ ABSURD-KOMISCH (entschieden)
 A5  Ton der Texte: trocken-buerokratisch, albern, sarkastisch? ....... [OFFEN]
 A6  Wer ist die Spielfigur - hat sie eine Geschichte oder ist sie
     nur eine Hand? ................................................... [OFFEN]
@@ -222,10 +363,12 @@ A6  Wer ist die Spielfigur - hat sie eine Geschichte oder ist sie
 B1  Was genau macht der Spieler pro Sekunde? (Klicken, Zielen,
     Ziehen, Timing treffen, Sortieren?) .............................. [OFFEN]
 B2  Ist die Eingabe geschicklichkeitsbasiert (Praezision/Timing) oder
-    entscheidungsbasiert (was zuerst)? ............................... [OFFEN]
+    entscheidungsbasiert (was zuerst)? ....... ENTSCHEIDUNGSBASIERT
+    (entschieden). Konsequenz: Upgrades muessen REGELN aendern, nicht nur
+    Zahlen - sonst hat der Spieler nichts zu entscheiden.
 B3  Maus, Tastatur oder beides? Controller-Support geplant? .......... [OFFEN]
-B4  Was ist die RUNDEN-UHR (die Ressource, die die Runde beendet)?
-    Stamina / Zeit / Luft / Treibstoff / Verschleiss / Wuerfe? ........ [OFFEN]
+B4  Was ist die RUNDEN-UHR? ......... STEMPELKISSEN-TINTE (entschieden).
+    Diskretes Aktionsbudget pro Arbeitstag, keine Echtzeit.
 B5  Kann der Spieler die Runde freiwillig frueh beenden (Cash-out)?
     (Sehr starke Spannungsquelle: bleiben oder sichern?) .............. [OFFEN]
 B6  Welche Mechanik-Drehung aus D1-D7 ist DEIN Alleinstellungsmerkmal? [OFFEN]
@@ -292,21 +435,21 @@ H4  Gibt es seltene "Jackpot"-Objekte? Wie selten? .................. [OFFEN]
 H5  Gibt es Bosse / besondere Runden? ............................... [OFFEN]
 
 --- I. META & PRESTIGE ---------------------------------------------------------------
-I1  Wie heisst dein Reset thematisch? (BMBP: "Bankruptcy" - kein Fail,
-    sondern Story-Beat) ............................................. [OFFEN]
+I1  Wie heisst dein Reset thematisch? ..... BEFOERDERUNG / VERSETZUNG
+    (entschieden). Besoldungsstufe steigt, Abteilung wechselt.
 I2  Was BLEIBT ueber den Reset hinweg? ............................. [OFFEN]
 I3  Wie schnell ist der zweite Durchlauf? (Ziel: 3-5x schneller,
     sonst fuehlt sich Prestige wie Strafe an - Loot-Loop-Lektion) .... [OFFEN]
 I4  Wie oft soll man prestigen? (2-3 mal / 10+ mal?) ............... [OFFEN]
-I5  Welche NEUE Systemebene oeffnet sich ab ca. Minute 60-90?
-    (Das ist die Antwort auf die Haupt-Kritik an BMBP) .............. [OFFEN]
+I5  Welche NEUE Systemebene ab Minute 60-90? ..... MITARBEITER mit
+    Fehlerquote (entschieden), spaeter PARAGRAPHEN-EDITOR als dritte Ebene.
 I6  Gibt es ein Endgame / "alles maxen"-Ziel? ...................... [OFFEN]
 
 --- J. AUTOMATISIERUNG ---------------------------------------------------------------
-J1  Wird irgendwann automatisiert (Incredicer: Helper Hands)? ....... [OFFEN]
-J2  Wenn ja: Wohin verschiebt sich dann die aktive Aufgabe des
-    Spielers? (WICHTIG - sonst wird das Spiel zum Idle-Game und
-    verliert seine Agency, siehe Loot-Loop-Kritik) .................. [OFFEN]
+J1  Wird automatisiert? ........ JA, ueber Mitarbeiter (entschieden)
+J2  Wohin verschiebt sich die aktive Aufgabe? ..... Von "Vorgaenge
+    bearbeiten" zu "Mitarbeiter einteilen + deren Fehler finden"
+    (entschieden). Das haelt die Agency oben.
 J3  Gibt es Offline-Fortschritt? ................................... [OFFEN]
 
 --- K. FEEL / JUICE / PRAESENTATION ---------------------------------------------------
@@ -317,8 +460,8 @@ K3F Wer macht Art & Sound? (selbst / Asset-Packs / Auftrag) ......... [OFFEN]
 K4F Gibt es eine Anti-Sehnenscheiden-Loesung (Halten statt Klicken)? . [OFFEN]
 
 --- L. UMFANG & TECHNIK -------------------------------------------------------------
-L1  Zielspielzeit bis "durch": 2 h / 4 h / 10 h / endlos? ........... [OFFEN]
-L2  Engine: Godot / Unity / Web (HTML5+Electron) / anderes? ......... [OFFEN]
+L1  Zielspielzeit bis "durch": ........................ 3-4 h (entschieden)
+L2  Engine: ............... WEB-STACK, TypeScript (entschieden)
 L3  Arbeitest du allein? Wie viele Stunden pro Woche? ............... [OFFEN]
 L4  Ziel-Releasedatum? Gibt es einen Termin, der wackelt? ........... [OFFEN]
 L5  Speicherstand-Format + Cloud-Saves? Was passiert bei Patches
@@ -326,8 +469,8 @@ L5  Speicherstand-Format + Cloud-Saves? Was passiert bei Patches
 L6  Sprachen zum Release? (DE/EN mindestens) ....................... [OFFEN]
 
 --- M. MARKT & RELEASE ---------------------------------------------------------------
-M1  Preis? (Vergleich: Loot Loop ca. 4-5 USD, Incredicer guenstig) .. [OFFEN]
-M2  Kostenlose Steam-Demo? (Empfehlung: ja, war bei BMBP der Motor) . [OFFEN]
+M1  Preis? ............................. ca. 5 EUR (entschieden, Richtwert)
+M2  Kostenlose Steam-Demo? ................................ JA (entschieden)
 M3  Zusaetzlich Web-Version (CrazyGames/itch) als Funnel? ........... [OFFEN]
 M4  Achievements: wie viele? (BMBP: 27) ............................ [OFFEN]
 M5  Steam-Tags & Capsule-Text - was steht im ersten Satz? .......... [OFFEN]
@@ -347,15 +490,15 @@ N4  Wird die Kern-Handlung nach 500 Wiederholungen zur Arbeit? Was
 ################################################################################
 # TEIL 3 - ENTSCHEIDUNGEN (wird gefuellt, sobald beantwortet)
 ################################################################################
-3.1 Kern-Handlung:              [OFFEN]
-3.2 Runden-Uhr:                 [OFFEN]
+3.1 Kern-Handlung:              DAS AMT - Vorgaenge bearbeiten (entschieden)
+3.2 Runden-Uhr:                 Stempelkissen-Tinte (entschieden)
 3.3 Druck-System:               [OFFEN]
 3.4 Waehrungen:                 [OFFEN]
 3.5 Skill-Tree-Aeste:           [OFFEN]
-3.6 Prestige-Name & Regeln:     [OFFEN]
-3.7 Zweite Systemebene:         [OFFEN]
-3.8 Engine & Scope:             [OFFEN]
-3.9 Preis & Release:            [OFFEN]
+3.6 Prestige-Name & Regeln:     Befoerderung + Versetzung (entschieden)
+3.7 Zweite Systemebene:         Mitarbeiter m. Fehlern, dann Paragraphen-Editor
+3.8 Engine & Scope:             TypeScript/Web, 3-4 h Spielzeit (entschieden)
+3.9 Preis & Release:            ca. 5 EUR + kostenlose Demo (Datum offen)
 
 
 ################################################################################
