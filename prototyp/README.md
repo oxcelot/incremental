@@ -192,6 +192,19 @@ Der Stempel behält immer seine Größe, die Reichweite zeigen die **amber
 umrandeten Plätze**. Da Trefferprüfung und sichtbarer Stempel jetzt dieselbe
 Fläche benutzen, stimmt die Markierung genau mit dem überein, was man sieht.
 
+### Platzmaße müssen nachgemessen werden
+
+Der Tisch ändert seine Größe noch, **nachdem** er gebaut wurde: Der
+Stempelhalter darunter entsteht später und staucht ihn, Schriften laden nach,
+das Fenster wird verändert. Wer die Platzmaße einmal beim Aufbau nimmt, rechnet
+den Rest der Runde mit einem Tisch, den es nicht mehr gibt.
+
+Konkret gemessen: 177 px gespeicherte Platzhöhe gegen 143 px echte — die Zeilen
+lagen um bis zu **70 px** daneben, und eine veraltete Mittelzeile reichte in die
+echte Unterzeile hinein. Deshalb prüft `ensureMeasured()` vor jedem Bild, ob der
+Tisch noch dort liegt, wo gemessen wurde, und `startRound()` misst zusätzlich
+am Ende des Aufbaus, wenn der Stempelhalter schon steht.
+
 Ein breiter Abdruck trifft **alle** Vorgänge unter sich, auch die, die einen
 anderen Stempel verlangen — die zählen als Beschwerde. Damit wird die Fläche
 zur Abwägung statt zum Freifahrtschein: Man sucht Nester gleichartiger

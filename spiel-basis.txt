@@ -916,6 +916,22 @@ Der Stempel behaelt immer seine Groesse. Die Reichweite zeigen ausschliesslich
 die AMBER UMRANDETEN PLAETZE, und die stimmen jetzt exakt mit dem ueberein,
 was der Stempel verdeckt.
 
+PLATZMASSE VERALTEN - UND ZWAR STILL
+Der Tisch aendert seine Groesse NACH dem Aufbau: der Stempelhalter darunter
+entsteht spaeter und staucht ihn, Schriften laden nach, das Fenster wird
+veraendert. Die Masse wurden bisher einmal beim Aufbau genommen - also von
+einem Tisch, den es eine Millisekunde spaeter nicht mehr gab.
+Gemessen: 177 px gespeicherte Platzhoehe gegen 143 px echte, Zeilen bis zu
+70 px daneben. Eine veraltete Mittelzeile reichte dadurch in die echte
+Unterzeile hinein, und ein Klick knapp unter der Oberkante der Unterzeile
+nahm die Mittelzeile mit, obwohl der Stempel sie nicht beruehrte.
+Loesung: ensureMeasured() prueft vor jedem Bild, ob der Tisch noch dort liegt,
+wo gemessen wurde; startRound() misst zusaetzlich am Ende des Aufbaus.
+=> MERKE: Jede Geometrie, die aus dem Layout gelesen und gespeichert wird,
+   braucht eine Pruefung auf Veraltung. Ein solcher Fehler zeigt sich NIE als
+   Absturz, sondern nur als "das Spiel fuehlt sich falsch an" - und ist ohne
+   Nachmessen praktisch nicht zu finden.
+
 Ein breiter Abdruck trifft weiterhin ALLE Vorgaenge unter sich, auch die mit
 einem anderen Sollstempel; die zaehlen als Beschwerde.
 

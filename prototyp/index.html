@@ -906,9 +906,24 @@ function buildDesk(){
 // zaehlt erst ab areaMinOverlap Ueberdeckung.
 let slotRects = [];
 let stampSize = 74;
+let deskBox = null;
 function measureSlots(){
   slotRects = [...el.desk.children].map(sl => sl.getBoundingClientRect());
   stampSize = el.stampBody.offsetWidth || 74;   // ohne Druck-Animation
+  deskBox = el.desk.getBoundingClientRect();
+}
+// Der Tisch aendert seine Groesse noch, nachdem er gebaut wurde: der
+// Stempelhalter darunter entsteht spaeter, Schriften laden nach, das Fenster
+// wird veraendert. Gemessene Platzmasse veralten dadurch stillschweigend - und
+// eine veraltete Zeile reicht in die Nachbarzeile hinein. Deshalb wird vor
+// jedem Bild geprueft, ob der Tisch noch dort liegt, wo gemessen wurde.
+function ensureMeasured(){
+  const r = el.desk.getBoundingClientRect();
+  if(!deskBox
+     || Math.abs(r.top - deskBox.top) > 0.5 || Math.abs(r.left - deskBox.left) > 0.5
+     || Math.abs(r.width - deskBox.width) > 0.5 || Math.abs(r.height - deskBox.height) > 0.5){
+    measureSlots();
+  }
 }
 function hitSlots(px, py){
   if(!slotRects.length) return [];
@@ -998,6 +1013,8 @@ function startRound(){
   el.home.hidden = true;
   el.stamp.hidden = false;
   el.inkBar.style.setProperty('--seg', (100 / STATS.freshnessMax) + '%');
+  measureSlots();   // jetzt steht der Stempelhalter, der Tisch hat seine
+                    // endgueltige Groesse - vorher gemessene Masse waeren falsch
   setStampColor();
   running = true; lastMove = performance.now();
   let prev = performance.now();
@@ -1020,6 +1037,7 @@ function setStampColor(){
 }
 
 function tick(dt, now){
+  ensureMeasured();
   S.t += dt;
   const left = Math.max(0, STATS.roundMs - S.t);
 
