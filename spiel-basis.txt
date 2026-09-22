@@ -814,27 +814,33 @@ Ziehen verschiebt die Ansicht, Mausrad zoomt, drei Knoepfe oben rechts fuer
 Plus, Minus und Zuruecksetzen. Damit ist der Baum nicht mehr auf die 13
 sichtbaren Knoten begrenzt - spaetere Aeste brauchen nur Koordinaten.
 
-KEINE VORAUSSETZUNGEN  [ENTSCHIEDEN 22.09.2026]
-Jeder Knoten ist jederzeit kaufbar, sofern das Geld reicht. Die Linien
-gruppieren nur noch, was zusammengehoert, und zeigen die staerkere Stufe
-desselben Gedankens - sperren tun sie nichts.
-  + Der Spieler kann von Tag 1 an auf ein teures Ziel hinsparen, statt sich
-    durch eine vorgegebene Kette zu arbeiten. Das Sparen selbst wird zur
-    Entscheidung.
-  - Der Baum verliert seine Fuehrung. Ein Anfaenger weiss nicht mehr, womit
-    er anfangen soll, und die Community-Routen ("erst Griffkraft, dann
-    Koffein"), die bei Bills Must Be Paid so gut funktionieren, entstehen
-    schwerer.
-  => Falls sich das im Test als zu beliebig anfuehlt: eine Abfrage auf den
-     Vorgaengerknoten in nodeState() stellt die Kette wieder her. Ein
-     Mittelweg waere, nur die teuren Ring-2-Knoten zu sperren.
+VORAUSSETZUNGEN  [ENTSCHIEDEN 22.09.2026, nach einem Zwischenstand ohne Sperre]
+Ein Knoten wird erst kaufbar, wenn der Knoten davor freigeschaltet ist. Die
+Ring-2-Knoten sind also gesperrt, bis ihr Ring-1-Knoten gekauft wurde.
+Ein Zwischenstand hatte die Sperre testweise entfernt. Das nahm dem Baum seine
+Fuehrung: ein Anfaenger weiss dann nicht, womit er anfangen soll, und die
+Community-Routen ("erst Griffkraft, dann Koffein"), die bei Bills Must Be Paid
+so gut funktionieren, entstehen schwerer. Die Kette bleibt.
 
-REIHENFOLGE-SICHERHEIT
-Weil die Knoten frei kaufbar sind, kann die staerkere Stufe zuerst gekauft
-werden. resetStats() wendet die Knoten in TREE-Reihenfolge an, und dort steht
-die schwaechere Stufe vorn - wer "Stempelkissen XXL" vor "Volles Kissen"
-kauft, behaelt Kapazitaet 4. Bei JEDEM neuen Upgrade-Paar mit absoluten
-Werten muss diese Reihenfolge eingehalten werden.
+EINGABE: WARUM DER KAUF NICHT AM CLICK-EVENT HAENGT
+Die Zoom-Steuerung ruft beim Ziehen setPointerCapture() auf dem SVG auf. Sobald
+ein Element den Zeiger eingefangen hat, wird das daraus abgeleitete click-Event
+auf dieses Element umgeleitet - es landet auf dem <svg> statt auf dem
+angeklickten <g>. Ein Klick-Listener am Knoten feuert dann NIE, und kein
+Upgrade laesst sich freischalten.
+Loesung: endDrag() erledigt den Kauf selbst. Beim pointerup wird geprueft, ob
+sich der Zeiger seit dem pointerdown um mehr als 5 px bewegt hat. Wenn nicht,
+war es ein Tippen - dann sucht document.elementFromPoint() den Knoten unter dem
+Zeiger und kauft ihn. Der Zeiger wird ausserdem erst eingefangen, NACHDEM die
+5-px-Schwelle ueberschritten ist.
+=> MERKE: Wer Zoom/Pan auf dieselbe Flaeche legt wie anklickbare Elemente, darf
+   sich nicht auf click verlassen. Das gilt spaeter genauso fuer den Tisch,
+   falls er jemals verschiebbar wird.
+
+PRUEFHINWEIS FUER SPAETER
+Ein UI-Test, der das Event direkt auf dem Zielelement ausloest, findet genau
+diesen Fehler NICHT - er umgeht die Umleitung. Klick-Tests muessen das Event
+auf dem Element unter den Koordinaten ausloesen und nach oben laufen lassen.
 
 DIE SECHS SPEICHEN (alle implementiert)
   Dienstzeit    Ueberstunden +6 s (2)      -> Gleitzeit +8 s (5)

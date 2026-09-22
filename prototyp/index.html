@@ -255,6 +255,7 @@
     letter-spacing:.04em; pointer-events:none;
   }
   #tree .link{stroke:var(--line); stroke-width:2.5;}
+  #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
   #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2;}
   #tree .ico{fill:none; stroke:var(--line); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
@@ -269,6 +270,7 @@
   #tree .nd.afford .cost{fill:var(--s-amber);}
   #tree .nd.short .box{stroke:var(--s-amber); stroke-dasharray:5 4; opacity:.6;}
   #tree .nd.short .ico{stroke:var(--s-amber); opacity:.6;}
+  #tree .nd.locked{opacity:.38;}
   #tree .nd:hover .box{stroke-width:3.5;}
   #tree .nd:focus-visible{outline:none;}
   #tree .nd:focus-visible .box{stroke:var(--s-blue); stroke-width:3.5;}
@@ -896,11 +898,15 @@ const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
 // ---------------------------------------------------------------- Homescreen
 const BOX = 56, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
+const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
 // --- Ansicht: verschieben und zoomen ---------------------------------------
 const VIEW0 = { x:0, y:45, w:760, h:640 };
 let view = Object.assign({}, VIEW0);
-let dragging = null, dragMoved = false;
+// Ein einzelner Zeiger steuert beides: ziehen verschiebt, tippen kauft.
+// Der Kauf laeuft bewusst NICHT ueber das click-Event - sobald das SVG den
+// Zeiger einfaengt, landet der Klick auf dem SVG statt auf dem Kaestchen.
+let drag = null;
 
 function applyView(){
   el.tree.setAttribute('viewBox', view.x + ' ' + view.y + ' ' + view.w + ' ' + view.h);
@@ -937,32 +943,46 @@ el.tree.addEventListener('wheel', e => {
 }, { passive:false });
 
 el.tree.addEventListener('pointerdown', e => {
-  dragging = { cx:e.clientX, cy:e.clientY, vx:view.x, vy:view.y };
-  dragMoved = false;
-  el.tree.classList.add('drag');
-  el.tree.setPointerCapture(e.pointerId);
+  drag = { id:e.pointerId, cx:e.clientX, cy:e.clientY, vx:view.x, vy:view.y, moved:false };
 });
 el.tree.addEventListener('pointermove', e => {
-  if(!dragging) return;
+  if(!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.cx, dy = e.clientY - drag.cy;
+  if(!drag.moved){
+    if(Math.abs(dx) < 5 && Math.abs(dy) < 5) return;   // noch ein Tippen
+    drag.moved = true;
+    el.tree.classList.add('drag');
+    try { el.tree.setPointerCapture(e.pointerId); } catch(err){}
+  }
   const sc = treeScale();
-  const dx = e.clientX - dragging.cx, dy = e.clientY - dragging.cy;
-  if(Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved = true;
-  view.x = dragging.vx - dx / sc;
-  view.y = dragging.vy - dy / sc;
+  view.x = drag.vx - dx / sc;
+  view.y = drag.vy - dy / sc;
   applyView();
 });
-for(const ev of ['pointerup','pointercancel']){
-  el.tree.addEventListener(ev, () => { dragging = null; el.tree.classList.remove('drag'); });
+function endDrag(e){
+  if(!drag || e.pointerId !== drag.id) return;
+  const tapped = !drag.moved;
+  if(drag.moved){ try { el.tree.releasePointerCapture(drag.id); } catch(err){} }
+  drag = null;
+  el.tree.classList.remove('drag');
+  if(tapped && e.type === 'pointerup'){
+    const t = document.elementFromPoint(e.clientX, e.clientY);
+    const g = t && t.closest('[data-node]');
+    if(g) buy(byId[g.dataset.node]);
+  }
 }
+el.tree.addEventListener('pointerup', endDrag);
+el.tree.addEventListener('pointercancel', endDrag);
 document.getElementById('zIn').onclick  = () => zoomCentre(1/1.25);
 document.getElementById('zOut').onclick = () => zoomCentre(1.25);
 document.getElementById('zFit').onclick = resetView;
 
 // --- Knoten ----------------------------------------------------------------
-// Jeder Knoten ist jederzeit kaufbar. Die Linien gruppieren nur noch, was
-// zusammengehoert - sie sperren nichts mehr.
+// Ein Knoten wird erst kaufbar, wenn sein Vorgaenger freigeschaltet ist.
 function nodeState(n){
   if(meta.owned[n.id]) return 'owned';
+  const par = PARENT[n.id];
+  if(par && !meta.owned[par]) return 'locked';
   return meta.account >= n.cost ? 'afford' : 'short';
 }
 
@@ -970,7 +990,9 @@ function renderTree(){
   let out = '';
   for(const [a,b] of LINKS){
     const A = byId[a], B = byId[b];
-    const cls = (meta.owned[a] && meta.owned[b]) ? ' done' : '';
+    const st = nodeState(B);
+    const cls = st === 'owned' ? ' done'
+              : (st === 'afford' || st === 'short') ? ' open' : '';
     const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1;
     const px = dx/L * (HALF + 4), py = dy/L * (HALF + 4);
     out += '<line class="link' + cls + '" x1="' + (A.x + px) + '" y1="' + (A.y + py)
@@ -994,9 +1016,8 @@ function renderTree(){
   el.tree.innerHTML = out;
   for(const g of el.tree.querySelectorAll('.nd')){
     const n = byId[g.dataset.node];
-    g.addEventListener('mouseenter', () => { if(!dragging) showDetail(n); });
+    g.addEventListener('mouseenter', () => { if(!drag || !drag.moved) showDetail(n); });
     g.addEventListener('focus', () => showDetail(n));
-    g.addEventListener('click', () => { if(!dragMoved) buy(n); });
     g.addEventListener('keydown', e => {
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); buy(n); }
     });
@@ -1018,9 +1039,11 @@ function buy(n){
 
 function showDetail(n){
   const st = nodeState(n);
-  el.detail.style.setProperty('--c', st === 'owned' ? 'var(--s-green)' : 'var(--s-amber)');
+  el.detail.style.setProperty('--c',
+    st === 'owned' ? 'var(--s-green)' : st === 'locked' ? 'var(--line)' : 'var(--s-amber)');
   const status =
       st === 'owned'  ? 'Freigeschaltet.'
+    : st === 'locked' ? 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + ' freischalten.'
     : st === 'afford' ? eur(n.cost) + ' \u20ac \u2014 klicken zum Freischalten.'
     : eur(n.cost) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
   el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
