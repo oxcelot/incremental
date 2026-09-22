@@ -814,6 +814,28 @@ Ziehen verschiebt die Ansicht, Mausrad zoomt, drei Knoepfe oben rechts fuer
 Plus, Minus und Zuruecksetzen. Damit ist der Baum nicht mehr auf die 13
 sichtbaren Knoten begrenzt - spaetere Aeste brauchen nur Koordinaten.
 
+KEINE VORAUSSETZUNGEN  [ENTSCHIEDEN 22.09.2026]
+Jeder Knoten ist jederzeit kaufbar, sofern das Geld reicht. Die Linien
+gruppieren nur noch, was zusammengehoert, und zeigen die staerkere Stufe
+desselben Gedankens - sperren tun sie nichts.
+  + Der Spieler kann von Tag 1 an auf ein teures Ziel hinsparen, statt sich
+    durch eine vorgegebene Kette zu arbeiten. Das Sparen selbst wird zur
+    Entscheidung.
+  - Der Baum verliert seine Fuehrung. Ein Anfaenger weiss nicht mehr, womit
+    er anfangen soll, und die Community-Routen ("erst Griffkraft, dann
+    Koffein"), die bei Bills Must Be Paid so gut funktionieren, entstehen
+    schwerer.
+  => Falls sich das im Test als zu beliebig anfuehlt: eine Abfrage auf den
+     Vorgaengerknoten in nodeState() stellt die Kette wieder her. Ein
+     Mittelweg waere, nur die teuren Ring-2-Knoten zu sperren.
+
+REIHENFOLGE-SICHERHEIT
+Weil die Knoten frei kaufbar sind, kann die staerkere Stufe zuerst gekauft
+werden. resetStats() wendet die Knoten in TREE-Reihenfolge an, und dort steht
+die schwaechere Stufe vorn - wer "Stempelkissen XXL" vor "Volles Kissen"
+kauft, behaelt Kapazitaet 4. Bei JEDEM neuen Upgrade-Paar mit absoluten
+Werten muss diese Reihenfolge eingehalten werden.
+
 DIE SECHS SPEICHEN (alle implementiert)
   Dienstzeit    Ueberstunden +6 s (2)      -> Gleitzeit +8 s (5)
   Takt          Routine -0,15 s (3)        -> Blindstempeln -0,20 s (6)

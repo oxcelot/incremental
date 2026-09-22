@@ -255,7 +255,6 @@
     letter-spacing:.04em; pointer-events:none;
   }
   #tree .link{stroke:var(--line); stroke-width:2.5;}
-  #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
   #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2;}
   #tree .ico{fill:none; stroke:var(--line); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
@@ -270,7 +269,6 @@
   #tree .nd.afford .cost{fill:var(--s-amber);}
   #tree .nd.short .box{stroke:var(--s-amber); stroke-dasharray:5 4; opacity:.6;}
   #tree .nd.short .ico{stroke:var(--s-amber); opacity:.6;}
-  #tree .nd.locked{opacity:.38;}
   #tree .nd:hover .box{stroke-width:3.5;}
   #tree .nd:focus-visible{outline:none;}
   #tree .nd:focus-visible .box{stroke:var(--s-blue); stroke-width:3.5;}
@@ -504,7 +502,6 @@ const LINKS = [
   ['start','hand'], ['hand','vorbei'],
   ['start','spar'], ['spar','vorsc'],
 ];
-const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
 // ---------------------------------------------------------------- Elemente
 const el = {
@@ -962,10 +959,10 @@ document.getElementById('zOut').onclick = () => zoomCentre(1.25);
 document.getElementById('zFit').onclick = resetView;
 
 // --- Knoten ----------------------------------------------------------------
+// Jeder Knoten ist jederzeit kaufbar. Die Linien gruppieren nur noch, was
+// zusammengehoert - sie sperren nichts mehr.
 function nodeState(n){
   if(meta.owned[n.id]) return 'owned';
-  const par = PARENT[n.id];
-  if(par && !meta.owned[par]) return 'locked';
   return meta.account >= n.cost ? 'afford' : 'short';
 }
 
@@ -973,9 +970,7 @@ function renderTree(){
   let out = '';
   for(const [a,b] of LINKS){
     const A = byId[a], B = byId[b];
-    const st = nodeState(B);
-    const cls = st === 'owned' ? ' done'
-              : (st === 'afford' || st === 'short') ? ' open' : '';
+    const cls = (meta.owned[a] && meta.owned[b]) ? ' done' : '';
     const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1;
     const px = dx/L * (HALF + 4), py = dy/L * (HALF + 4);
     out += '<line class="link' + cls + '" x1="' + (A.x + px) + '" y1="' + (A.y + py)
@@ -1023,14 +1018,11 @@ function buy(n){
 
 function showDetail(n){
   const st = nodeState(n);
-  const color = st === 'owned' ? 'var(--s-green)'
-              : st === 'locked' ? 'var(--line)' : 'var(--s-amber)';
-  el.detail.style.setProperty('--c', color);
+  el.detail.style.setProperty('--c', st === 'owned' ? 'var(--s-green)' : 'var(--s-amber)');
   const status =
       st === 'owned'  ? 'Freigeschaltet.'
     : st === 'afford' ? eur(n.cost) + ' \u20ac \u2014 klicken zum Freischalten.'
-    : st === 'short'  ? eur(n.cost) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.'
-    : 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + '.';
+    : eur(n.cost) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
   el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
                       + '<div class="de">' + n.eff + '</div>'
                       + '<div class="dc">' + status + '</div>';

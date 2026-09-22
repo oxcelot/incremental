@@ -32,6 +32,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
 | Homescreen | Fortbildungsplan: 13 Icon-Knoten, zoom- und verschiebbar |
+| Voraussetzungen | keine — jeder Knoten ist jederzeit kaufbar, nur das Geld begrenzt |
 | Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
 Vier Formulartypen statt der drei aus der Spezifikation, damit jeder der vier
@@ -102,3 +103,13 @@ eigenen Gehalt. Der ganze Baum kostet **1000 €**, ein Tag bringt anfangs rund
 
 Das ist der wichtigste Balancing-Hebel im Prototyp: Fühlt sich der Baum zäh an,
 gehören die `cost`-Werte in `TREE` heruntergesetzt, nicht die Erträge hoch.
+
+**Keine Voraussetzungen.** Jeder Knoten lässt sich jederzeit kaufen, sofern das
+Geld reicht. Die Linien gruppieren nur noch, was zusammengehört, und zeigen,
+welcher Knoten die stärkere Stufe desselben Gedankens ist — sperren tun sie
+nichts. Kauft man die stärkere Stufe zuerst, bleibt sie erhalten: `resetStats()`
+wendet die Knoten in `TREE`-Reihenfolge an, und dort steht die schwächere Stufe
+vorn. Wer „Stempelkissen XXL" vor „Volles Kissen" kauft, behält Kapazität 4.
+
+Soll die Reihenfolge wieder erzwungen werden, genügt in `nodeState()` eine
+Abfrage auf den Vorgängerknoten.
