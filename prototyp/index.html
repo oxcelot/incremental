@@ -237,10 +237,23 @@
   .stat{text-align:right;}
   .stat b{display:block; font-family:var(--font-stamp); font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1;}
   .stat span{display:block; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600;}
-  .stat.fp b{color:var(--s-amber);}
+  .stat.money b{color:var(--s-amber);}
 
-  .treewrap{flex:1 1 auto; min-height:0; overflow:hidden;}
-  #tree{display:block; width:100%; height:100%;}
+  .treewrap{flex:1 1 auto; min-height:0; overflow:hidden; position:relative;}
+  #tree{display:block; width:100%; height:100%; touch-action:none; cursor:grab;}
+  #tree.drag{cursor:grabbing;}
+  .zoom{position:absolute; top:8px; right:8px; display:flex; flex-direction:column; gap:5px;}
+  .zoom button{
+    width:32px; height:32px; cursor:pointer; background:var(--surface);
+    border:1px solid var(--line); border-radius:3px; color:var(--text);
+    font-family:var(--font-stamp); font-size:17px; font-weight:700; line-height:1;
+  }
+  .zoom button:hover{background:color-mix(in srgb, var(--s-amber) 16%, var(--surface));}
+  .zoom button:focus-visible{outline:2px solid var(--s-amber); outline-offset:2px;}
+  .zoomhint{
+    position:absolute; left:8px; bottom:6px; font-size:10px; color:var(--muted);
+    letter-spacing:.04em; pointer-events:none;
+  }
   #tree .link{stroke:var(--line); stroke-width:2.5;}
   #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
@@ -327,10 +340,18 @@
     </div>
     <div class="spacer"></div>
     <div class="stat"><b id="hDay">1</b><span>Diensttage</span></div>
-    <div class="stat"><b id="hAcct">0,00</b><span>Kontostand &euro;</span></div>
-    <div class="stat fp"><b id="hFp">0</b><span>Fortbildungs&shy;punkte</span></div>
+    <div class="stat"><b id="hBest">0,00</b><span>Bester Tag &euro;</span></div>
+    <div class="stat money"><b id="hAcct">0,00</b><span>Kontostand &euro;</span></div>
   </div>
-  <div class="treewrap"><svg id="tree" viewBox="0 45 760 640" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Fortbildungsplan"></svg></div>
+  <div class="treewrap">
+    <svg id="tree" viewBox="0 45 760 640" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Fortbildungsplan"></svg>
+    <div class="zoom">
+      <button type="button" id="zIn" aria-label="Vergr&ouml;&szlig;ern">+</button>
+      <button type="button" id="zOut" aria-label="Verkleinern">&minus;</button>
+      <button type="button" id="zFit" aria-label="Ansicht zur&uuml;cksetzen">&#8634;</button>
+    </div>
+    <div class="zoomhint">Ziehen zum Verschieben &middot; Mausrad zum Zoomen</div>
+  </div>
   <div class="homefoot">
     <div class="detail" id="detail"></div>
     <button class="gostart" id="goDay">Dienst antreten</button>
@@ -361,7 +382,8 @@ const CONFIG = {
   comboStep:      0.10,   // Multiplikator-Zuwachs pro Kombo-Stufe
   comboCap:       3.00,   // Deckel
   freshnessMax:   1,      // Vorgaenge, die ein frisches Kissen traegt
-  fadedFactor:    0.25,   // Ertrag mit trockenem Stempel
+                          // Ist das Kissen leer, stempelt der Stempel GAR NICHT
+                          // mehr: der Takt verpufft, Tinte kostet er keine.
   missBreaksCombo:false,  // Fehldruck bricht die Kombo? (Auto-Feuer: eher nein)
   afkBeats:       3,      // Takte ohne Mausbewegung, bis die Hand sich hebt
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
@@ -404,7 +426,6 @@ function resetStats(){
   STATS.slots        = CONFIG.slots;
   STATS.inkCost      = CONFIG.inkCost;
   STATS.freshnessMax = CONFIG.freshnessMax;
-  STATS.fadedFactor  = CONFIG.fadedFactor;
   STATS.wrongPenalty = CONFIG.wrongPenalty;
   STATS.swapCost     = 1;   // Anteil eines Taktes fuer den Stempelwechsel
   STATS.reinkCost    = 1;   // Anteil eines Taktes fuers Nachtinten
@@ -433,45 +454,45 @@ const TREE = [
   { id:'start', x:380, y:350, icon:'start', cost:0, name:'Dienstantritt',
     eff:'Ein Tisch, vier Stempel und keine Wahl.' },
 
-  { id:'ueber', x:380, y:220, icon:'clock', cost:2, name:'\u00DCberstunden',
+  { id:'ueber', x:380, y:220, icon:'clock', cost:40, name:'\u00DCberstunden',
     eff:'Der Arbeitstag dauert 6 Sekunden l\u00e4nger.',
     apply:st => st.roundMs += 6000 },
-  { id:'gleit', x:380, y:85, icon:'clockp', cost:5, name:'Gleitzeit',
+  { id:'gleit', x:380, y:85, icon:'clockp', cost:120, name:'Gleitzeit',
     eff:'Noch einmal 8 Sekunden mehr Dienstzeit.',
     apply:st => st.roundMs += 8000 },
 
-  { id:'routi', x:553, y:285, icon:'chev', cost:3, name:'Routine',
+  { id:'routi', x:553, y:285, icon:'chev', cost:60, name:'Routine',
     eff:'Der Stempeltakt sinkt von 1,50 s auf 1,35 s.',
     apply:st => st.beatMs -= 150 },
-  { id:'blind', x:726, y:218, icon:'chev3', cost:6, name:'Blindstempeln',
+  { id:'blind', x:726, y:218, icon:'chev3', cost:140, name:'Blindstempeln',
     eff:'Der Takt sinkt um weitere 0,20 s. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
     apply:st => st.beatMs -= 200 },
 
-  { id:'bote1', x:553, y:415, icon:'tray1', cost:2, name:'Flinker Bote',
+  { id:'bote1', x:553, y:415, icon:'tray1', cost:40, name:'Flinker Bote',
     eff:'Vorg\u00e4nge r\u00fccken alle 1,3 s nach statt alle 1,6 s.',
     apply:st => st.spawnMs = 1300 },
-  { id:'bote2', x:726, y:482, icon:'tray2', cost:5, name:'Zweiter Bote',
+  { id:'bote2', x:726, y:482, icon:'tray2', cost:110, name:'Zweiter Bote',
     eff:'Vorg\u00e4nge r\u00fccken alle 1,0 s nach. Der Tisch bleibt voll.',
     apply:st => st.spawnMs = 1000 },
 
-  { id:'voll', x:380, y:480, icon:'pad1', cost:2, name:'Volles Kissen',
+  { id:'voll', x:380, y:480, icon:'pad1', cost:40, name:'Volles Kissen',
     eff:'Das Stempelkissen tr\u00e4gt zwei Vorg\u00e4nge statt einem.',
     apply:st => st.freshnessMax = 2 },
-  { id:'xxl', x:380, y:615, icon:'pad2', cost:6, name:'Stempelkissen XXL',
+  { id:'xxl', x:380, y:615, icon:'pad2', cost:150, name:'Stempelkissen XXL',
     eff:'Das Kissen tr\u00e4gt vier Vorg\u00e4nge. Nachtinten wird zur Nebensache.',
     apply:st => st.freshnessMax = 4 },
 
-  { id:'hand', x:207, y:415, icon:'rot', cost:4, name:'Handgelenkdrehung',
+  { id:'hand', x:207, y:415, icon:'rot', cost:80, name:'Handgelenkdrehung',
     eff:'Der Stempelwechsel kostet nur noch einen halben Takt.',
     apply:st => st.swapCost = 0.5 },
-  { id:'vorbei', x:34, y:482, icon:'droprot', cost:4, name:'Nachtinten im Vorbeigehen',
+  { id:'vorbei', x:34, y:482, icon:'droprot', cost:90, name:'Nachtinten im Vorbeigehen',
     eff:'Auch das Nachtinten kostet nur noch einen halben Takt.',
     apply:st => st.reinkCost = 0.5 },
 
-  { id:'spar', x:207, y:285, icon:'dropmin', cost:2, name:'Sparsames Kissen',
+  { id:'spar', x:207, y:285, icon:'dropmin', cost:40, name:'Sparsames Kissen',
     eff:'Ein Stempeldruck kostet 0,35 \u20ac Tinte statt 0,50 \u20ac.',
     apply:st => st.inkCost = 0.35 },
-  { id:'vorsc', x:34, y:218, icon:'shield', cost:4, name:'Dienst nach Vorschrift',
+  { id:'vorsc', x:34, y:218, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
     eff:'Eine Beschwerde kostet nur noch 1,00 \u20ac statt 2,00 \u20ac.',
     apply:st => st.wrongPenalty = 1 },
 ];
@@ -499,7 +520,7 @@ const el = {
   warn: document.getElementById('warn'),
   hDay: document.getElementById('hDay'),
   hAcct: document.getElementById('hAcct'),
-  hFp: document.getElementById('hFp'),
+  hBest: document.getElementById('hBest'),
   stamp: document.getElementById('stamp'),
   stampBody: document.getElementById('stampBody'),
   ringFg: document.querySelector('#ring .fg'),
@@ -524,7 +545,7 @@ let pointer = { x:-999, y:-999 };
 let lastMove = 0;
 let rafId = 0;
 let roundToken = 0;
-let meta = { day:1, best:0, fp:0, account:0, owned:{ start:true } };
+let meta = { day:1, best:0, account:0, owned:{ start:true } };
 
 const eur = n => n.toFixed(2).replace('.', ',');
 
@@ -577,6 +598,7 @@ const SFX = {
   correct(tier){ const f = 392 * Math.pow(2, tier/12); tone(f, 0.11, 'triangle', 0.16, f*1.5); },
   wrong(){ tone(150, 0.26, 'sawtooth', 0.14, 70); },
   miss(){ noise(0.07, 130, 0.5, 0.14); },
+  dry(){ noise(0.05, 190, 1.1, 0.07); tone(120, 0.05, 'sine', 0.05); },
   reink(){ noise(0.16, 700, 1.4, 0.13); tone(200, 0.13, 'sine', 0.09, 300); },
   swap(){ noise(0.05, 1800, 3, 0.11); tone(560, 0.05, 'square', 0.06); },
   pretick(){ tone(2100, 0.022, 'square', 0.022); },
@@ -651,7 +673,7 @@ function startRound(){
   S = {
     t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
     combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
-    swaps:0, reinks:0, bestCombo:0,
+    swaps:0, reinks:0, bestCombo:0, dryBeats:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
@@ -747,11 +769,19 @@ function strike(now){
   el.stamp.classList.remove('press');
   void el.stamp.offsetWidth;
   el.stamp.classList.add('press');
-  SFX.thud();
-
   const target = document.elementFromPoint(pointer.x, pointer.y);
   const pad  = target && target.closest('[data-pad]');
   const form = target && target.closest('[data-form]');
+  const dry  = S.freshness <= 0;
+
+  // Leeres Kissen: der Stempel hinterlaesst nichts. Der Takt ist weg, Tinte
+  // kostet er keine, der Vorgang bleibt liegen. Nur die Kissen gehen noch.
+  if(dry && !pad){
+    SFX.dry(); S.dryBeats++;
+    float('kein Abdruck', 'var(--bad)');
+    return;
+  }
+  SFX.thud();
 
   // 1) Eigenes Kissen -> nachtinten (Parkplatz, Kombo bleibt)
   if(pad && pad.dataset.pad === S.stamp){
@@ -776,12 +806,11 @@ function strike(now){
     charge(); wear();
     const t = TYPES.find(x => x.id === form.dataset.form);
     if(t.want === S.stamp){
-      const faded = S.freshness <= 0;
-      const gain = t.value * mult() * (faded ? STATS.fadedFactor : 1);
+      const gain = t.value * mult();
       S.earned += gain; S.done++; S.combo++;
       S.bestCombo = Math.max(S.bestCombo, S.combo);
       SFX.correct(Math.min(S.combo, 14));
-      float('+' + eur(gain) + (faded ? ' trocken' : ''), 'var(--good)');
+      float('+' + eur(gain), 'var(--good)');
       finish(form, true);
     } else {
       S.wrongs++; S.combo = 0;
@@ -834,10 +863,8 @@ function endRound(){
   const complaints = S.wrongs * STATS.wrongPenalty;
   const raw = S.earned - inkTotal - complaints;
   const net = CONFIG.floorAtZero ? Math.max(0, raw) : raw;
-  const fp = 1 + Math.floor(S.done / 8);
   meta.best = Math.max(meta.best, net);
   meta.account += net;
-  meta.fp += fp;
 
   el.sheet.innerHTML =
     '<h1>Abrechnungsbogen</h1>'
@@ -848,11 +875,13 @@ function endRound(){
   + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
   + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
-  + row('Fortbildungspunkte', '+' + fp)
+  + (S.dryBeats ? row('Leerschl&auml;ge ohne Tinte (' + S.dryBeats + ')', '—') : '')
   + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'
   + '</table>'
   + '<div class="note">'
   + (raw < 0 && CONFIG.floorAtZero ? 'Fehlbetrag von ' + eur(-raw) + ' &euro; wurde erlassen.<br>' : '')
+  + (S.dryBeats ? 'Mit vollem Kissen h&auml;tten diese ' + S.dryBeats
+       + ' Takte rund ' + eur(S.dryBeats * 4) + ' &euro; gebracht.<br>' : '')
   + 'R&uuml;ckstand im Posteingang: <b>' + backlog + '</b> Vorg&auml;nge. '
   + 'Zulauf heute: ' + Math.round(STATS.roundMs/STATS.inflowMs) + ', geschafft: ' + S.done + '.'
   + (meta.day > 1 ? '<br>Bester Tag bisher: ' + eur(meta.best) + ' &euro;.' : '')
@@ -871,11 +900,73 @@ const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
 const BOX = 56, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
 
+// --- Ansicht: verschieben und zoomen ---------------------------------------
+const VIEW0 = { x:0, y:45, w:760, h:640 };
+let view = Object.assign({}, VIEW0);
+let dragging = null, dragMoved = false;
+
+function applyView(){
+  el.tree.setAttribute('viewBox', view.x + ' ' + view.y + ' ' + view.w + ' ' + view.h);
+}
+function treeScale(){
+  const r = el.tree.getBoundingClientRect();
+  return Math.min(r.width / view.w, r.height / view.h) || 1;
+}
+function svgPt(cx, cy){
+  const r = el.tree.getBoundingClientRect(), sc = treeScale();
+  return {
+    x: view.x + (cx - r.left - (r.width  - view.w * sc) / 2) / sc,
+    y: view.y + (cy - r.top  - (r.height - view.h * sc) / 2) / sc,
+  };
+}
+function zoomAt(cx, cy, k){
+  const p = svgPt(cx, cy);
+  const nw = Math.min(2400, Math.max(260, view.w * k));
+  const kk = nw / view.w;
+  view.x = p.x - (p.x - view.x) * kk;
+  view.y = p.y - (p.y - view.y) * kk;
+  view.w = nw; view.h *= kk;
+  applyView();
+}
+function zoomCentre(k){
+  const r = el.tree.getBoundingClientRect();
+  zoomAt(r.left + r.width/2, r.top + r.height/2, k);
+}
+function resetView(){ view = Object.assign({}, VIEW0); applyView(); }
+
+el.tree.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoomAt(e.clientX, e.clientY, e.deltaY > 0 ? 1.15 : 1/1.15);
+}, { passive:false });
+
+el.tree.addEventListener('pointerdown', e => {
+  dragging = { cx:e.clientX, cy:e.clientY, vx:view.x, vy:view.y };
+  dragMoved = false;
+  el.tree.classList.add('drag');
+  el.tree.setPointerCapture(e.pointerId);
+});
+el.tree.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  const sc = treeScale();
+  const dx = e.clientX - dragging.cx, dy = e.clientY - dragging.cy;
+  if(Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved = true;
+  view.x = dragging.vx - dx / sc;
+  view.y = dragging.vy - dy / sc;
+  applyView();
+});
+for(const ev of ['pointerup','pointercancel']){
+  el.tree.addEventListener(ev, () => { dragging = null; el.tree.classList.remove('drag'); });
+}
+document.getElementById('zIn').onclick  = () => zoomCentre(1/1.25);
+document.getElementById('zOut').onclick = () => zoomCentre(1.25);
+document.getElementById('zFit').onclick = resetView;
+
+// --- Knoten ----------------------------------------------------------------
 function nodeState(n){
   if(meta.owned[n.id]) return 'owned';
   const par = PARENT[n.id];
   if(par && !meta.owned[par]) return 'locked';
-  return meta.fp >= n.cost ? 'afford' : 'short';
+  return meta.account >= n.cost ? 'afford' : 'short';
 }
 
 function renderTree(){
@@ -894,22 +985,23 @@ function renderTree(){
     const st = nodeState(n);
     out += '<g class="nd ' + st + '" data-node="' + n.id + '" tabindex="0" role="button"'
          + ' aria-label="' + n.name
-         + (st === 'owned' ? ', freigeschaltet' : ', ' + n.cost + ' Punkte') + '">'
+         + (st === 'owned' ? ', freigeschaltet' : ', ' + n.cost + ' Euro') + '">'
          + '<rect class="box" x="' + (n.x - HALF) + '" y="' + (n.y - HALF) + '"'
          + ' width="' + BOX + '" height="' + BOX + '" rx="3"></rect>'
          + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ')">' + ICONS[n.icon] + '</g>'
          + (st === 'owned' ? ''
-            : '<rect class="costbg" x="' + (n.x - 13) + '" y="' + (n.y + HALF + 3)
-              + '" width="26" height="20" rx="3"></rect>'
-              + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 18) + '">' + n.cost + '</text>')
+            : '<rect class="costbg" x="' + (n.x - 22) + '" y="' + (n.y + HALF + 3)
+              + '" width="44" height="20" rx="3"></rect>'
+              + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 18) + '">'
+              + n.cost + '\u20ac</text>')
          + '</g>';
   }
   el.tree.innerHTML = out;
   for(const g of el.tree.querySelectorAll('.nd')){
     const n = byId[g.dataset.node];
-    g.addEventListener('mouseenter', () => showDetail(n));
+    g.addEventListener('mouseenter', () => { if(!dragging) showDetail(n); });
     g.addEventListener('focus', () => showDetail(n));
-    g.addEventListener('click', () => buy(n));
+    g.addEventListener('click', () => { if(!dragMoved) buy(n); });
     g.addEventListener('keydown', e => {
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); buy(n); }
     });
@@ -918,10 +1010,10 @@ function renderTree(){
 
 function buy(n){
   if(nodeState(n) !== 'afford'){ showDetail(n); return; }
-  meta.fp -= n.cost;
+  meta.account -= n.cost;
   meta.owned[n.id] = true;
   resetStats();
-  el.hFp.textContent = meta.fp;
+  el.hAcct.textContent = eur(meta.account);
   renderTree();
   const g = el.tree.querySelector('[data-node="' + n.id + '"]');
   if(g){ g.classList.add('buy'); setTimeout(() => g.classList.remove('buy'), 320); }
@@ -936,8 +1028,8 @@ function showDetail(n){
   el.detail.style.setProperty('--c', color);
   const status =
       st === 'owned'  ? 'Freigeschaltet.'
-    : st === 'afford' ? n.cost + ' Fortbildungspunkte \u2014 klicken zum Freischalten.'
-    : st === 'short'  ? n.cost + ' Fortbildungspunkte \u2014 du hast erst ' + meta.fp + '.'
+    : st === 'afford' ? eur(n.cost) + ' \u20ac \u2014 klicken zum Freischalten.'
+    : st === 'short'  ? eur(n.cost) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.'
     : 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + '.';
   el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
                       + '<div class="de">' + n.eff + '</div>'
@@ -950,8 +1042,9 @@ function showHome(){
   el.warn.hidden = true;
   el.home.hidden = false;
   el.hDay.textContent = meta.day;
+  el.hBest.textContent = eur(meta.best);
   el.hAcct.textContent = eur(meta.account);
-  el.hFp.textContent = meta.fp;
+  resetView();
   renderTree();
   showDetail(byId.start);
   el.goDay.textContent = 'Tag ' + (meta.day + 1) + ' antreten';
@@ -975,7 +1068,7 @@ function showIntro(){
   + '<ul>'
   + '<li>Auf ein <b>fremdes Kissen</b> stempeln &rarr; Stempel gewechselt. Kostet einen Takt und die Kombo.</li>'
   + '<li>Auf das <b>eigene Kissen</b> stempeln &rarr; nachgetintet. Kostet einen Takt, h&auml;lt aber die Kombo &ndash; der Platz zum Nachdenken.</li>'
-  + '<li>Das Kissen tr&auml;gt anfangs <b>genau einen Vorgang</b>. Danach wird der Stempel grau und ein rotes <b>!</b> erscheint: er bringt nur noch ein Viertel, bis du nachtintest.</li>'
+  + '<li>Das Kissen tr&auml;gt anfangs <b>genau einen Vorgang</b>. Danach wird der Stempel grau und ein rotes <b>!</b> erscheint: er hinterl&auml;sst <b>gar nichts</b> mehr. Der Takt verpufft, bis du nachtintest.</li>'
   + '<li>Maus vom Tisch nehmen &rarr; Hand gehoben. Keine Tinte, aber der Takt ist trotzdem weg.</li>'
   + '</ul>'
   + '<h2>Welcher Stempel wohin</h2>'
@@ -983,7 +1076,7 @@ function showIntro(){
   + LEGEND.map(([k,v]) => '<div><span class="k">' + k + '</span><span class="v">' + v + '</span></div>').join('')
   + '</div>'
   + '<div class="note">Gleicher Stempel hintereinander baut die Kombo auf (bis &times;3). Falscher Stempel: Beschwerde. '
-  + 'Im Fortbildungsplan kaufst du dir gr&ouml;&szlig;ere Kissen &ndash; und alles andere auch.</div>'
+  + 'Im Fortbildungsplan kaufst du dir von deinem Gehalt gr&ouml;&szlig;ere Kissen &ndash; und alles andere auch.</div>'
   + '<button class="btn" id="go">Dienst antreten</button>';
   el.veil.hidden = false;
   const b = document.getElementById('go');
@@ -1003,6 +1096,8 @@ window.addEventListener('pointerdown', e => {
 function boot(data){
   if(data && typeof data.day === 'number') meta = data;
   if(!meta.owned) meta.owned = { start:true };
+  if(typeof meta.account !== 'number') meta.account = 0;
+  if(typeof meta.best !== 'number') meta.best = 0;
   resetStats();
   showIntro();
 }

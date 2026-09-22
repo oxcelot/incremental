@@ -25,14 +25,14 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Stempel | GENEHMIGT, NACHFORDERUNG, WEITERLEITEN, ABGELEHNT |
 | Stempelwechsel | auf das fremde Kissen stempeln — kostet einen Takt und die Kombo |
 | Nachtinten | auf das eigene Kissen stempeln — kostet einen Takt, **hält** die Kombo |
-| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel grau, ein rotes `!` erscheint, der Abdruck bringt nur noch 25 % |
+| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel grau, ein rotes `!` erscheint — er stempelt **gar nicht** mehr |
 | Hand gehoben | Maus außerhalb des Tisches — keine Tinte, Takt trotzdem weg |
 | Tinte | Kostenposten, 0,50 € pro Druck, Abrechnung bei Dienstschluss |
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan: 13 Icon-Knoten, alle freischaltbar |
-| Fortbildungspunkte | 1 pro Tag + 1 je 8 bearbeitete Vorgänge |
+| Homescreen | Fortbildungsplan: 13 Icon-Knoten, zoom- und verschiebbar |
+| Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
 Vier Formulartypen statt der drei aus der Spezifikation, damit jeder der vier
 Stempel eine Aufgabe hat.
@@ -59,6 +59,7 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 5. Ist der automatische Takt angenehm oder hetzt er?
 6. Reichen 26 Takte, oder ist der Tag vorbei, bevor er angefangen hat?
 7. Machen die Namen im Fortbildungsplan Lust auf den nächsten Tag?
+8. Fühlt sich ein Leerschlag nach eigenem Fehler an oder nach Gemeinheit?
 
 ## Der Fortbildungsplan
 
@@ -77,19 +78,27 @@ Spiellogik.
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Nachtinten im Vorbeigehen (½ Takt) |
 | Beschaffung | Sparsames Kissen (0,35 €) | Dienst nach Vorschrift (Beschwerde 1,00 €) |
 
-## Warum `fadedFactor` bei 0,25 steht und nicht bei 0,5
+## Das leere Kissen
 
-Bei einem Kissen, das genau einen Vorgang trägt, gilt über drei Takte:
-
-- nie nachtinten: `4,00 + Faktor·4,00 + Faktor·4,00`
-- jeden zweiten Takt nachtinten: `4,00 + 0 + 4,00 = 8,00`
-
-Bei `fadedFactor = 0,5` ergibt die erste Zeile ebenfalls genau 8,00 — beide
-Strategien sind exakt gleichwertig, die Entscheidung ist wertlos. Erst bei 0,25
-(Ergebnis 6,00) lohnt sich Nachtinten, und das Weiterstempeln mit trockenem
-Stempel wird zur bewussten Ausnahme, etwa für einen Vorgang, der sonst
-verloren geht.
+Ist die Tinte alle, hinterlässt der Stempel **nichts**. Der Takt verpufft, es
+wird keine Tinte berechnet, der Vorgang bleibt liegen. Wer das Nachtinten nicht
+einplant, setzt schlicht aus. Die Abrechnung zählt diese Leerschläge und rechnet
+vor, was sie gekostet haben.
 
 **Effektiver Durchsatz** bei 26 Takten und Kissenkapazität C: `26·C/(C+1)`
-— also 13 Vorgänge bei C=1, 17 bei C=2, 21 bei C=4. Genau deshalb ist
-„Volles Kissen" mit 2 Punkten der stärkste Kauf im Spiel.
+— also 13 Vorgänge bei C=1, 17 bei C=2, 21 bei C=4. Deshalb ist „Volles
+Kissen" für 40 € der stärkste erste Kauf im Spiel.
+
+**Kosten pro Vorgang** bei C=1: ein Stempeldruck plus ein Nachtinten, also
+1,00 € Tinte auf einen Vorgang im Wert von rund 4,00 €. Bei C=2 sinkt das auf
+0,75 €, bei C=4 auf 0,63 €.
+
+## Geld ist die Währung
+
+Es gibt keine zweite Währung. Was am Tagesende auf dem Konto landet, ist
+zugleich Punktestand und Kaufkraft — man bezahlt seine Fortbildungen vom
+eigenen Gehalt. Der ganze Baum kostet **1000 €**, ein Tag bringt anfangs rund
+30 €. Der erste Kauf fällt damit auf Tag 2.
+
+Das ist der wichtigste Balancing-Hebel im Prototyp: Fühlt sich der Baum zäh an,
+gehören die `cost`-Werte in `TREE` heruntergesetzt, nicht die Erträge hoch.

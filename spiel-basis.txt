@@ -776,27 +776,43 @@ Jeder Knoten traegt eine apply-Funktion, die in STATS schreibt; resetStats()
 baut die Werte bei jedem Rundenstart aus CONFIG plus allen gekauften Knoten
 neu auf. Neue Upgrades brauchen nur einen Eintrag in TREE.
 
-DAS STEMPELKISSEN ALS ZENTRALE ACHSE
+DAS STEMPELKISSEN ALS ZENTRALE ACHSE  [REVIDIERT 22.09.2026]
 Das Kissen traegt anfangs GENAU EINEN VORGANG. Danach wird der Stempel grau,
-ein rotes Ausrufezeichen erscheint daneben, und der Abdruck bringt nur noch
-ein Viertel. Der Spieler stempelt also anfangs im Wechsel: Vorgang, nachtinten,
-Vorgang, nachtinten. Das halbiert den Durchsatz - und genau diese Fessel kauft
-er sich im Fortbildungsplan wieder ab.
+ein rotes Ausrufezeichen erscheint daneben, und er hinterlaesst GAR NICHTS
+mehr: der Takt verpufft, Tinte kostet er keine, der Vorgang bleibt liegen.
+Der Spieler stempelt also anfangs im Wechsel: Vorgang, nachtinten, Vorgang,
+nachtinten. Wer das nicht einplant, SETZT AUS. Das halbiert den Durchsatz -
+und genau diese Fessel kauft er sich im Fortbildungsplan wieder ab.
 
   Effektiver Durchsatz bei 26 Takten und Kissenkapazitaet C:  26*C/(C+1)
      C=1 ->  13 Vorgaenge      C=2 -> 17      C=4 -> 21
 
-BALANCING-FALLE, DIE HIER LAUERT
-Der Ertrag mit trockenem Stempel (fadedFactor) darf NICHT 0,5 sein. Ueber drei
-Takte gerechnet:
-     nie nachtinten          4,00 + 0,5*4,00 + 0,5*4,00 = 8,00
-     jeden zweiten nachtinten 4,00 +    0     +    4,00 = 8,00
-Beide Strategien waeren exakt gleichwertig, die Entscheidung damit wertlos.
-Bei 0,25 ergibt die erste Zeile 6,00 - Nachtinten lohnt sich, und das
-Weiterstempeln mit trockenem Stempel wird zur bewussten Ausnahme.
+WARUM DER LEERE STEMPEL GAR NICHTS TUT STATT WENIGER
+Eine Zwischenfassung liess den trockenen Stempel noch einen Bruchteil bringen.
+Das war rechnerisch eine Falle: bei einem Restertrag von 0,5 gilt ueber drei
+Takte
+     nie nachtinten           4,00 + 0,5*4,00 + 0,5*4,00 = 8,00
+     jeden zweiten nachtinten 4,00 +    0     +    4,00  = 8,00
+Beide Strategien waeren exakt gleichwertig gewesen - die Entscheidung damit
+wertlos. Die jetzige Regel (leer = gar nichts) umgeht das Problem ganz:
+Nachtinten ist immer richtig, die Frage ist nur WANN man es einplant.
 => MERKE FUER ALLE SPAETEREN SYSTEME: Immer nachrechnen, ob zwei Strategien
    zufaellig gleich viel einbringen. Eine Entscheidung, die rechnerisch egal
    ist, ist keine Entscheidung.
+
+WAEHRUNG: GELD  [REVIDIERT 22.09.2026 - ersetzt die Fortbildungspunkte]
+Es gibt KEINE zweite Waehrung. Was am Tagesende auf dem Konto landet, ist
+zugleich Punktestand und Kaufkraft: man bezahlt seine Fortbildungen vom
+eigenen Gehalt. Das passt thematisch besser als eine erfundene Punktewaehrung
+und macht jede Kaufentscheidung sofort spuerbar, weil der Kontostand faellt.
+Der ganze Baum kostet 1000 EUR, ein Tag bringt anfangs rund 30 EUR.
+=> Offene Frage E2 aus dem Katalog ist damit beantwortet: Waehrung 2 entfaellt,
+   die Meta-Progression laeuft ueber Waehrung 1.
+
+BEDIENUNG DES BAUMS
+Ziehen verschiebt die Ansicht, Mausrad zoomt, drei Knoepfe oben rechts fuer
+Plus, Minus und Zuruecksetzen. Damit ist der Baum nicht mehr auf die 13
+sichtbaren Knoten begrenzt - spaetere Aeste brauchen nur Koordinaten.
 
 DIE SECHS SPEICHEN (alle implementiert)
   Dienstzeit    Ueberstunden +6 s (2)      -> Gleitzeit +8 s (5)
