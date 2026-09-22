@@ -769,7 +769,43 @@ AUFBAU DES BAUMS
 WAEHRUNG: FORTBILDUNGSPUNKTE. Im Prototyp: 1 pro Tag plus 1 je 12 bearbeiteten
 Vorgaengen. Der endgueltige Schluessel steht noch aus (Frage E2).
 
-NOCH NICHT GEBAUT: das Freischalten selbst. Der Baum zeigt, was kommt - kaufen
-kann man noch nichts. Das ist bewusst so: Phase P1 beantwortet, ob die
-Kern-Handlung ohne Belohnung traegt. Kommt das Freischalten zu frueh dazu,
-misst man nur noch die Belohnung und nicht mehr die Handlung.
+GEBAUT (Stand 22.09.2026): Die Knoten sind QUADRATE MIT MINIMALISTISCHEN
+ICONS, kein Text im Knoten - der Name steht in der Detailkarte, wie bei
+Bills Must Be Paid. Alle zwoelf Knoten sind FREISCHALTBAR und wirken sofort.
+Jeder Knoten traegt eine apply-Funktion, die in STATS schreibt; resetStats()
+baut die Werte bei jedem Rundenstart aus CONFIG plus allen gekauften Knoten
+neu auf. Neue Upgrades brauchen nur einen Eintrag in TREE.
+
+DAS STEMPELKISSEN ALS ZENTRALE ACHSE
+Das Kissen traegt anfangs GENAU EINEN VORGANG. Danach wird der Stempel grau,
+ein rotes Ausrufezeichen erscheint daneben, und der Abdruck bringt nur noch
+ein Viertel. Der Spieler stempelt also anfangs im Wechsel: Vorgang, nachtinten,
+Vorgang, nachtinten. Das halbiert den Durchsatz - und genau diese Fessel kauft
+er sich im Fortbildungsplan wieder ab.
+
+  Effektiver Durchsatz bei 26 Takten und Kissenkapazitaet C:  26*C/(C+1)
+     C=1 ->  13 Vorgaenge      C=2 -> 17      C=4 -> 21
+
+BALANCING-FALLE, DIE HIER LAUERT
+Der Ertrag mit trockenem Stempel (fadedFactor) darf NICHT 0,5 sein. Ueber drei
+Takte gerechnet:
+     nie nachtinten          4,00 + 0,5*4,00 + 0,5*4,00 = 8,00
+     jeden zweiten nachtinten 4,00 +    0     +    4,00 = 8,00
+Beide Strategien waeren exakt gleichwertig, die Entscheidung damit wertlos.
+Bei 0,25 ergibt die erste Zeile 6,00 - Nachtinten lohnt sich, und das
+Weiterstempeln mit trockenem Stempel wird zur bewussten Ausnahme.
+=> MERKE FUER ALLE SPAETEREN SYSTEME: Immer nachrechnen, ob zwei Strategien
+   zufaellig gleich viel einbringen. Eine Entscheidung, die rechnerisch egal
+   ist, ist keine Entscheidung.
+
+DIE SECHS SPEICHEN (alle implementiert)
+  Dienstzeit    Ueberstunden +6 s (2)      -> Gleitzeit +8 s (5)
+  Takt          Routine -0,15 s (3)        -> Blindstempeln -0,20 s (6)
+  Nachschub     Flinker Bote 1,3 s (2)     -> Zweiter Bote 1,0 s (5)
+  Kissen        Volles Kissen C=2 (2)      -> Stempelkissen XXL C=4 (6)
+  Ergonomie     Handgelenkdrehung (4)      -> Nachtinten im Vorbeigehen (4)
+  Beschaffung   Sparsames Kissen 0,35 (2)  -> Dienst nach Vorschrift (4)
+
+Ein aufgenommener Stempel ist immer frisch - er lag ja auf seinem eigenen
+Kissen. Der Wechsel bleibt trotzdem schlechter als das Nachtinten, weil er
+die Kombo bricht.

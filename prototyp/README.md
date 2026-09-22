@@ -25,12 +25,14 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Stempel | GENEHMIGT, NACHFORDERUNG, WEITERLEITEN, ABGELEHNT |
 | Stempelwechsel | auf das fremde Kissen stempeln — kostet einen Takt und die Kombo |
 | Nachtinten | auf das eigene Kissen stempeln — kostet einen Takt, **hält** die Kombo |
+| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel grau, ein rotes `!` erscheint, der Abdruck bringt nur noch 25 % |
 | Hand gehoben | Maus außerhalb des Tisches — keine Tinte, Takt trotzdem weg |
 | Tinte | Kostenposten, 0,50 € pro Druck, Abrechnung bei Dienstschluss |
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan mit 13 Knoten, Kontostand, Punktestand |
+| Homescreen | Fortbildungsplan: 13 Icon-Knoten, alle freischaltbar |
+| Fortbildungspunkte | 1 pro Tag + 1 je 8 bearbeitete Vorgänge |
 
 Vier Formulartypen statt der drei aus der Spezifikation, damit jeder der vier
 Stempel eine Aufgabe hat.
@@ -58,9 +60,36 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 6. Reichen 26 Takte, oder ist der Tag vorbei, bevor er angefangen hat?
 7. Machen die Namen im Fortbildungsplan Lust auf den nächsten Tag?
 
-## Was bewusst fehlt
+## Der Fortbildungsplan
 
-Das **Freischalten** im Fortbildungsplan. Der Baum zeigt, was kommt — kaufen
-kann man noch nichts. Sonst misst der Test nur noch die Belohnung statt der
-Handlung. Alle Effekte sind in `TREE` bereits als Text hinterlegt und schreiben
-später in `STATS`, das schon von der Spiellogik gelesen wird.
+Alle zwölf Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
+`apply`-Funktion, die in `STATS` schreibt; `resetStats()` baut die Werte bei
+jedem Rundenstart aus `CONFIG` plus allen gekauften Knoten neu auf. Neue
+Upgrades brauchen daher nur einen Eintrag in `TREE` — keine Änderung an der
+Spiellogik.
+
+| Speiche | Ring 1 | Ring 2 |
+|---|---|---|
+| Dienstzeit | Überstunden (+6 s) | Gleitzeit (+8 s) |
+| Takt | Routine (−0,15 s) | Blindstempeln (−0,20 s) |
+| Nachschub | Flinker Bote (1,3 s) | Zweiter Bote (1,0 s) |
+| Kissen | Volles Kissen (2 Vorgänge) | Stempelkissen XXL (4) |
+| Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Nachtinten im Vorbeigehen (½ Takt) |
+| Beschaffung | Sparsames Kissen (0,35 €) | Dienst nach Vorschrift (Beschwerde 1,00 €) |
+
+## Warum `fadedFactor` bei 0,25 steht und nicht bei 0,5
+
+Bei einem Kissen, das genau einen Vorgang trägt, gilt über drei Takte:
+
+- nie nachtinten: `4,00 + Faktor·4,00 + Faktor·4,00`
+- jeden zweiten Takt nachtinten: `4,00 + 0 + 4,00 = 8,00`
+
+Bei `fadedFactor = 0,5` ergibt die erste Zeile ebenfalls genau 8,00 — beide
+Strategien sind exakt gleichwertig, die Entscheidung ist wertlos. Erst bei 0,25
+(Ergebnis 6,00) lohnt sich Nachtinten, und das Weiterstempeln mit trockenem
+Stempel wird zur bewussten Ausnahme, etwa für einen Vorgang, der sonst
+verloren geht.
+
+**Effektiver Durchsatz** bei 26 Takten und Kissenkapazität C: `26·C/(C+1)`
+— also 13 Vorgänge bei C=1, 17 bei C=2, 21 bei C=4. Genau deshalb ist
+„Volles Kissen" mit 2 Punkten der stärkste Kauf im Spiel.

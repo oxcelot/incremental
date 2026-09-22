@@ -144,7 +144,21 @@
     letter-spacing:.05em; text-align:center; padding:0 4px; box-sizing:border-box;
     backdrop-filter:blur(1px);
   }
-  #stamp.faded .body{opacity:.45; border-style:dashed;}
+  #stamp.faded .body{
+    border-color:var(--muted); color:var(--muted);
+    background:color-mix(in srgb, var(--muted) 14%, #0000);
+  }
+  #warn{
+    position:absolute; left:calc(50% + 40px); top:calc(50% - 30px);
+    font-family:var(--font-stamp); font-size:30px; font-weight:700; line-height:1;
+    color:var(--bad); text-shadow:0 1px 3px rgba(0,0,0,.4);
+    animation:warnpulse .9s ease-in-out infinite;
+  }
+  @keyframes warnpulse{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.55; transform:scale(.88)}}
+  .pad .dry{
+    position:absolute; top:5px; right:8px; font-family:var(--font-stamp);
+    font-size:17px; font-weight:700; color:var(--bad); line-height:1;
+  }
   #stamp.press{animation:press .16s ease-out;}
   @keyframes press{0%{transform:scale(1)}40%{transform:scale(.78)}100%{transform:scale(1)}}
   #stamp.lifted{opacity:.3;}
@@ -227,22 +241,29 @@
 
   .treewrap{flex:1 1 auto; min-height:0; overflow:hidden;}
   #tree{display:block; width:100%; height:100%;}
-  #tree .link{stroke:var(--line); stroke-width:3;}
-  #tree .link.open{stroke:var(--s-amber); stroke-dasharray:7 5;}
-  #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2; rx:3;}
-  #tree .nd.unlocked .box{fill:color-mix(in srgb, var(--s-green) 20%, var(--surface)); stroke:var(--s-green); stroke-width:3;}
-  #tree .nd.open .box{stroke:var(--s-amber); stroke-dasharray:6 4;}
-  #tree .nd.locked .box{opacity:.45;}
-  #tree .nd text{font-family:var(--font-ui); font-weight:600; fill:var(--text); text-anchor:middle;}
-  #tree .nd.locked text{opacity:.5;}
-  #tree .nd .t1{font-size:14px;}
-  #tree .nd .t2{font-size:12.5px; font-weight:500;}
-  #tree .nd .cost{font-family:var(--font-stamp); font-size:12px; font-weight:700; fill:var(--s-amber); text-anchor:middle;}
-  #tree .nd .costbg{fill:var(--bg); stroke:var(--s-amber); stroke-width:2;}
+  #tree .link{stroke:var(--line); stroke-width:2.5;}
+  #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
+  #tree .link.done{stroke:var(--s-green);}
+  #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2;}
+  #tree .ico{fill:none; stroke:var(--line); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  #tree .cost{font-family:var(--font-stamp); font-size:15px; font-weight:700; fill:var(--muted); text-anchor:middle;}
+  #tree .costbg{fill:var(--bg); stroke:none;}
+
   #tree .nd{cursor:pointer;}
-  #tree .nd:hover .box, #tree .nd:focus-visible .box{stroke-width:3.5;}
+  #tree .nd.owned .box{fill:color-mix(in srgb, var(--s-green) 22%, var(--surface)); stroke:var(--s-green); stroke-width:2.5;}
+  #tree .nd.owned .ico{stroke:var(--s-green);}
+  #tree .nd.afford .box{stroke:var(--s-amber); stroke-width:2.5; stroke-dasharray:5 4;}
+  #tree .nd.afford .ico{stroke:var(--s-amber);}
+  #tree .nd.afford .cost{fill:var(--s-amber);}
+  #tree .nd.short .box{stroke:var(--s-amber); stroke-dasharray:5 4; opacity:.6;}
+  #tree .nd.short .ico{stroke:var(--s-amber); opacity:.6;}
+  #tree .nd.locked{opacity:.38;}
+  #tree .nd:hover .box{stroke-width:3.5;}
   #tree .nd:focus-visible{outline:none;}
-  #tree .nd:focus-visible .box{stroke:var(--s-blue);}
+  #tree .nd:focus-visible .box{stroke:var(--s-blue); stroke-width:3.5;}
+  #tree .nd.buy .box{animation:buypop .3s ease-out;}
+  @keyframes buypop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+  #tree .nd .box{transform-box:fill-box; transform-origin:center;}
 
   .homefoot{display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;}
   .detail{
@@ -295,6 +316,7 @@
     <circle class="fg" cx="46" cy="46" r="43"></circle>
   </svg>
   <div class="body" id="stampBody">GENEHMIGT</div>
+  <div id="warn" hidden>!</div>
 </div>
 
 <div id="home" hidden>
@@ -308,7 +330,7 @@
     <div class="stat"><b id="hAcct">0,00</b><span>Kontostand &euro;</span></div>
     <div class="stat fp"><b id="hFp">0</b><span>Fortbildungs&shy;punkte</span></div>
   </div>
-  <div class="treewrap"><svg id="tree" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Fortbildungsplan"></svg></div>
+  <div class="treewrap"><svg id="tree" viewBox="0 45 760 640" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Fortbildungsplan"></svg></div>
   <div class="homefoot">
     <div class="detail" id="detail"></div>
     <button class="gostart" id="goDay">Dienst antreten</button>
@@ -338,8 +360,8 @@ const CONFIG = {
   wrongPenalty:   2.00,   // Beschwerde bei falschem Stempel
   comboStep:      0.10,   // Multiplikator-Zuwachs pro Kombo-Stufe
   comboCap:       3.00,   // Deckel
-  freshnessMax:   10,     // Drucke bis der Abdruck blass wird
-  fadedFactor:    0.50,   // Ertrag bei blassem Abdruck
+  freshnessMax:   1,      // Vorgaenge, die ein frisches Kissen traegt
+  fadedFactor:    0.25,   // Ertrag mit trockenem Stempel
   missBreaksCombo:false,  // Fehldruck bricht die Kombo? (Auto-Feuer: eher nein)
   afkBeats:       3,      // Takte ohne Mausbewegung, bis die Hand sich hebt
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
@@ -381,53 +403,87 @@ function resetStats(){
   STATS.inflowMs     = CONFIG.inflowMs;
   STATS.slots        = CONFIG.slots;
   STATS.inkCost      = CONFIG.inkCost;
+  STATS.freshnessMax = CONFIG.freshnessMax;
+  STATS.fadedFactor  = CONFIG.fadedFactor;
+  STATS.wrongPenalty = CONFIG.wrongPenalty;
+  STATS.swapCost     = 1;   // Anteil eines Taktes fuer den Stempelwechsel
+  STATS.reinkCost    = 1;   // Anteil eines Taktes fuers Nachtinten
+  for(const n of TREE) if(meta.owned[n.id] && n.apply) n.apply(STATS);
 }
-resetStats();
 
 // ---------------------------------------------------------------- Fortbildungsplan
+// Minimalistische Icons, im lokalen Koordinatensystem um (0,0) gezeichnet.
+const ICONS = {
+  start:    '<rect x="-10" y="4" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/>',
+  clock:    '<circle cx="0" cy="0" r="10"/><path d="M0 -5V0l5 3"/>',
+  clockp:   '<circle cx="-2" cy="1" r="9"/><path d="M-2 -4v5l4 2"/><path d="M5 -10h8M9 -14v8"/>',
+  chev:     '<path d="M-9 -7l6 7-6 7"/><path d="M1 -7l6 7-6 7"/>',
+  chev3:    '<path d="M-11 -7l5 7-5 7"/><path d="M-3 -7l5 7-5 7"/><path d="M5 -7l5 7-5 7"/>',
+  tray1:    '<path d="M-10 8h20"/><path d="M0 -10v11"/><path d="M-5 -4l5 5 5-5"/>',
+  tray2:    '<path d="M-11 9h22"/><path d="M-5 -10v9"/><path d="M-9 -5l4 4 4-4"/><path d="M5 -10v9"/><path d="M1 -5l4 4 4-4"/>',
+  pad1:     '<rect x="-11" y="3" width="22" height="7" rx="2"/><path d="M0 -11c4 5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5 6-10z"/>',
+  pad2:     '<rect x="-12" y="4" width="24" height="7" rx="2"/><path d="M-5 -11c3 3.5 4.5 5.5 4.5 7.5a4.5 4.5 0 0 1-9 0c0-2 1.5-4 4.5-7.5z"/><path d="M6 -11c3 3.5 4.5 5.5 4.5 7.5a4.5 4.5 0 0 1-9 0c0-2 1.5-4 4.5-7.5z"/>',
+  rot:      '<path d="M10 -2a10 10 0 1 1-3.5-7.2"/><path d="M10.5 -11v7.5H3"/>',
+  droprot:  '<path d="M9 0a9 9 0 1 1-3-6.7"/><path d="M9.5 -8.5v6H4"/><path d="M-1 3c2 2.5 3 3.8 3 5a3 3 0 0 1-6 0c0-1.2 1-2.5 3-5z"/>',
+  dropmin:  '<path d="M-3 -10c4 5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5 6-10z"/><path d="M6 4h9"/>',
+  shield:   '<path d="M0 -11l9 4v6.5C9 5.5 4.5 8.8 0 11c-4.5-2.2-9-5.5-9-11.5V-7z"/><path d="M-3.5 1.5h7"/>',
+};
+
 const TREE = [
-  { id:'start', x:500, y:350, state:'unlocked', cost:0,
-    name:['Dienstantritt'],
+  { id:'start', x:380, y:350, icon:'start', cost:0, name:'Dienstantritt',
     eff:'Ein Tisch, vier Stempel und keine Wahl.' },
 
-  { id:'ueber', x:500, y:215, state:'open', cost:2, name:['Überstunden'],
-    eff:'Dienstzeit 40 s → 46 s.' },
-  { id:'gleit', x:500, y:85,  state:'locked', cost:5, name:['Gleitzeit'],
-    eff:'Dienstzeit 46 s → 54 s.' },
+  { id:'ueber', x:380, y:220, icon:'clock', cost:2, name:'\u00DCberstunden',
+    eff:'Der Arbeitstag dauert 6 Sekunden l\u00e4nger.',
+    apply:st => st.roundMs += 6000 },
+  { id:'gleit', x:380, y:85, icon:'clockp', cost:5, name:'Gleitzeit',
+    eff:'Noch einmal 8 Sekunden mehr Dienstzeit.',
+    apply:st => st.roundMs += 8000 },
 
-  { id:'routi', x:742, y:248, state:'open', cost:2, name:['Routine'],
-    eff:'Stempeltakt 1,50 s → 1,35 s.' },
-  { id:'blind', x:862, y:140, state:'locked', cost:6, name:['Blindstempeln'],
-    eff:'Stempeltakt 1,35 s → 1,15 s. Mehr Takte, mehr Tinte, weniger Bedenkzeit.' },
+  { id:'routi', x:553, y:285, icon:'chev', cost:3, name:'Routine',
+    eff:'Der Stempeltakt sinkt von 1,50 s auf 1,35 s.',
+    apply:st => st.beatMs -= 150 },
+  { id:'blind', x:726, y:218, icon:'chev3', cost:6, name:'Blindstempeln',
+    eff:'Der Takt sinkt um weitere 0,20 s. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
+    apply:st => st.beatMs -= 200 },
 
-  { id:'bote1', x:742, y:452, state:'open', cost:2, name:['Flinker Bote'],
-    eff:'Vorgänge rücken alle 1,3 s statt 1,6 s nach.' },
-  { id:'bote2', x:862, y:560, state:'locked', cost:5, name:['Zweiter Bote'],
-    eff:'Vorgänge rücken alle 1,0 s nach. Der Tisch bleibt voll.' },
+  { id:'bote1', x:553, y:415, icon:'tray1', cost:2, name:'Flinker Bote',
+    eff:'Vorg\u00e4nge r\u00fccken alle 1,3 s nach statt alle 1,6 s.',
+    apply:st => st.spawnMs = 1300 },
+  { id:'bote2', x:726, y:482, icon:'tray2', cost:5, name:'Zweiter Bote',
+    eff:'Vorg\u00e4nge r\u00fccken alle 1,0 s nach. Der Tisch bleibt voll.',
+    apply:st => st.spawnMs = 1000 },
 
-  { id:'radar', x:500, y:485, state:'open', cost:3, name:['Posteingang-','Radar'],
-    eff:'Die nächsten drei Vorgänge im Stapel sind sichtbar.' },
-  { id:'unbek', x:500, y:615, state:'hidden', cost:null, name:['???'],
-    eff:'Dafür sind Sie noch nicht aktenkundig genug.' },
+  { id:'voll', x:380, y:480, icon:'pad1', cost:2, name:'Volles Kissen',
+    eff:'Das Stempelkissen tr\u00e4gt zwei Vorg\u00e4nge statt einem.',
+    apply:st => st.freshnessMax = 2 },
+  { id:'xxl', x:380, y:615, icon:'pad2', cost:6, name:'Stempelkissen XXL',
+    eff:'Das Kissen tr\u00e4gt vier Vorg\u00e4nge. Nachtinten wird zur Nebensache.',
+    apply:st => st.freshnessMax = 4 },
 
-  { id:'hand',  x:258, y:452, state:'open', cost:4, name:['Handgelenk-','drehung'],
-    eff:'Stempelwechsel kostet nur noch einen halben Takt.' },
-  { id:'beid',  x:138, y:560, state:'locked', cost:12, name:['Beidhändig'],
-    eff:'Zwei Stempel gleichzeitig in der Hand. Kein Wechsel mehr nötig.' },
+  { id:'hand', x:207, y:415, icon:'rot', cost:4, name:'Handgelenkdrehung',
+    eff:'Der Stempelwechsel kostet nur noch einen halben Takt.',
+    apply:st => st.swapCost = 0.5 },
+  { id:'vorbei', x:34, y:482, icon:'droprot', cost:4, name:'Nachtinten im Vorbeigehen',
+    eff:'Auch das Nachtinten kostet nur noch einen halben Takt.',
+    apply:st => st.reinkCost = 0.5 },
 
-  { id:'spar',  x:258, y:248, state:'open', cost:2, name:['Sparsames','Kissen'],
-    eff:'Tinte kostet 0,38 € statt 0,50 € pro Druck.' },
-  { id:'vorsc', x:138, y:140, state:'locked', cost:4, name:['Dienst nach','Vorschrift'],
-    eff:'Beschwerden kosten nur noch die Hälfte.' },
+  { id:'spar', x:207, y:285, icon:'dropmin', cost:2, name:'Sparsames Kissen',
+    eff:'Ein Stempeldruck kostet 0,35 \u20ac Tinte statt 0,50 \u20ac.',
+    apply:st => st.inkCost = 0.35 },
+  { id:'vorsc', x:34, y:218, icon:'shield', cost:4, name:'Dienst nach Vorschrift',
+    eff:'Eine Beschwerde kostet nur noch 1,00 \u20ac statt 2,00 \u20ac.',
+    apply:st => st.wrongPenalty = 1 },
 ];
 const LINKS = [
   ['start','ueber'],['ueber','gleit'],
   ['start','routi'],['routi','blind'],
   ['start','bote1'],['bote1','bote2'],
-  ['start','radar'],['radar','unbek'],
-  ['start','hand'], ['hand','beid'],
+  ['start','voll'], ['voll','xxl'],
+  ['start','hand'], ['hand','vorbei'],
   ['start','spar'], ['spar','vorsc'],
 ];
+const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
 // ---------------------------------------------------------------- Elemente
 const el = {
@@ -440,6 +496,7 @@ const el = {
   tree: document.getElementById('tree'),
   detail: document.getElementById('detail'),
   goDay: document.getElementById('goDay'),
+  warn: document.getElementById('warn'),
   hDay: document.getElementById('hDay'),
   hAcct: document.getElementById('hAcct'),
   hFp: document.getElementById('hFp'),
@@ -467,7 +524,7 @@ let pointer = { x:-999, y:-999 };
 let lastMove = 0;
 let rafId = 0;
 let roundToken = 0;
-let meta = { day:1, best:0, fp:0, account:0 };
+let meta = { day:1, best:0, fp:0, account:0, owned:{ start:true } };
 
 const eur = n => n.toFixed(2).replace('.', ',');
 
@@ -542,7 +599,8 @@ function buildRack(){
     p.className = 'pad'; p.dataset.pad = st.id; p.style.setProperty('--c', st.color);
     p.innerHTML = '<div class="nm">'+st.name+'</div>'
                 + '<div class="st" data-role="st">Kissen</div>'
-                + '<div class="fresh"><i data-role="fresh"></i></div>';
+                + '<div class="fresh"><i data-role="fresh"></i></div>'
+                + '<div class="dry" data-role="dry" hidden>!</div>';
     el.rack.appendChild(p);
   }
 }
@@ -550,9 +608,12 @@ function renderRack(){
   for(const p of el.rack.children){
     const held = p.dataset.pad === S.stamp;
     p.classList.toggle('held', held);
-    p.querySelector('[data-role="st"]').textContent = held ? 'in der Hand' : 'Kissen';
+    const dry = held && S.freshness <= 0;
+    p.querySelector('[data-role="st"]').textContent =
+      held ? (dry ? 'trocken' : 'in der Hand') : 'Kissen';
+    p.querySelector('[data-role="dry"]').hidden = !dry;
     const f = p.querySelector('[data-role="fresh"]');
-    f.style.transform = 'scaleX(' + (held ? S.freshness/CONFIG.freshnessMax : 0) + ')';
+    f.style.transform = 'scaleX(' + (held ? S.freshness/STATS.freshnessMax : 0) + ')';
   }
 }
 
@@ -586,8 +647,9 @@ function renderQueue(){
 
 // ---------------------------------------------------------------- Runde
 function startRound(){
+  resetStats();
   S = {
-    t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:CONFIG.freshnessMax,
+    t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
     combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
@@ -650,7 +712,9 @@ function tick(dt, now){
 
   const lifted = isLifted(now);
   el.stamp.classList.toggle('lifted', lifted);
-  el.stamp.classList.toggle('faded', S.freshness <= 0);
+  const dry = S.freshness <= 0;
+  el.stamp.classList.toggle('faded', dry);
+  el.warn.hidden = !dry || lifted;
 
   // HUD
   const secs = Math.ceil(left/1000);
@@ -692,14 +756,17 @@ function strike(now){
   // 1) Eigenes Kissen -> nachtinten (Parkplatz, Kombo bleibt)
   if(pad && pad.dataset.pad === S.stamp){
     charge();
-    S.freshness = CONFIG.freshnessMax; S.reinks++;
+    S.freshness = STATS.freshnessMax; S.reinks++;
+    S.accBeat += STATS.beatMs * (1 - STATS.reinkCost);
     SFX.reink(); float('nachgetintet', 'var(--muted)');
     renderRack(); return;
   }
   // 2) Fremdes Kissen -> Stempelwechsel (kostet Takt + Kombo)
   if(pad){
-    charge(); wear();
+    charge();
     S.stamp = pad.dataset.pad; S.combo = 0; S.swaps++;
+    S.freshness = STATS.freshnessMax;   // lag auf seinem eigenen Kissen
+    S.accBeat += STATS.beatMs * (1 - STATS.swapCost);
     setStampColor(); SFX.swap();
     float(STAMPS.find(s=>s.id===S.stamp).name, 'var(--muted)');
     renderRack(); return;
@@ -710,11 +777,11 @@ function strike(now){
     const t = TYPES.find(x => x.id === form.dataset.form);
     if(t.want === S.stamp){
       const faded = S.freshness <= 0;
-      const gain = t.value * mult() * (faded ? CONFIG.fadedFactor : 1);
+      const gain = t.value * mult() * (faded ? STATS.fadedFactor : 1);
       S.earned += gain; S.done++; S.combo++;
       S.bestCombo = Math.max(S.bestCombo, S.combo);
       SFX.correct(Math.min(S.combo, 14));
-      float('+' + eur(gain) + (faded ? ' blass' : ''), 'var(--good)');
+      float('+' + eur(gain) + (faded ? ' trocken' : ''), 'var(--good)');
       finish(form, true);
     } else {
       S.wrongs++; S.combo = 0;
@@ -759,15 +826,15 @@ function float(txt, color){
 function endRound(){
   running = false;
   cancelAnimationFrame(rafId);
-  el.stamp.hidden = true;
+  el.stamp.hidden = true; el.warn.hidden = true;
   SFX.bell();
 
   const backlog = S.queue + onDesk();
   const inkTotal = S.inkSpent;
-  const complaints = S.wrongs * CONFIG.wrongPenalty;
+  const complaints = S.wrongs * STATS.wrongPenalty;
   const raw = S.earned - inkTotal - complaints;
   const net = CONFIG.floorAtZero ? Math.max(0, raw) : raw;
-  const fp = 1 + Math.floor(S.done / 12);
+  const fp = 1 + Math.floor(S.done / 8);
   meta.best = Math.max(meta.best, net);
   meta.account += net;
   meta.fp += fp;
@@ -801,53 +868,78 @@ const row = (k,v) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
 const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
 
 // ---------------------------------------------------------------- Homescreen
-const NODE_W = 176, NODE_H = 54;
+const BOX = 56, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
+
+function nodeState(n){
+  if(meta.owned[n.id]) return 'owned';
+  const par = PARENT[n.id];
+  if(par && !meta.owned[par]) return 'locked';
+  return meta.fp >= n.cost ? 'afford' : 'short';
+}
 
 function renderTree(){
   let out = '';
   for(const [a,b] of LINKS){
     const A = byId[a], B = byId[b];
-    out += '<line class="link' + (B.state === 'open' ? ' open' : '') + '"'
-         + ' x1="' + A.x + '" y1="' + A.y + '" x2="' + B.x + '" y2="' + B.y + '"></line>';
+    const st = nodeState(B);
+    const cls = st === 'owned' ? ' done'
+              : (st === 'afford' || st === 'short') ? ' open' : '';
+    const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1;
+    const px = dx/L * (HALF + 4), py = dy/L * (HALF + 4);
+    out += '<line class="link' + cls + '" x1="' + (A.x + px) + '" y1="' + (A.y + py)
+         + '" x2="' + (B.x - px) + '" y2="' + (B.y - py) + '"></line>';
   }
   for(const n of TREE){
-    const cls = n.state === 'unlocked' ? 'unlocked'
-              : n.state === 'open'     ? 'open' : 'locked';
-    const txt = n.name.length === 1
-      ? '<text class="t1" x="' + n.x + '" y="' + (n.y + 5) + '">' + n.name[0] + '</text>'
-      : '<text class="t2" x="' + n.x + '" y="' + (n.y - 3) + '">' + n.name[0] + '</text>'
-        + '<text class="t2" x="' + n.x + '" y="' + (n.y + 15) + '">' + n.name[1] + '</text>';
-    const badge = n.cost
-      ? '<circle class="costbg" cx="' + (n.x + NODE_W/2) + '" cy="' + (n.y - NODE_H/2) + '" r="14"></circle>'
-        + '<text class="cost" x="' + (n.x + NODE_W/2) + '" y="' + (n.y - NODE_H/2 + 4) + '">' + n.cost + '</text>'
-      : '';
-    out += '<g class="nd ' + cls + '" data-node="' + n.id + '" tabindex="0" role="button"'
-         + ' aria-label="' + n.name.join(' ') + '">'
-         + '<rect class="box" x="' + (n.x - NODE_W/2) + '" y="' + (n.y - NODE_H/2) + '"'
-         + ' width="' + NODE_W + '" height="' + NODE_H + '"></rect>'
-         + txt + badge + '</g>';
+    const st = nodeState(n);
+    out += '<g class="nd ' + st + '" data-node="' + n.id + '" tabindex="0" role="button"'
+         + ' aria-label="' + n.name
+         + (st === 'owned' ? ', freigeschaltet' : ', ' + n.cost + ' Punkte') + '">'
+         + '<rect class="box" x="' + (n.x - HALF) + '" y="' + (n.y - HALF) + '"'
+         + ' width="' + BOX + '" height="' + BOX + '" rx="3"></rect>'
+         + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ')">' + ICONS[n.icon] + '</g>'
+         + (st === 'owned' ? ''
+            : '<rect class="costbg" x="' + (n.x - 13) + '" y="' + (n.y + HALF + 3)
+              + '" width="26" height="20" rx="3"></rect>'
+              + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 18) + '">' + n.cost + '</text>')
+         + '</g>';
   }
   el.tree.innerHTML = out;
   for(const g of el.tree.querySelectorAll('.nd')){
     const n = byId[g.dataset.node];
-    const show = () => showDetail(n);
-    g.addEventListener('mouseenter', show);
-    g.addEventListener('focus', show);
-    g.addEventListener('click', show);
+    g.addEventListener('mouseenter', () => showDetail(n));
+    g.addEventListener('focus', () => showDetail(n));
+    g.addEventListener('click', () => buy(n));
+    g.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); buy(n); }
+    });
   }
 }
 
+function buy(n){
+  if(nodeState(n) !== 'afford'){ showDetail(n); return; }
+  meta.fp -= n.cost;
+  meta.owned[n.id] = true;
+  resetStats();
+  el.hFp.textContent = meta.fp;
+  renderTree();
+  const g = el.tree.querySelector('[data-node="' + n.id + '"]');
+  if(g){ g.classList.add('buy'); setTimeout(() => g.classList.remove('buy'), 320); }
+  SFX.correct(12);
+  showDetail(n);
+}
+
 function showDetail(n){
-  const color = n.state === 'unlocked' ? 'var(--s-green)'
-              : n.state === 'open'     ? 'var(--s-amber)' : 'var(--line)';
+  const st = nodeState(n);
+  const color = st === 'owned' ? 'var(--s-green)'
+              : st === 'locked' ? 'var(--line)' : 'var(--s-amber)';
   el.detail.style.setProperty('--c', color);
   const status =
-      n.state === 'unlocked' ? 'Freigeschaltet.'
-    : n.state === 'open'     ? n.cost + ' Fortbildungspunkte — Freischalten ist noch nicht eingebaut.'
-    : n.state === 'hidden'   ? 'Noch verborgen.'
-    : 'Gesperrt — erst die Stufe davor.';
-  el.detail.innerHTML = '<div class="dn">' + n.name.join(' ') + '</div>'
+      st === 'owned'  ? 'Freigeschaltet.'
+    : st === 'afford' ? n.cost + ' Fortbildungspunkte \u2014 klicken zum Freischalten.'
+    : st === 'short'  ? n.cost + ' Fortbildungspunkte \u2014 du hast erst ' + meta.fp + '.'
+    : 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + '.';
+  el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
                       + '<div class="de">' + n.eff + '</div>'
                       + '<div class="dc">' + status + '</div>';
 }
@@ -855,6 +947,7 @@ function showDetail(n){
 function showHome(){
   el.veil.hidden = true;
   el.stamp.hidden = true;
+  el.warn.hidden = true;
   el.home.hidden = false;
   el.hDay.textContent = meta.day;
   el.hAcct.textContent = eur(meta.account);
@@ -882,6 +975,7 @@ function showIntro(){
   + '<ul>'
   + '<li>Auf ein <b>fremdes Kissen</b> stempeln &rarr; Stempel gewechselt. Kostet einen Takt und die Kombo.</li>'
   + '<li>Auf das <b>eigene Kissen</b> stempeln &rarr; nachgetintet. Kostet einen Takt, h&auml;lt aber die Kombo &ndash; der Platz zum Nachdenken.</li>'
+  + '<li>Das Kissen tr&auml;gt anfangs <b>genau einen Vorgang</b>. Danach wird der Stempel grau und ein rotes <b>!</b> erscheint: er bringt nur noch ein Viertel, bis du nachtintest.</li>'
   + '<li>Maus vom Tisch nehmen &rarr; Hand gehoben. Keine Tinte, aber der Takt ist trotzdem weg.</li>'
   + '</ul>'
   + '<h2>Welcher Stempel wohin</h2>'
@@ -889,7 +983,7 @@ function showIntro(){
   + LEGEND.map(([k,v]) => '<div><span class="k">' + k + '</span><span class="v">' + v + '</span></div>').join('')
   + '</div>'
   + '<div class="note">Gleicher Stempel hintereinander baut die Kombo auf (bis &times;3). Falscher Stempel: Beschwerde. '
-  + 'Nach 10 Drucken wird der Abdruck blass und bringt nur noch die H&auml;lfte.</div>'
+  + 'Im Fortbildungsplan kaufst du dir gr&ouml;&szlig;ere Kissen &ndash; und alles andere auch.</div>'
   + '<button class="btn" id="go">Dienst antreten</button>';
   el.veil.hidden = false;
   const b = document.getElementById('go');
@@ -908,6 +1002,8 @@ window.addEventListener('pointerdown', e => {
 // ---------------------------------------------------------------- Boot
 function boot(data){
   if(data && typeof data.day === 'number') meta = data;
+  if(!meta.owned) meta.owned = { start:true };
+  resetStats();
   showIntro();
 }
 try{
