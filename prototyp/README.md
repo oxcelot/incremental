@@ -32,7 +32,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan: 25 Icon-Knoten, zoom- und verschiebbar |
+| Homescreen | Fortbildungsplan: 34 Icon-Knoten, zoom- und verschiebbar |
 | Voraussetzungen | Ring 2 ist gesperrt, bis der Knoten davor freigeschaltet ist |
 | Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
@@ -80,7 +80,45 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | **Flinker Bote ×4** → **Zweiter Bote ×4** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
 | Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
-| Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr (+0,60 €/Vorgang) → Säumniszuschlag (+1,40 €) | — |
+| Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
+| Kombo *(an Ergonomie)* | — | Der kurze Dienstweg → Getrennte Registratur | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit, **Schwung ×5** → **Warmgelaufen ×5** |
+
+### Ertrag nach Stempelart
+
+`STATS.stampBonus` hält je Stempel einen Aufschlag, der zum Grundwert des
+Vorgangs addiert wird, bevor die Kombo multipliziert. Das belohnt
+Spezialisierung: Wer auf Ablehnungen setzt, spielt einen anderen Tisch als wer
+weiterleitet.
+
+| Knoten | Stufen | je Stufe | gemaxt |
+|---|---|---|---|
+| Ablehnungsbescheid | 5 | +0,50 € | +2,50 € auf ABGELEHNT |
+| Weiterleitungspauschale | 4 | +0,60 € | +2,40 € auf WEITERLEITEN |
+| Nachforderungsgebühr | 4 | +0,50 € | +2,00 € auf NACHFORDERUNG |
+
+Die Weiterleitung ist mit 3,00 € die billigste Aktion und kostet keinen vollen
+Takt — aufgewertet wird sie zur echten Alternative statt zur Notlösung.
+
+### Der Kombo-Zweig
+
+Die Kombo lief vorher, wurde aber von keinem einzigen Upgrade berührt. Sechs
+neue Knoten hängen an der Ergonomie-Speiche, weil Stempelwechsel und Kombo
+dieselbe Frage betreffen.
+
+| Knoten | Stufen | Wirkung |
+|---|---|---|
+| Aktenzeichen-Gedächtnis | 4 | Kombo-Deckel ×3 → ×5 |
+| Schwung | 5 | Kombo wächst um 0,15 statt 0,10 je Vorgang |
+| Warmgelaufen | 5 | Kombo startet morgens auf Stufe 1–5 |
+| Beharrlichkeit | 1 | Eine Beschwerde halbiert die Kombo, statt sie zu brechen |
+| Der kurze Dienstweg | 1 | Ein Stempelwechsel bricht die Kombo nicht mehr |
+| **Getrennte Registratur** | 1 | Jede Aktenart führt ihre **eigene** Kombo, die bis Dienstschluss hält |
+
+**Getrennte Registratur** ist der Endgame-Knoten: Statt einer Kette laufen vier
+parallel, eine je Aktenart. Der Stempelwechsel verliert damit jeden Nachteil,
+und die Anzeige im Kopf zeigt die Kombo der Art, deren Stempel gerade in der
+Hand liegt. Mit 900 € ist er der teuerste Knoten im Baum — er entwertet sonst
+zu früh die gesamte Ergonomie-Speiche, auf der er sitzt.
 
 ### Mehrstufige Upgrades
 

@@ -533,6 +533,13 @@ function resetStats(){
   STATS.echoChance   = 0;   // Durchschlagpapier: zweiter Vorgang gratis
   STATS.bonusPerForm = 0;   // Verwaltungsgebuehr je erledigtem Vorgang
   STATS.critFree     = 0;   // Volltreffer nutzen das Kissen nicht ab
+  STATS.stampBonus   = { gen:0, abl:0, weit:0, nach:0 };  // Ertrag je Stempelart
+  STATS.comboStep    = CONFIG.comboStep;
+  STATS.comboCap     = CONFIG.comboCap;
+  STATS.comboStart   = 0;   // Kombo-Stufe zu Rundenbeginn
+  STATS.comboKeepSwap= 0;   // Stempelwechsel bricht die Kombo nicht
+  STATS.comboOnWrong = 0;   // Beschwerde halbiert statt zu brechen
+  STATS.comboPerType = 0;   // jede Aktenart fuehrt ihre eigene Kombo
   for(const n of TREE){
     const r = rankOf(n);
     if(r > 0 && n.apply) n.apply(STATS, r);
@@ -570,6 +577,15 @@ const ICONS = {
   four:     '<rect x="-12" y="-12" width="11" height="11" rx="2"/><rect x="1" y="-12" width="11" height="11" rx="2"/><rect x="-12" y="1" width="11" height="11" rx="2"/><rect x="1" y="1" width="11" height="11" rx="2"/>',
   nodrop:   '<path d="M0 -11c4 5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5 6-10z"/><path d="M-11 11L11 -11"/>',
   coin:     '<circle cx="0" cy="0" r="10"/><path d="M-3.5 -3.5h7M-3.5 3.5h7M0 -7v14"/>',
+  swap2:    '<path d="M-11 -4h16l-4-4"/><path d="M11 5h-16l4 4"/>',
+  drawer:   '<rect x="-11" y="-11" width="22" height="22" rx="2"/><path d="M-11 -3h22M-11 4h22"/><path d="M-3 -7h6M-3 0h6M-3 7h6"/>',
+  chain:    '<rect x="-12" y="-5" width="13" height="10" rx="5"/><rect x="-1" y="-5" width="13" height="10" rx="5"/>',
+  anchor:   '<circle cx="0" cy="-8" r="3"/><path d="M0 -5v16"/><path d="M-7 -2h14"/><path d="M-9 4a9 9 0 0 0 18 0"/>',
+  bars:     '<path d="M-10 9V3"/><path d="M-3 9V-3"/><path d="M4 9V-8"/><path d="M11 9V-12"/>',
+  flame:    '<path d="M0 -12c5 6 8 8 8 12a8 8 0 0 1-16 0c0-2 1-4 3-6 0 3 1 4 2 4 0-4 1-7 3-10z"/>',
+  stampno:  '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-3 -7l6 6M3 -7l-6 6"/>',
+  stampq:   '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-2 -6.5a2.2 2.2 0 1 1 2 3.2v1"/><path d="M0 -0.5v.6"/>',
+  stampfwd: '<rect x="-11" y="5" width="22" height="5" rx="1"/><rect x="-9" y="-10" width="11" height="12" rx="2"/><path d="M5 -4h7"/><path d="M9 -7l3 3-3 3"/>',
   coin2:    '<circle cx="-3" cy="-1" r="8.5"/><path d="M-6 -4h6M-6 1h6M-3 -7v12"/><path d="M6 6l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/>',
 };
 
@@ -676,6 +692,52 @@ const TREE = [
   { id:'saeum', a:210, r:450, icon:'coin2', cost:380, name:'S\u00e4umniszuschlag',
     eff:'Der Zuschlag steigt auf 1,40 \u20ac je Vorgang.',
     apply:st => st.bonusPerForm = 1.40 },
+
+  // ---- Ertrag nach Stempelart (an der Amtsautoritaet) --------------------
+  { id:'ablehn', a:210, r:300, o:-95, icon:'stampno', cost:90, ranks:5,
+    name:'Ablehnungsbescheid',
+    eff:'Zuschlag auf jeden abgelehnten Vorgang.',
+    valueAt:r => '+' + eur(0.5 * r) + ' \u20ac',
+    apply:(st, r) => st.stampBonus.abl += 0.5 * r },
+  { id:'nachford', a:210, r:450, o:-95, icon:'stampq', cost:100, ranks:4,
+    name:'Nachforderungsgeb\u00fchr',
+    eff:'Zuschlag auf jede Nachforderung.',
+    valueAt:r => '+' + eur(0.5 * r) + ' \u20ac',
+    apply:(st, r) => st.stampBonus.nach += 0.5 * r },
+  { id:'weiter', a:210, r:300, o:95, icon:'stampfwd', cost:80, ranks:4,
+    name:'Weiterleitungspauschale',
+    eff:'Zuschlag auf jede Weiterleitung. Die billigste Aktion wird zur echten Alternative.',
+    valueAt:r => '+' + eur(0.6 * r) + ' \u20ac',
+    apply:(st, r) => st.stampBonus.weit += 0.6 * r },
+
+  // ---- Kombo (an der Ergonomie-Speiche) ----------------------------------
+  { id:'kmerk', a:150, r:450, o:-30, icon:'chain', cost:150, ranks:4,
+    name:'Aktenzeichen-Ged\u00e4chtnis',
+    eff:'Wie hoch die Kombo steigen kann.',
+    valueAt:r => '\u00d7' + num(3 + 0.5 * r, 1),
+    apply:(st, r) => st.comboCap += 0.5 * r },
+  { id:'beharr', a:150, r:600, o:-30, icon:'anchor', cost:180,
+    name:'Beharrlichkeit',
+    eff:'Eine Beschwerde halbiert die Kombo, statt sie zu brechen.',
+    apply:st => st.comboOnWrong = 1 },
+  { id:'kurz', a:150, r:450, o:-160, icon:'swap2', cost:260,
+    name:'Der kurze Dienstweg',
+    eff:'Ein Stempelwechsel bricht die Kombo nicht mehr.',
+    apply:st => st.comboKeepSwap = 1 },
+  { id:'registr', a:150, r:600, o:-160, icon:'drawer', cost:900,
+    name:'Getrennte Registratur',
+    eff:'Jede Aktenart f\u00fchrt ihre eigene Kombo \u2013 und die h\u00e4lt bis Dienstschluss.',
+    apply:st => st.comboPerType = 1 },
+  { id:'schwung', a:150, r:450, o:95, icon:'bars', cost:120, ranks:5,
+    name:'Schwung',
+    eff:'Wie stark die Kombo mit jedem Vorgang w\u00e4chst.',
+    valueAt:r => '+' + num(0.10 + 0.01 * r, 2) + ' je Vorgang',
+    apply:(st, r) => st.comboStep += 0.01 * r },
+  { id:'warm', a:150, r:600, o:95, icon:'flame', cost:110, ranks:5,
+    name:'Warmgelaufen',
+    eff:'Auf welcher Stufe die Kombo jeden Morgen startet.',
+    valueAt:r => 'Stufe ' + r,
+    apply:(st, r) => st.comboStart = r },
 ];
 
 // Radialkoordinaten in Bildpunkte umrechnen. Der Baum wird dabei elliptisch
@@ -698,6 +760,11 @@ const LINKS = [
   ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
   ['start','routi'], ['routi','blind'], ['routi','ueber'], ['ueber','gleit'],
   ['start','vorsc'], ['vorsc','gebuehr'],['gebuehr','saeum'],
+                     ['vorsc','ablehn'], ['ablehn','nachford'],
+                     ['vorsc','weiter'],
+  ['trocken','kurz'],  ['kurz','registr'],
+  ['trocken','kmerk'], ['kmerk','beharr'],
+  ['vorbei','schwung'],['schwung','warm'],
 ];
 
 // ---------------------------------------------------------------- Elemente
@@ -912,12 +979,13 @@ function startRound(){
   resetStats();
   S = {
     t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
-    wasDry:null,
-    combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
+    wasDry:null, comboByType:{},
+    combo:STATS.comboStart, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
+  for(const t of TYPES) S.comboByType[t.id] = STATS.comboStart;
   buildDesk(); buildRack(); renderRack(); renderQueue();
   for(let i=0;i<6;i++) spawnForm();
   el.veil.hidden = true;
@@ -1005,7 +1073,7 @@ function tick(dt, now){
   const untilNext = S.graceLeft > 0 ? S.graceLeft : (STATS.beatMs - S.accBeat);
   el.beats.textContent = left < untilNext
     ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs);
-  el.combo.textContent = '×' + mult().toFixed(1).replace('.',',');
+  el.combo.textContent = '×' + multFor(STAMP_TYPE[S.stamp]).toFixed(1).replace('.',',');
   el.earned.textContent = eur(S.earned);
   el.ink.textContent = eur(S.inkSpent);
   el.backlog.textContent = S.queue + onDesk();
@@ -1014,7 +1082,26 @@ function tick(dt, now){
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
-const mult = () => Math.min(1 + S.combo*CONFIG.comboStep, CONFIG.comboCap);
+// Ohne "Getrennte Registratur" gibt es eine einzige Kombo; mit ihr fuehrt
+// jede Aktenart ihre eigene, die bis Dienstschluss haelt.
+const STAMP_TYPE = {};
+for(const t of TYPES) STAMP_TYPE[t.want] = t.id;
+
+const comboOf = tid =>
+  STATS.comboPerType ? (S.comboByType[tid] || 0) : S.combo;
+const multFor = tid =>
+  Math.min(1 + comboOf(tid) * STATS.comboStep, STATS.comboCap);
+
+function bumpCombo(tid){
+  if(STATS.comboPerType) S.comboByType[tid] = (S.comboByType[tid] || 0) + 1;
+  else S.combo++;
+  S.bestCombo = Math.max(S.bestCombo, comboOf(tid));
+}
+function cutCombo(tid){
+  const keep = STATS.comboOnWrong ? 0.5 : 0;
+  if(STATS.comboPerType) S.comboByType[tid] = Math.floor((S.comboByType[tid] || 0) * keep);
+  else S.combo = Math.floor(S.combo * keep);
+}
 
 function isLifted(now){
   if(now - lastMove > CONFIG.afkBeats * STATS.beatMs) return true;
@@ -1052,7 +1139,8 @@ function strike(now){
   // 2) Fremdes Kissen -> Stempelwechsel (kostet Takt + Kombo)
   if(pad){
     if(STATS.swapInk) charge();
-    S.stamp = pad.dataset.pad; S.combo = 0; S.swaps++;
+    S.stamp = pad.dataset.pad; S.swaps++;
+    if(!STATS.comboKeepSwap && !STATS.comboPerType) S.combo = 0;
     S.freshness = STATS.freshnessMax;   // lag auf seinem eigenen Kissen
     S.accBeat += STATS.beatMs * (1 - STATS.swapCost);
     setStampColor(); SFX.swap();
@@ -1077,7 +1165,7 @@ function strike(now){
   // 4) Tisch -> Fehldruck
   charge(); wear();
   S.misses++;
-  if(CONFIG.missBreaksCombo) S.combo = 0;
+  if(CONFIG.missBreaksCombo) cutCombo(STAMP_TYPE[S.stamp]);
   SFX.miss(); float('daneben', 'var(--muted)');
   renderRack();
 }
@@ -1087,16 +1175,15 @@ function resolveForm(f){
   const t = TYPES.find(x => x.id === f.dataset.form);
   if(!t) return false;
   if(t.want !== S.stamp){
-    S.wrongs++; S.combo = 0;
+    S.wrongs++; cutCombo(t.id);
     SFX.wrong(); float('Beschwerde', 'var(--bad)');
     finish(f, false);
     return false;
   }
   const crit = Math.random() < STATS.critChance;
-  let gain = (t.value + STATS.bonusPerForm) * mult();
+  let gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor(t.id);
   if(crit){ gain *= STATS.critMult; S.crits++; }
-  S.earned += gain; S.done++; S.combo++;
-  S.bestCombo = Math.max(S.bestCombo, S.combo);
+  S.earned += gain; S.done++; bumpCombo(t.id);
   if(crit){ SFX.crit(); float('VOLLTREFFER +' + eur(gain), 'var(--s-amber)'); }
   else     { SFX.correct(Math.min(S.combo, 14)); float('+' + eur(gain), 'var(--good)'); }
   finish(f, true);
@@ -1111,7 +1198,7 @@ function echoBonus(){
   const f = rest[Math.random() * rest.length | 0];
   const t = TYPES.find(x => x.id === f.dataset.form);
   if(!t) return;
-  const gain = (t.value + STATS.bonusPerForm) * mult();
+  const gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor(t.id);
   S.earned += gain; S.done++; S.echoes++;
   // Immer die RICHTIGE Aktion - der Durchschlag kann keine Beschwerde ausloesen
   finish(f, true, STAMPS.find(x => x.id === t.want).name);
@@ -1186,7 +1273,7 @@ function endRound(){
   + '<div class="sub">Tag ' + meta.day + ' &middot; Dienstschluss</div>'
   + '<table class="ledger">'
   + row('Bearbeitete Vorg&auml;nge (' + S.done + ')', '+' + eur(S.earned))
-  + sub('beste Kombo &times;' + (1+S.bestCombo*CONFIG.comboStep).toFixed(1).replace('.',','), '')
+  + sub('beste Kombo &times;' + Math.min(1 + S.bestCombo*STATS.comboStep, STATS.comboCap).toFixed(1).replace('.',','), '')
   + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
   + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))

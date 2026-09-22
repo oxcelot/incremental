@@ -989,3 +989,58 @@ Ersetzt "Blick fuer das Detail" (x4), das durch die Stufen des Routinierten
 Auges ueberfluessig wurde. Wirkung: Ein Volltreffer nutzt das Kissen nicht ab -
 der Abdruck sass ja perfekt. Verzahnt den Volltreffer-Zweig mit dem Kissen,
 dem wichtigsten Engpass des Spiels.
+
+
+################################################################################
+# TEIL 1G - KOMBO-ZWEIG UND ERTRAG NACH STEMPELART (22.09.2026)
+################################################################################
+Der Baum waechst von 25 auf 34 Knoten. Die neuen Zweige haengen an vorhandenen
+Speichen, damit das Radialschema nicht umgebaut werden muss.
+
+ERTRAG NACH STEMPELART (an der Amtsautoritaet)
+  Ablehnungsbescheid       5 Stufen  +0,50 EUR  -> +2,50 auf ABGELEHNT
+  Weiterleitungspauschale  4 Stufen  +0,60 EUR  -> +2,40 auf WEITERLEITEN
+  Nachforderungsgebuehr    4 Stufen  +0,50 EUR  -> +2,00 auf NACHFORDERUNG
+STATS.stampBonus haelt je Stempel einen Aufschlag, der zum Grundwert addiert
+wird, BEVOR die Kombo multipliziert. Das belohnt Spezialisierung: wer auf
+Ablehnungen setzt, spielt einen anderen Tisch als wer weiterleitet.
+Die Weiterleitung war mit 3,00 EUR die billigste Aktion und kostet keinen
+vollen Takt - aufgewertet wird sie zur echten Alternative statt zur Notloesung.
+
+DER KOMBO-ZWEIG (an der Ergonomie-Speiche)
+Die Kombo lief seit dem ersten Prototyp, wurde aber von KEINEM Upgrade
+beruehrt - der groesste ungenutzte Hebel im Spiel. Sechs neue Knoten:
+  Aktenzeichen-Gedaechtnis 4 Stufen  Deckel x3 -> x5
+  Schwung                  5 Stufen  Zuwachs 0,10 -> 0,15 je Vorgang
+  Warmgelaufen             5 Stufen  Startstufe 1 bis 5
+  Beharrlichkeit           1 Stufe   Beschwerde halbiert statt zu brechen
+  Der kurze Dienstweg      1 Stufe   Stempelwechsel bricht die Kombo nicht
+  Getrennte Registratur    1 Stufe   ENDGAME: jede Aktenart hat ihre eigene
+                                     Kombo, die bis Dienstschluss haelt
+
+WARUM DIE GETRENNTE REGISTRATUR 900 EUR KOSTET
+Sie macht die Frage "lohnt sich der Wechsel?" bedeutungslos - und genau diese
+Frage traegt das halbe Spiel. Als billiger Knoten wuerde sie die gesamte
+Ergonomie-Speiche entwerten, auf der sie selbst sitzt. Sie gehoert deshalb ans
+Ende einer Kette (Handgelenkdrehung -> Trockenwechsel -> Kurzer Dienstweg ->
+Registratur) und muss teuer bleiben.
+=> MERKE: Ein Upgrade, das eine Kernfrage des Spiels abschaltet, darf nie
+   frueh erreichbar sein. Es ist eine Belohnung fuer das Durchspielen, keine
+   Abkuerzung.
+
+TECHNISCHE UMSETZUNG DER KOMBO
+comboOf/multFor/bumpCombo/cutCombo kapseln den Zugriff. Ohne Registratur gibt
+es eine einzige Kombo (S.combo), mit ihr eine je Aktenart (S.comboByType).
+Die Kopfzeile zeigt die Kombo der Art, deren Stempel gerade in der Hand liegt -
+sonst waere bei vier parallelen Ketten keine sinnvolle Einzelzahl anzeigbar.
+
+NICHT UEBERNOMMEN (aus dem Vorschlag vom selben Tag, fuer spaeter)
+  Registratur-Erweiterung  +2 Tischplaetze je Stufe
+  Vorsortierung            gleiche Arten landen nebeneinander
+  Aktenkunde               farbige Ecke zeigt den Sollstempel
+  Ermessensspielraum       Fehlstempel bringt Teilertrag statt Beschwerde
+  Amtsschimmel             Chance auf vorgestempelte Vorgaenge
+  Feierabendbonus          Pauschale fuer Liegengebliebenes
+Zwei davon sind heikel: Aktenkunde nimmt dem Spiel das Lernen der
+Vorgangstypen ab, also die Wissensachse des Kern-Skills. Der Feierabendbonus
+arbeitet gegen den Rueckstand, also gegen die zentrale Druckquelle.
