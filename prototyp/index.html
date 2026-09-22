@@ -1,0 +1,694 @@
+<title>Stamp Duty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#E3DED1; --surface:#F2ECDD; --line:#C6BDA6;
+    --desk:#6E7C66; --desk-edge:#56624F; --desk-grid:#5F6C58;
+    --paper:#F8F2E2; --paper-line:#CEC4AA; --paper-edge:#D8CFB6;
+    --ink:#22282F; --text:#22282F; --muted:#6E6757;
+    --s-green:#2F6B4F; --s-red:#A33227; --s-amber:#AF7016; --s-blue:#2B5E86;
+    --good:#2F6B4F; --bad:#A33227;
+    --font-ui:"IBM Plex Sans",system-ui,sans-serif;
+    --font-stamp:"Oswald",Impact,sans-serif;
+    --font-form:"Courier Prime","Courier New",monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#141715; --surface:#1E2320; --line:#333A34;
+      --desk:#2F3B30; --desk-edge:#212A22; --desk-grid:#3A473A;
+      --paper:#E9E1CD; --paper-line:#B7AC91; --paper-edge:#CFC5AB;
+      --text:#E4E1D7; --muted:#9AA093;
+      --s-green:#4E9C77; --s-red:#D05A4C; --s-amber:#D79A38; --s-blue:#5B95C4;
+      --good:#4E9C77; --bad:#D05A4C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141715; --surface:#1E2320; --line:#333A34;
+    --desk:#2F3B30; --desk-edge:#212A22; --desk-grid:#3A473A;
+    --paper:#E9E1CD; --paper-line:#B7AC91; --paper-edge:#CFC5AB;
+    --text:#E4E1D7; --muted:#9AA093;
+    --s-green:#4E9C77; --s-red:#D05A4C; --s-amber:#D79A38; --s-blue:#5B95C4;
+    --good:#4E9C77; --bad:#D05A4C;
+  }
+
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font-ui); overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+  #app{height:100%; display:flex; flex-direction:column; padding:12px 16px; box-sizing:border-box; gap:10px;}
+
+  /* ---------- HUD ---------- */
+  .hud{
+    display:flex; flex-wrap:wrap; align-items:stretch; gap:8px;
+  }
+  .gauge{
+    background:var(--surface); border:1px solid var(--line); border-radius:3px;
+    padding:6px 10px; min-width:72px; flex:0 0 auto;
+  }
+  .gauge b{
+    display:block; font-family:var(--font-stamp); font-size:19px; font-weight:700;
+    letter-spacing:.02em; font-variant-numeric:tabular-nums; line-height:1.15;
+  }
+  .gauge span{
+    display:block; font-size:9px; text-transform:uppercase; letter-spacing:.14em;
+    color:var(--muted); font-weight:600;
+  }
+  .gauge.wide{flex:1 1 120px;}
+  #combo b{color:var(--s-amber);}
+  #ink b{color:var(--bad);}
+  #earned b{color:var(--good);}
+  .timebar{height:4px; background:var(--line); border-radius:2px; margin-top:5px; overflow:hidden;}
+  .timebar i{display:block; height:100%; width:100%; background:var(--s-red); transform-origin:left;}
+
+  /* ---------- Stage ---------- */
+  #stage{
+    flex:1 1 auto; min-height:0; display:flex; gap:10px;
+  }
+  .inbox{
+    flex:0 0 96px; background:var(--surface); border:1px solid var(--line); border-radius:3px;
+    padding:10px 8px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px;
+  }
+  .inbox .cnt{font-family:var(--font-stamp); font-size:26px; font-weight:700; font-variant-numeric:tabular-nums;}
+  .inbox .lbl{font-size:9px; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-weight:600; text-align:center;}
+  .pile{flex:1 1 auto; width:100%; display:flex; flex-direction:column-reverse; justify-content:flex-start; gap:1px; overflow:hidden; padding-top:6px;}
+  .pile i{display:block; height:3px; background:var(--paper); border:1px solid var(--paper-edge); border-radius:1px;}
+
+  .deskwrap{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:10px;}
+  .desk{
+    flex:1 1 auto; min-height:0;
+    background:var(--desk); border:3px solid var(--desk-edge); border-radius:4px;
+    padding:10px; display:grid; gap:8px;
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(3,1fr);
+  }
+  .slot{border:1px dashed var(--desk-grid); border-radius:3px; position:relative;}
+
+  .form{
+    position:absolute; inset:0; background:var(--paper); color:var(--ink);
+    border:1px solid var(--paper-edge); border-radius:2px;
+    box-shadow:0 2px 0 rgba(0,0,0,.18);
+    padding:6px 7px; display:flex; flex-direction:column; gap:3px;
+    font-family:var(--font-form); overflow:hidden;
+    animation:drop .18s ease-out;
+  }
+  @keyframes drop{from{transform:translateY(-10px) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+  .form .az{font-size:9px; color:#7A7362; letter-spacing:.04em;}
+  .form .betreff{font-size:11px; font-weight:700; line-height:1.2; text-wrap:balance;}
+  .form .rows{margin-top:auto; display:flex; flex-direction:column; gap:2px;}
+  .form .row{height:3px; background:var(--paper-line); border-radius:1px;}
+  .form .row.empty{height:9px; background:transparent; border:1px dashed var(--bad); border-radius:2px;}
+  .form .seal{
+    position:absolute; top:4px; right:4px; width:30px; height:30px; border-radius:50%;
+    border:2px solid var(--s-blue); color:var(--s-blue);
+    display:grid; place-items:center; font-family:var(--font-stamp); font-size:8px;
+    font-weight:700; letter-spacing:.04em; transform:rotate(-12deg); opacity:.85;
+  }
+  .form .para{
+    position:absolute; top:4px; right:6px; font-family:var(--font-stamp);
+    font-size:22px; font-weight:700; color:var(--bad); opacity:.9; line-height:1;
+  }
+  .form .value{position:absolute; bottom:5px; right:6px; font-size:10px; font-weight:700; color:#7A7362;}
+  .form.done{animation:done .22s ease-in forwards;}
+  @keyframes done{to{transform:scale(.88) rotate(3deg); opacity:0;}}
+  .imprint{
+    position:absolute; inset:0; display:grid; place-items:center; pointer-events:none;
+    font-family:var(--font-stamp); font-size:12px; font-weight:700; letter-spacing:.06em;
+    border:3px solid currentColor; border-radius:3px; transform:rotate(-8deg) scale(1.6);
+    opacity:0; animation:slam .22s ease-out forwards;
+  }
+  @keyframes slam{to{transform:rotate(-8deg) scale(1); opacity:.92;}}
+
+  /* ---------- Stempelablage ---------- */
+  .rack{display:flex; gap:8px; flex-wrap:wrap;}
+  .pad{
+    flex:1 1 90px; background:var(--surface); border:1px solid var(--line);
+    border-top:4px solid var(--c); border-radius:3px; padding:7px 8px 6px;
+    position:relative; min-width:0;
+  }
+  .pad .nm{font-family:var(--font-stamp); font-size:12px; font-weight:700; color:var(--c); letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .pad .st{font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600;}
+  .pad.held{background:color-mix(in srgb, var(--c) 14%, var(--surface)); border-color:var(--c);}
+  .pad.held .st{color:var(--c);}
+  .fresh{height:3px; background:var(--line); border-radius:2px; margin-top:5px; overflow:hidden;}
+  .fresh i{display:block; height:100%; background:var(--c); transform-origin:left;}
+
+  /* ---------- Stempel-Cursor ---------- */
+  #stamp{position:fixed; left:0; top:0; pointer-events:none; z-index:40; transform:translate(-50%,-50%); transition:opacity .12s;}
+  #stamp .body{
+    width:74px; height:74px; display:grid; place-items:center; border-radius:4px;
+    background:color-mix(in srgb, var(--c) 22%, #0000); border:2px solid var(--c);
+    font-family:var(--font-stamp); font-size:10px; font-weight:700; color:var(--c);
+    letter-spacing:.05em; text-align:center; padding:0 4px; box-sizing:border-box;
+    backdrop-filter:blur(1px);
+  }
+  #stamp.faded .body{opacity:.45; border-style:dashed;}
+  #stamp.press{animation:press .16s ease-out;}
+  @keyframes press{0%{transform:scale(1)}40%{transform:scale(.78)}100%{transform:scale(1)}}
+  #stamp.lifted{opacity:.3;}
+  #ring{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-90deg);}
+  #ring circle{fill:none; stroke-width:3;}
+  #ring .bg{stroke:color-mix(in srgb, var(--c) 25%, #0000);}
+  #ring .fg{stroke:var(--c); stroke-linecap:round;}
+
+  .float{
+    position:fixed; z-index:45; pointer-events:none; font-family:var(--font-stamp);
+    font-size:17px; font-weight:700; font-variant-numeric:tabular-nums;
+    animation:rise .75s ease-out forwards; text-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  @keyframes rise{to{transform:translateY(-38px); opacity:0;}}
+
+  /* ---------- Overlays ---------- */
+  .veil{
+    position:fixed; inset:0; z-index:60; display:grid; place-items:center;
+    background:color-mix(in srgb, var(--bg) 82%, #000); padding:16px; overflow:auto;
+  }
+  .sheet{
+    background:var(--paper); color:var(--ink); border:1px solid var(--paper-edge);
+    border-radius:3px; box-shadow:0 10px 30px rgba(0,0,0,.3);
+    width:min(560px,100%); padding:22px 24px; box-sizing:border-box;
+    font-family:var(--font-form);
+  }
+  .sheet h1{font-family:var(--font-stamp); font-size:30px; font-weight:700; letter-spacing:.03em; margin:0 0 2px; text-wrap:balance;}
+  .sheet .sub{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#7A7362; margin-bottom:16px;}
+  .sheet h2{font-family:var(--font-stamp); font-size:13px; letter-spacing:.1em; text-transform:uppercase; margin:18px 0 7px; color:#5E5849;}
+  .sheet ul{margin:0; padding-left:17px; font-size:12.5px; line-height:1.55;}
+  .sheet li{margin-bottom:3px;}
+  .legend{display:grid; gap:5px; font-size:12px;}
+  .legend div{display:flex; gap:8px; align-items:baseline; border-bottom:1px dotted var(--paper-line); padding-bottom:4px;}
+  .legend .k{flex:1 1 auto;}
+  .legend .v{font-family:var(--font-stamp); font-weight:700; letter-spacing:.04em; white-space:nowrap;}
+  .ledger{width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums;}
+  .ledger td{padding:4px 0; border-bottom:1px dotted var(--paper-line);}
+  .ledger td:last-child{text-align:right; font-weight:700;}
+  .ledger tr.sum td{border-top:2px solid var(--ink); border-bottom:none; padding-top:8px; font-size:16px; font-family:var(--font-stamp); letter-spacing:.03em;}
+  .ledger tr.sub td{color:#7A7362; font-size:11.5px; border-bottom:none; padding:1px 0 4px 14px;}
+  .ledger tr.sub td:last-child{font-weight:400;}
+  .btn{
+    margin-top:18px; width:100%; padding:13px; cursor:pointer;
+    font-family:var(--font-stamp); font-size:15px; font-weight:700; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--paper); background:var(--ink);
+    border:none; border-radius:2px;
+  }
+  .btn:hover{background:#3A434E;}
+  .btn:focus-visible{outline:3px solid var(--s-amber); outline-offset:2px;}
+  .note{font-size:11px; color:#7A7362; margin-top:9px; line-height:1.5;}
+
+  @media (max-width:760px){
+    #stage{flex-direction:column;}
+    .inbox{flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:10px; padding:6px 10px;}
+    .pile{flex-direction:row; height:12px; flex:1 1 auto; padding:0;}
+    .pile i{height:auto; width:3px; flex:0 0 3px;}
+    .desk{grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(4,1fr);}
+    .gauge{min-width:62px; padding:5px 8px;}
+    .gauge b{font-size:16px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important;}
+  }
+</style>
+
+<div id="app">
+  <div class="hud">
+    <div class="gauge wide" id="clock"><span>Dienstzeit</span><b>00:60</b><div class="timebar"><i></i></div></div>
+    <div class="gauge" id="beats"><span>Takte</span><b>40</b></div>
+    <div class="gauge" id="combo"><span>Kombo</span><b>&times;1,0</b></div>
+    <div class="gauge" id="earned"><span>Ertrag</span><b>0,00</b></div>
+    <div class="gauge" id="ink"><span>Tinte</span><b>0,00</b></div>
+    <div class="gauge" id="backlog"><span>R&uuml;ckstand</span><b>0</b></div>
+  </div>
+
+  <div id="stage">
+    <div class="inbox">
+      <div class="pile" id="pile"></div>
+      <div class="cnt" id="queueCnt">0</div>
+      <div class="lbl">Post&shy;eingang</div>
+    </div>
+    <div class="deskwrap">
+      <div class="desk" id="desk"></div>
+      <div class="rack" id="rack"></div>
+    </div>
+  </div>
+</div>
+
+<div id="stamp" hidden>
+  <svg id="ring" width="92" height="92" viewBox="0 0 92 92">
+    <circle class="bg" cx="46" cy="46" r="43"></circle>
+    <circle class="fg" cx="46" cy="46" r="43"></circle>
+  </svg>
+  <div class="body" id="stampBody">GENEHMIGT</div>
+</div>
+
+<div class="veil" id="veil">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script type="module">
+// ============================================================================
+//  STAMP DUTY - Prototyp P1
+//  Zweck: Traegt die Kern-Handlung 60 Sekunden ohne jede Belohnung?
+//  Alle Stellschrauben stehen in CONFIG. Nichts anderes muss angefasst werden.
+// ============================================================================
+
+const CONFIG = {
+  roundSeconds:   60,     // Laenge eines Arbeitstages
+  beatMs:         1500,   // Stempeltakt - der Stempel schlaegt von selbst zu
+  spawnMs:        800,    // Nachrueckrate vom Stapel auf einen freien Platz
+  inflowMs:       1000,   // Zulauf in den Posteingang
+  startQueue:     20,     // Posteingang zu Dienstbeginn
+  slots:          12,     // Tischplaetze
+  inkCost:        0.50,   // Kosten pro Stempeldruck, Treffer wie Fehldruck
+  wrongPenalty:   2.00,   // Beschwerde bei falschem Stempel
+  comboStep:      0.10,   // Multiplikator-Zuwachs pro Kombo-Stufe
+  comboCap:       3.00,   // Deckel
+  freshnessMax:   10,     // Drucke bis der Abdruck blass wird
+  fadedFactor:    0.50,   // Ertrag bei blassem Abdruck
+  missBreaksCombo:false,  // Fehldruck bricht die Kombo? (Auto-Feuer: eher nein)
+  afkBeats:       3,      // Takte ohne Mausbewegung, bis die Hand sich hebt
+  floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
+};
+
+const STAMPS = [
+  { id:'gen',  name:'GENEHMIGT',     color:'var(--s-green)' },
+  { id:'nach', name:'NACHFORDERUNG', color:'var(--s-amber)' },
+  { id:'weit', name:'WEITERLEITEN',  color:'var(--s-blue)'  },
+  { id:'abl',  name:'ABGELEHNT',     color:'var(--s-red)'   },
+];
+
+const TYPES = [
+  { id:'standard', want:'gen',  value:4, weight:5,
+    betreff:['Antrag auf Wohngeld','Anmeldung Zweitwohnsitz','Antrag auf Kindergeld','Verlängerung Parkausweis'] },
+  { id:'unvoll',   want:'nach', value:5, weight:3,
+    betreff:['Antrag auf Elterngeld','Bauvoranfrage','Antrag auf Beförderung','Erstattung Fahrtkosten'] },
+  { id:'fremd',    want:'weit', value:3, weight:2,
+    betreff:['Gewerbeanmeldung','Hundesteuer-Abmeldung','Fischereischein','Sondernutzung Gehweg'] },
+  { id:'absurd',   want:'abl',  value:6, weight:2,
+    betreff:['Antrag auf Zeitumkehr','Antrag auf einen zweiten Montag','Befreiung von der Schwerkraft','Antrag auf Unsterblichkeit'] },
+];
+
+const LEGEND = [
+  ['Alle Felder ausgef&uuml;llt',                 'GENEHMIGT'],
+  ['Ein Feld leer (rot gestrichelt)',             'NACHFORDERUNG'],
+  ['Fremdes Amtssiegel (AMT 4-B)',                'WEITERLEITEN'],
+  ['Unzul&auml;ssiges Anliegen (rotes &sect;)',   'ABGELEHNT'],
+];
+
+// ---------------------------------------------------------------- Elemente
+const el = {
+  desk: document.getElementById('desk'),
+  rack: document.getElementById('rack'),
+  pile: document.getElementById('pile'),
+  queueCnt: document.getElementById('queueCnt'),
+  stage: document.getElementById('stage'),
+  stamp: document.getElementById('stamp'),
+  stampBody: document.getElementById('stampBody'),
+  ringFg: document.querySelector('#ring .fg'),
+  veil: document.getElementById('veil'),
+  sheet: document.getElementById('sheet'),
+  clock: document.querySelector('#clock b'),
+  clockBar: document.querySelector('#clock .timebar i'),
+  beats: document.querySelector('#beats b'),
+  combo: document.querySelector('#combo b'),
+  earned: document.querySelector('#earned b'),
+  ink: document.querySelector('#ink b'),
+  backlog: document.querySelector('#backlog b'),
+};
+
+const RING_LEN = 2 * Math.PI * 43;
+el.ringFg.style.strokeDasharray = RING_LEN;
+
+// ---------------------------------------------------------------- Zustand
+let S = null;                  // Rundenzustand
+let running = false;
+let pointer = { x:-999, y:-999 };
+let lastMove = 0;
+let rafId = 0;
+let meta = { day:1, best:0 };
+
+const eur = n => n.toFixed(2).replace('.', ',');
+
+function pickType(){
+  const total = TYPES.reduce((s,t)=>s+t.weight,0);
+  let r = Math.random()*total;
+  for(const t of TYPES){ r -= t.weight; if(r<=0) return t; }
+  return TYPES[0];
+}
+function aktenzeichen(){
+  const a = 'ABDFGHKLMRSTVZ';
+  return a[Math.random()*a.length|0] + a[Math.random()*a.length|0]
+       + '-' + String(100+Math.random()*899|0) + '/' + String(10+Math.random()*89|0);
+}
+
+// ---------------------------------------------------------------- Audio
+let actx = null;
+function audio(){
+  if(!actx){
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ return null; }
+  }
+  if(actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function noise(dur, freq, q, gain){
+  const c = audio(); if(!c) return;
+  const n = Math.floor(c.sampleRate * dur);
+  const buf = c.createBuffer(1, n, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i] = (Math.random()*2-1) * (1 - i/n);
+  const src = c.createBufferSource(); src.buffer = buf;
+  const flt = c.createBiquadFilter(); flt.type='bandpass'; flt.frequency.value=freq; flt.Q.value=q;
+  const g = c.createGain(); g.gain.value = gain;
+  src.connect(flt); flt.connect(g); g.connect(c.destination);
+  src.start();
+}
+function tone(freq, dur, type, gain, slideTo){
+  const c = audio(); if(!c) return;
+  const o = c.createOscillator(); const g = c.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, c.currentTime);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime+dur);
+  g.gain.setValueAtTime(gain, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime+dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime+dur+0.02);
+}
+const SFX = {
+  thud(){ noise(0.09, 260, 0.7, 0.22); tone(88, 0.10, 'sine', 0.30, 52); },
+  correct(tier){ const f = 392 * Math.pow(2, tier/12); tone(f, 0.11, 'triangle', 0.16, f*1.5); },
+  wrong(){ tone(150, 0.26, 'sawtooth', 0.14, 70); },
+  miss(){ noise(0.07, 130, 0.5, 0.14); },
+  reink(){ noise(0.16, 700, 1.4, 0.13); tone(200, 0.13, 'sine', 0.09, 300); },
+  swap(){ noise(0.05, 1800, 3, 0.11); tone(560, 0.05, 'square', 0.06); },
+  pretick(){ tone(2100, 0.022, 'square', 0.022); },
+  bell(){ tone(880,0.5,'sine',0.14,440); tone(1320,0.5,'sine',0.07,660); },
+};
+
+// ---------------------------------------------------------------- Aufbau
+function buildDesk(){
+  el.desk.innerHTML = '';
+  for(let i=0;i<CONFIG.slots;i++){
+    const s = document.createElement('div');
+    s.className = 'slot'; s.dataset.slot = String(i);
+    el.desk.appendChild(s);
+  }
+}
+function buildRack(){
+  el.rack.innerHTML = '';
+  for(const st of STAMPS){
+    const p = document.createElement('div');
+    p.className = 'pad'; p.dataset.pad = st.id; p.style.setProperty('--c', st.color);
+    p.innerHTML = '<div class="nm">'+st.name+'</div>'
+                + '<div class="st" data-role="st">Kissen</div>'
+                + '<div class="fresh"><i data-role="fresh"></i></div>';
+    el.rack.appendChild(p);
+  }
+}
+function renderRack(){
+  for(const p of el.rack.children){
+    const held = p.dataset.pad === S.stamp;
+    p.classList.toggle('held', held);
+    p.querySelector('[data-role="st"]').textContent = held ? 'in der Hand' : 'Kissen';
+    const f = p.querySelector('[data-role="fresh"]');
+    f.style.transform = 'scaleX(' + (held ? S.freshness/CONFIG.freshnessMax : 0) + ')';
+  }
+}
+
+function spawnForm(){
+  const free = [...el.desk.children].filter(s => !s.firstElementChild);
+  if(!free.length || S.queue <= 0) return;
+  S.queue--;
+  const slot = free[Math.random()*free.length|0];
+  const t = pickType();
+  const f = document.createElement('div');
+  f.className = 'form'; f.dataset.form = t.id;
+  let extra = '';
+  let rows = '<div class="row"></div><div class="row"></div><div class="row"></div>';
+  if(t.id === 'unvoll') rows = '<div class="row"></div><div class="row empty"></div><div class="row"></div>';
+  if(t.id === 'fremd') extra = '<div class="seal">AMT<br>4-B</div>';
+  if(t.id === 'absurd') extra = '<div class="para">&sect;</div>';
+  f.innerHTML = '<div class="az">' + aktenzeichen() + '</div>'
+              + '<div class="betreff">' + t.betreff[Math.random()*t.betreff.length|0] + '</div>'
+              + extra
+              + '<div class="rows">' + rows + '</div>'
+              + '<div class="value">' + eur(t.value) + '</div>';
+  slot.appendChild(f);
+}
+
+function renderQueue(){
+  el.queueCnt.textContent = S.queue;
+  const want = Math.min(26, Math.ceil(S.queue/3));
+  while(el.pile.children.length < want) el.pile.appendChild(document.createElement('i'));
+  while(el.pile.children.length > want) el.pile.lastElementChild.remove();
+}
+
+// ---------------------------------------------------------------- Runde
+function startRound(){
+  S = {
+    t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:CONFIG.freshnessMax,
+    combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
+    swaps:0, reinks:0, bestCombo:0,
+    accBeat:0, accSpawn:0, accInflow:0, preticked:false,
+  };
+  buildDesk(); buildRack(); renderRack(); renderQueue();
+  for(let i=0;i<6;i++) spawnForm();
+  el.veil.hidden = true;
+  el.stamp.hidden = false;
+  setStampColor();
+  running = true; lastMove = performance.now();
+  let prev = performance.now();
+  cancelAnimationFrame(rafId);
+  const loop = now => {
+    const dt = Math.min(now - prev, 100); prev = now;
+    tick(dt, now);
+    if(running) rafId = requestAnimationFrame(loop);
+  };
+  rafId = requestAnimationFrame(loop);
+}
+
+function setStampColor(){
+  const st = STAMPS.find(s => s.id === S.stamp);
+  el.stamp.style.setProperty('--c', st.color);
+  el.stampBody.textContent = st.name;
+}
+
+function tick(dt, now){
+  S.t += dt;
+  const left = Math.max(0, CONFIG.roundSeconds*1000 - S.t);
+
+  S.accBeat += dt;
+  S.accSpawn += dt;
+  S.accInflow += dt;
+
+  if(S.accInflow >= CONFIG.inflowMs){ S.accInflow -= CONFIG.inflowMs; S.queue++; renderQueue(); }
+  if(S.accSpawn  >= CONFIG.spawnMs ){ S.accSpawn  -= CONFIG.spawnMs;  spawnForm(); renderQueue(); }
+
+  const p = S.accBeat / CONFIG.beatMs;
+  if(p >= 0.82 && !S.preticked){ S.preticked = true; SFX.pretick(); }
+  if(S.accBeat >= CONFIG.beatMs){
+    S.accBeat -= CONFIG.beatMs; S.preticked = false;
+    strike(now);
+  }
+
+  // Taktring
+  el.ringFg.style.strokeDashoffset = RING_LEN * (1 - Math.min(1, S.accBeat/CONFIG.beatMs));
+  el.stamp.style.transform = 'translate(' + pointer.x + 'px,' + pointer.y + 'px) translate(-50%,-50%)';
+
+  const lifted = isLifted(now);
+  el.stamp.classList.toggle('lifted', lifted);
+  el.stamp.classList.toggle('faded', S.freshness <= 0);
+
+  // HUD
+  const secs = Math.ceil(left/1000);
+  el.clock.textContent = String(Math.floor(secs/60)).padStart(2,'0')
+    + ':' + String(secs%60).padStart(2,'0');
+  el.clockBar.style.transform = 'scaleX(' + (left/(CONFIG.roundSeconds*1000)) + ')';
+  el.beats.textContent = Math.ceil(left / CONFIG.beatMs);
+  el.combo.textContent = '×' + mult().toFixed(1).replace('.',',');
+  el.earned.textContent = eur(S.earned);
+  el.ink.textContent = eur(S.inkSpent);
+  el.backlog.textContent = S.queue + onDesk();
+
+  if(left <= 0) endRound();
+}
+
+const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
+const mult = () => Math.min(1 + S.combo*CONFIG.comboStep, CONFIG.comboCap);
+
+function isLifted(now){
+  if(now - lastMove > CONFIG.afkBeats * CONFIG.beatMs) return true;
+  const r = el.stage.getBoundingClientRect();
+  return pointer.x < r.left || pointer.x > r.right || pointer.y < r.top || pointer.y > r.bottom;
+}
+
+// ---------------------------------------------------------------- Der Schlag
+function strike(now){
+  if(isLifted(now)) return;            // Hand gehoben: kein Druck, keine Tinte
+  el.stamp.classList.remove('press');
+  void el.stamp.offsetWidth;
+  el.stamp.classList.add('press');
+  SFX.thud();
+
+  const target = document.elementFromPoint(pointer.x, pointer.y);
+  const pad  = target && target.closest('[data-pad]');
+  const form = target && target.closest('[data-form]');
+
+  // 1) Eigenes Kissen -> nachtinten (Parkplatz, Kombo bleibt)
+  if(pad && pad.dataset.pad === S.stamp){
+    charge();
+    S.freshness = CONFIG.freshnessMax; S.reinks++;
+    SFX.reink(); float('nachgetintet', 'var(--muted)');
+    renderRack(); return;
+  }
+  // 2) Fremdes Kissen -> Stempelwechsel (kostet Takt + Kombo)
+  if(pad){
+    charge(); wear();
+    S.stamp = pad.dataset.pad; S.combo = 0; S.swaps++;
+    setStampColor(); SFX.swap();
+    float(STAMPS.find(s=>s.id===S.stamp).name, 'var(--muted)');
+    renderRack(); return;
+  }
+  // 3) Formular
+  if(form){
+    charge(); wear();
+    const t = TYPES.find(x => x.id === form.dataset.form);
+    if(t.want === S.stamp){
+      const faded = S.freshness <= 0;
+      const gain = t.value * mult() * (faded ? CONFIG.fadedFactor : 1);
+      S.earned += gain; S.done++; S.combo++;
+      S.bestCombo = Math.max(S.bestCombo, S.combo);
+      SFX.correct(Math.min(S.combo, 14));
+      float('+' + eur(gain) + (faded ? ' blass' : ''), 'var(--good)');
+      finish(form, true);
+    } else {
+      S.wrongs++; S.combo = 0;
+      SFX.wrong(); float('Beschwerde', 'var(--bad)');
+      finish(form, false);
+    }
+    renderRack(); return;
+  }
+  // 4) Tisch -> Fehldruck
+  charge(); wear();
+  S.misses++;
+  if(CONFIG.missBreaksCombo) S.combo = 0;
+  SFX.miss(); float('daneben', 'var(--muted)');
+  renderRack();
+}
+
+function charge(){ S.presses++; S.inkSpent += CONFIG.inkCost; }
+function wear(){ S.freshness = Math.max(0, S.freshness - 1); }
+
+function finish(form, ok){
+  const st = STAMPS.find(s => s.id === S.stamp);
+  form.removeAttribute('data-form');
+  form.style.pointerEvents = 'none';
+  const imp = document.createElement('div');
+  imp.className = 'imprint';
+  imp.style.color = ok ? st.color : 'var(--bad)';
+  imp.textContent = st.name;
+  form.appendChild(imp);
+  form.classList.add('done');
+  setTimeout(() => form.remove(), 240);
+}
+
+function float(txt, color){
+  const d = document.createElement('div');
+  d.className = 'float'; d.textContent = txt; d.style.color = color;
+  d.style.left = (pointer.x + 24) + 'px'; d.style.top = (pointer.y - 12) + 'px';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 780);
+}
+
+// ---------------------------------------------------------------- Feierabend
+function endRound(){
+  running = false;
+  cancelAnimationFrame(rafId);
+  el.stamp.hidden = true;
+  SFX.bell();
+
+  const backlog = S.queue + onDesk();
+  const inkTotal = S.inkSpent;
+  const complaints = S.wrongs * CONFIG.wrongPenalty;
+  const raw = S.earned - inkTotal - complaints;
+  const net = CONFIG.floorAtZero ? Math.max(0, raw) : raw;
+  meta.best = Math.max(meta.best, net);
+
+  el.sheet.innerHTML =
+    '<h1>Abrechnungsbogen</h1>'
+  + '<div class="sub">Tag ' + meta.day + ' &middot; Dienstschluss</div>'
+  + '<table class="ledger">'
+  + row('Bearbeitete Vorg&auml;nge (' + S.done + ')', '+' + eur(S.earned))
+  + sub('beste Kombo &times;' + (1+S.bestCombo*CONFIG.comboStep).toFixed(1).replace('.',','), '')
+  + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
+  + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
+  + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
+  + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'
+  + '</table>'
+  + '<div class="note">'
+  + (raw < 0 && CONFIG.floorAtZero ? 'Fehlbetrag von ' + eur(-raw) + ' &euro; wurde erlassen.<br>' : '')
+  + 'R&uuml;ckstand im Posteingang: <b>' + backlog + '</b> Vorg&auml;nge. '
+  + 'Zulauf heute: ' + CONFIG.roundSeconds + ', geschafft: ' + S.done + '.'
+  + (meta.day > 1 ? '<br>Bester Tag bisher: ' + eur(meta.best) + ' &euro;.' : '')
+  + '</div>'
+  + '<button class="btn" id="go">N&auml;chster Tag</button>';
+
+  el.veil.hidden = false;
+  const b = document.getElementById('go');
+  b.onclick = () => { meta.day++; startRound(); };
+  b.focus();
+}
+const row = (k,v) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
+const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
+
+// ---------------------------------------------------------------- Startseite
+function showIntro(){
+  el.stamp.hidden = true;
+  el.sheet.innerHTML =
+    '<h1>Stamp Duty</h1>'
+  + '<div class="sub">Dienstanweisung &middot; Prototyp</div>'
+  + '<h2>Der Stempel</h2>'
+  + '<ul>'
+  + '<li>Der Stempel schl&auml;gt <b>von selbst alle 1,5 Sekunden</b> zu. Du steuerst nur, wo er landet.</li>'
+  + '<li>Ein Arbeitstag dauert 60 Sekunden &ndash; also <b>40 Takte</b>. Mehr bekommst du nicht.</li>'
+  + '<li>Jeder Druck kostet Tinte. Abgerechnet wird bei Dienstschluss.</li>'
+  + '</ul>'
+  + '<h2>Die Kissen</h2>'
+  + '<ul>'
+  + '<li>Auf ein <b>fremdes Kissen</b> stempeln &rarr; Stempel gewechselt. Kostet einen Takt und die Kombo.</li>'
+  + '<li>Auf das <b>eigene Kissen</b> stempeln &rarr; nachgetintet. Kostet einen Takt, h&auml;lt aber die Kombo &ndash; der Platz zum Nachdenken.</li>'
+  + '<li>Maus vom Tisch nehmen &rarr; Hand gehoben. Keine Tinte, aber der Takt ist trotzdem weg.</li>'
+  + '</ul>'
+  + '<h2>Welcher Stempel wohin</h2>'
+  + '<div class="legend">'
+  + LEGEND.map(([k,v]) => '<div><span class="k">' + k + '</span><span class="v">' + v + '</span></div>').join('')
+  + '</div>'
+  + '<div class="note">Gleicher Stempel hintereinander baut die Kombo auf (bis &times;3). Falscher Stempel: Beschwerde. '
+  + 'Nach 10 Drucken wird der Abdruck blass und bringt nur noch die H&auml;lfte.</div>'
+  + '<button class="btn" id="go">Dienst antreten</button>';
+  el.veil.hidden = false;
+  const b = document.getElementById('go');
+  b.onclick = () => { audio(); startRound(); };
+  b.focus();
+}
+
+// ---------------------------------------------------------------- Eingabe
+window.addEventListener('pointermove', e => {
+  pointer.x = e.clientX; pointer.y = e.clientY; lastMove = performance.now();
+}, { passive:true });
+window.addEventListener('pointerdown', e => {
+  pointer.x = e.clientX; pointer.y = e.clientY; lastMove = performance.now();
+}, { passive:true });
+
+// ---------------------------------------------------------------- Boot
+function boot(data){
+  if(data && typeof data.day === 'number') meta = data;
+  showIntro();
+}
+try{
+  if(window.claude?.hot?.snapshot) window.claude.hot.snapshot(() => meta);
+}catch(e){}
+try{
+  if(window.claude?.hot?.ready) window.claude.hot.ready(boot);
+  else boot(window.claude?.hot?.data ?? null);
+}catch(e){ boot(null); }
+</script>
