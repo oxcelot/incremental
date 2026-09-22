@@ -883,14 +883,28 @@ UEBERSTUNDEN wandert bewusst aus Ring 1 nach Ring 2. Ring 1 gehoert jetzt den
 Entscheidungen, die den Arbeitstag VERAENDERN (Kissen, Volltreffer, Flaeche,
 Wechsel, Takt) - mehr Zeit ist die langweiligste Verbesserung und darf warten.
 
-DER FLAECHENSTEMPEL IST KEIN REINER GEWINN
-Ein breiter Abdruck trifft ALLE Vorgaenge unter sich, auch die mit einem anderen
-Sollstempel - die zaehlen als Beschwerde. Das war eine bewusste Entscheidung:
-ein Flaechenstempel, der nur die passenden Vorgaenge erwischt, waere ein
-Freifahrtschein ohne Entscheidung. So sucht der Spieler Nester gleichartiger
-Vorgaenge, statt blind draufzuhalten. Der Block schiebt sich am Rand so zurecht,
-dass der angeklickte Vorgang immer dabei ist; die betroffenen Plaetze werden
-beim Zielen amber umrandet.
+DER FLAECHENSTEMPEL MUSS GEZIELT WERDEN  [REVIDIERT 22.09.2026]
+Der Abdruck hat eine ECHTE FLAECHE, die am Zeiger klebt - es rastet nichts ein.
+Getroffen wird, wessen Platzmitte unter der Flaeche liegt:
+
+  Stempel steht ...                       Breiter Stempel   Amtsstempel XXL
+  mitten auf einem Platz                        1                 1
+  ueber der Luecke zwischen zwei Plaetzen       2                 2
+  ueber dem Kreuzungspunkt von vier Plaetzen    0                 4
+
+Die doppelte Ausbeute muss man sich also selbst erzielen, indem man den Stempel
+ueber die Luecke haelt; fuer vier ueber den Kreuzungspunkt. CONFIG.areaSpread
+steuert die Grosszuegigkeit: bei 1,4 liegt das Trefferband bei 40 % einer
+Platzbreite rund um die Luecke.
+Der Stempelumriss waechst sichtbar auf die Flaeche mit, und die abgedeckten
+Plaetze werden amber umrandet - man sieht VOR dem Schlag, was getroffen wird.
+Das ist Pflicht: eine Flaeche ohne Vorschau waere Raterei.
+Hinweis: Mit dem breiten (nur einen Platz hohen) Stempel genau zwischen zwei
+ZEILEN zu stehen trifft nichts. Das ist gewollt - der Stempel liegt dann
+zwischen den Vorgaengen - und die Vorschau zeigt es sofort.
+
+Ein breiter Abdruck trifft weiterhin ALLE Vorgaenge unter sich, auch die mit
+einem anderen Sollstempel; die zaehlen als Beschwerde.
 
 VOLLTREFFER
 Ohne Fortbildung gibt es KEINE Volltreffer (critChance startet bei 0). Erst
@@ -906,3 +920,10 @@ Das Durchschlagpapier hat eben mitkopiert.
 STEMPELKISSEN
 Die Kissen im Halter sind jetzt annaehernd quadratisch (122 x 104), damit sie
 wie echte Stempelkissen aussehen und der Fuellstand Platz hat.
+
+DEMO-MODUS
+CONFIG.demoCheapUpgrades steht auf true: jede Fortbildung kostet 1 EUR, damit
+sich der ganze Baum in wenigen Runden durchprobieren laesst. Auf dem Homescreen
+weist ein rotes Schild darauf hin. Die echten Preise stehen unveraendert in
+TREE - Flag auf false, und sie gelten wieder. VOR DEM ERSTEN OEFFENTLICHEN
+TEST ausschalten, sonst misst man ein Spiel ohne Oekonomie.

@@ -81,14 +81,35 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr (+0,60 €/Vorgang) → Säumniszuschlag (+1,40 €) | — |
 
-### Der Flächenstempel ist kein reiner Gewinn
+### Der Flächenstempel muss gezielt werden
+
+Der Abdruck hat eine **echte Fläche**, die am Mauszeiger klebt — es rastet
+nichts ein. Getroffen wird, wessen Platzmitte unter der Fläche liegt:
+
+| Stand des Stempels | mit „Breiter Stempel" | mit „Amtsstempel XXL" |
+|---|---|---|
+| mitten auf einem Platz | 1 Vorgang | 1 Vorgang |
+| über der Lücke zwischen zwei Plätzen | **2 Vorgänge** | 2 Vorgänge |
+| über dem Kreuzungspunkt von vier Plätzen | 0 (zu hoch/tief) | **4 Vorgänge** |
+
+Wer die doppelte Ausbeute will, muss den Stempel also selbst über die Lücke
+halten; für vier über den Kreuzungspunkt. `CONFIG.areaSpread` steuert, wie
+großzügig das ist: bei 1,4 liegt das Trefferband bei 40 % einer Platzbreite
+rund um die Lücke. Der Stempelumriss wächst sichtbar auf die Fläche mit, und
+die abgedeckten Plätze werden amber umrandet — man sieht vor dem Schlag genau,
+was getroffen wird.
 
 Ein breiter Abdruck trifft **alle** Vorgänge unter sich, auch die, die einen
-anderen Stempel verlangen — die zählen als Beschwerde. Der Block wird so an den
-Rand geschoben, dass der angeklickte Vorgang immer dabei ist. Damit wird die
-Fläche zur Abwägung statt zum Freifahrtschein: Man sucht Nester gleichartiger
-Vorgänge, statt blind draufzuhalten. Die betroffenen Plätze werden beim Zielen
-amber umrandet.
+anderen Stempel verlangen — die zählen als Beschwerde. Damit wird die Fläche
+zur Abwägung statt zum Freifahrtschein: Man sucht Nester gleichartiger
+Vorgänge, statt blind draufzuhalten.
+
+### Demo-Modus
+
+`CONFIG.demoCheapUpgrades` steht auf `true`: **jede Fortbildung kostet 1 €**,
+damit sich der ganze Baum in wenigen Runden durchprobieren lässt. Auf dem
+Homescreen weist ein rotes Schild darauf hin. Die echten Preise stehen
+unverändert in `TREE` — Flag auf `false`, und sie gelten wieder.
 
 ### Volltreffer und Durchschlag
 

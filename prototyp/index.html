@@ -259,6 +259,12 @@
     position:absolute; left:8px; bottom:6px; font-size:10px; color:var(--muted);
     letter-spacing:.04em; pointer-events:none;
   }
+  .demohint{
+    position:absolute; left:8px; top:8px; font-size:10px; font-weight:600;
+    color:var(--bad); letter-spacing:.06em; text-transform:uppercase;
+    border:1px solid var(--bad); border-radius:3px; padding:3px 7px;
+    pointer-events:none;
+  }
   #tree .link{stroke:var(--line); stroke-width:3;}
   #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
@@ -356,6 +362,7 @@
       <button type="button" id="zFit" aria-label="Ansicht zur&uuml;cksetzen">&#8634;</button>
     </div>
     <div class="zoomhint">Ziehen zum Verschieben &middot; Mausrad zum Zoomen</div>
+    <div class="demohint" id="demoHint" hidden>Demo-Modus: jede Fortbildung kostet 1 &euro;</div>
   </div>
   <div class="homefoot">
     <div class="detail" id="detail"></div>
@@ -391,6 +398,12 @@ const CONFIG = {
                           // mehr: der Takt verpufft, Tinte kostet er keine.
   missBreaksCombo:false,  // Fehldruck bricht die Kombo? (Auto-Feuer: eher nein)
   afkBeats:       3,      // Takte ohne Mausbewegung, bis die Hand sich hebt
+  areaSpread:     1.4,    // Kantenlaenge des Abdrucks in Platz-Abstaenden.
+                          // Bei 1,4 muss man in einem Band von 40 % Platz-
+                          // breite ueber der Luecke stehen, um zwei Vorgaenge
+                          // zu erwischen - blind draufhalten reicht nicht.
+  demoCheapUpgrades: true, // DEMO: jede Fortbildung kostet 1 EUR.
+                           // Auf false setzen fuer die echten Preise.
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
 };
 
@@ -596,6 +609,7 @@ const el = {
   home: document.getElementById('home'),
   tree: document.getElementById('tree'),
   detail: document.getElementById('detail'),
+  demoHint: document.getElementById('demoHint'),
   goDay: document.getElementById('goDay'),
   warn: document.getElementById('warn'),
   hDay: document.getElementById('hDay'),
@@ -698,20 +712,43 @@ function buildDesk(){
   }
   const tpl = getComputedStyle(el.desk).gridTemplateColumns.split(/\s+/).filter(Boolean);
   deskCols = Math.max(1, tpl.length);
+  measureSlots();
 }
 
-// Welche Plaetze deckt ein Abdruck ab? Der Block wird an den Rand geschoben,
-// damit der angeklickte Vorgang immer dabei ist.
-function hitGroup(idx){
-  const n = STATS.hitCount, cols = deskCols, total = STATS.slots;
-  if(n <= 1 || cols < 2) return [idx];
-  const rows = Math.ceil(total / cols);
-  const r = Math.floor(idx / cols);
-  const c = Math.min(idx % cols, cols - 2);
-  if(n < 4) return [r*cols + c, r*cols + c + 1].filter(i => i >= 0 && i < total);
-  const r2 = Math.min(r, Math.max(0, rows - 2));
-  return [r2*cols + c, r2*cols + c + 1, (r2+1)*cols + c, (r2+1)*cols + c + 1]
-    .filter(i => i >= 0 && i < total);
+// Der Abdruck hat eine echte Flaeche. Getroffen wird, wessen Platzmitte unter
+// ihr liegt - es rastet nichts ein. Wer zwei Vorgaenge gleichzeitig erwischen
+// will, muss den Stempel ueber die Luecke zwischen ihnen halten; bei vier ueber
+// den Kreuzungspunkt. Steht man mitten auf einem Platz, trifft man genau einen.
+let slotRects = [];
+function measureSlots(){
+  slotRects = [...el.desk.children].map(sl => sl.getBoundingClientRect());
+}
+function stampFootprint(){
+  if(slotRects.length < 2) return null;
+  const a = slotRects[0];
+  const pitchX = slotRects[1] ? (slotRects[1].left - a.left) || a.width : a.width;
+  const below  = slotRects[deskCols];
+  const pitchY = below ? (below.top - a.top) || a.height : a.height;
+  return {
+    w: STATS.hitCount >= 2 ? pitchX * CONFIG.areaSpread : a.width,
+    h: STATS.hitCount >= 4 ? pitchY * CONFIG.areaSpread : a.height,
+  };
+}
+function hitSlots(px, py){
+  if(!slotRects.length) return [];
+  if(STATS.hitCount <= 1){
+    const i = slotRects.findIndex(r =>
+      px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
+    return i < 0 ? [] : [i];
+  }
+  const fp = stampFootprint();
+  if(!fp) return [];
+  const out = [];
+  slotRects.forEach((r, i) => {
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if(Math.abs(cx - px) <= fp.w / 2 && Math.abs(cy - py) <= fp.h / 2) out.push(i);
+  });
+  return out;
 }
 function buildRack(){
   el.rack.innerHTML = '';
@@ -776,7 +813,7 @@ function startRound(){
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
-  buildDesk(); buildRack(); renderRack(); renderQueue();
+  buildDesk(); buildRack(); renderRack(); renderQueue(); resetStampSize();
   for(let i=0;i<6;i++) spawnForm();
   el.veil.hidden = true;
   el.home.hidden = true;
@@ -793,6 +830,11 @@ function startRound(){
     if(running) rafId = requestAnimationFrame(loop);
   };
   rafId = requestAnimationFrame(loop);
+}
+
+function resetStampSize(){
+  el.stampBody.style.width = '';
+  el.stampBody.style.height = '';
 }
 
 function setStampColor(){
@@ -837,13 +879,16 @@ function tick(dt, now){
   el.stamp.classList.toggle('faded', dry);
   el.warn.hidden = !dry || lifted;
 
-  // Zeigen, welche Plaetze der Abdruck abdeckt
+  // Zeigen, welche Plaetze der Abdruck gerade abdeckt
   for(const sl of el.desk.children) sl.classList.remove('aim');
   if(!lifted && STATS.hitCount > 1){
-    const under = document.elementFromPoint(pointer.x, pointer.y);
-    const sl = under && under.closest('.slot');
-    if(sl) for(const i of hitGroup(Number(sl.dataset.slot))){
+    for(const i of hitSlots(pointer.x, pointer.y)){
       if(el.desk.children[i]) el.desk.children[i].classList.add('aim');
+    }
+    const fp = stampFootprint();
+    if(fp){
+      el.stampBody.style.width  = Math.round(fp.w) + 'px';
+      el.stampBody.style.height = Math.round(fp.h) + 'px';
     }
   }
 
@@ -880,7 +925,6 @@ function strike(now){
   el.stamp.classList.add('press');
   const target = document.elementFromPoint(pointer.x, pointer.y);
   const pad  = target && target.closest('[data-pad]');
-  const form = target && target.closest('[data-form]');
   const dry  = S.freshness <= 0;
 
   // Leeres Kissen: der Stempel hinterlaesst nichts. Der Takt ist weg, Tinte
@@ -910,17 +954,14 @@ function strike(now){
     float(STAMPS.find(s=>s.id===S.stamp).name, 'var(--muted)');
     renderRack(); return;
   }
-  // 3) Formular - ein Abdruck kann mehrere Plaetze treffen, kostet aber
-  //    nur einmal Tinte
-  if(form){
+  // 3) Alles, was unter dem Abdruck liegt - kostet nur einmal Tinte
+  const under = hitSlots(pointer.x, pointer.y)
+    .map(i => el.desk.children[i] && el.desk.children[i].querySelector('[data-form]'))
+    .filter(Boolean);
+  if(under.length){
     charge(); wear();
-    const idx = Number(form.parentElement.dataset.slot);
     let any = false;
-    for(const i of hitGroup(idx)){
-      const slot = el.desk.children[i];
-      const f = slot && slot.querySelector('[data-form]');
-      if(f) any = resolveForm(f) || any;
-    }
+    for(const f of under) any = resolveForm(f) || any;
     if(any && Math.random() < STATS.echoChance) echoBonus();
     renderRack(); return;
   }
@@ -1046,6 +1087,10 @@ const BOX = 76, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
 const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
+// Im Demo-Modus kostet jede Fortbildung 1 EUR. Die echten Preise bleiben in
+// TREE stehen - CONFIG.demoCheapUpgrades auf false setzen und sie gelten wieder.
+const costOf = n => CONFIG.demoCheapUpgrades ? (n.cost > 0 ? 1 : 0) : n.cost;
+
 // --- Ansicht: verschieben und zoomen ---------------------------------------
 const VIEW0 = (() => {
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -1136,7 +1181,7 @@ function nodeState(n){
   if(meta.owned[n.id]) return 'owned';
   const par = PARENT[n.id];
   if(par && !meta.owned[par]) return 'locked';
-  return meta.account >= n.cost ? 'afford' : 'short';
+  return meta.account >= costOf(n) ? 'afford' : 'short';
 }
 
 function renderTree(){
@@ -1155,7 +1200,7 @@ function renderTree(){
     const st = nodeState(n);
     out += '<g class="nd ' + st + '" data-node="' + n.id + '" tabindex="0" role="button"'
          + ' aria-label="' + n.name
-         + (st === 'owned' ? ', freigeschaltet' : ', ' + n.cost + ' Euro') + '">'
+         + (st === 'owned' ? ', freigeschaltet' : ', ' + costOf(n) + ' Euro') + '">'
          + '<rect class="box" x="' + (n.x - HALF) + '" y="' + (n.y - HALF) + '"'
          + ' width="' + BOX + '" height="' + BOX + '" rx="3"></rect>'
          + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ') scale(1.45)">'
@@ -1164,7 +1209,7 @@ function renderTree(){
             : '<rect class="costbg" x="' + (n.x - 32) + '" y="' + (n.y + HALF + 4)
               + '" width="64" height="27" rx="3"></rect>'
               + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 24) + '">'
-              + n.cost + '\u20ac</text>')
+              + costOf(n) + '\u20ac</text>')
          + '</g>';
   }
   el.tree.innerHTML = out;
@@ -1180,7 +1225,7 @@ function renderTree(){
 
 function buy(n){
   if(nodeState(n) !== 'afford'){ showDetail(n); return; }
-  meta.account -= n.cost;
+  meta.account -= costOf(n);
   meta.owned[n.id] = true;
   resetStats();
   el.hAcct.textContent = eur(meta.account);
@@ -1198,8 +1243,8 @@ function showDetail(n){
   const status =
       st === 'owned'  ? 'Freigeschaltet.'
     : st === 'locked' ? 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + ' freischalten.'
-    : st === 'afford' ? eur(n.cost) + ' \u20ac \u2014 klicken zum Freischalten.'
-    : eur(n.cost) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
+    : st === 'afford' ? eur(costOf(n)) + ' \u20ac \u2014 klicken zum Freischalten.'
+    : eur(costOf(n)) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
   el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
                       + '<div class="de">' + n.eff + '</div>'
                       + '<div class="dc">' + status + '</div>';
@@ -1213,6 +1258,7 @@ function showHome(){
   el.hDay.textContent = meta.day;
   el.hBest.textContent = eur(meta.best);
   el.hAcct.textContent = eur(meta.account);
+  el.demoHint.hidden = !CONFIG.demoCheapUpgrades;
   resetView();
   renderTree();
   showDetail(byId.start);
@@ -1254,6 +1300,7 @@ function showIntro(){
 }
 
 // ---------------------------------------------------------------- Eingabe
+window.addEventListener('resize', () => { if(running) measureSlots(); });
 window.addEventListener('pointermove', e => {
   pointer.x = e.clientX; pointer.y = e.clientY; lastMove = performance.now();
 }, { passive:true });
