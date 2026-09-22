@@ -777,9 +777,11 @@ baut die Werte bei jedem Rundenstart aus CONFIG plus allen gekauften Knoten
 neu auf. Neue Upgrades brauchen nur einen Eintrag in TREE.
 
 DAS STEMPELKISSEN ALS ZENTRALE ACHSE  [REVIDIERT 22.09.2026]
-Das Kissen traegt anfangs GENAU EINEN VORGANG. Danach wird der Stempel grau,
-ein rotes Ausrufezeichen erscheint daneben, und er hinterlaesst GAR NICHTS
-mehr: der Takt verpufft, Tinte kostet er keine, der Vorgang bleibt liegen.
+Das Kissen traegt anfangs GENAU EINEN VORGANG. Danach wird der Stempel
+KOMPLETT GRAU, seine Beschriftung wechselt auf "TINTE LEER", ein rotes
+Warnabzeichen pulsiert daneben und das Kissen im Halter meldet "TROCKEN" -
+drei Signale, damit niemand uebersieht, dass er handeln muss. Er hinterlaesst
+GAR NICHTS mehr: der Takt verpufft, Tinte kostet er keine, der Vorgang bleibt liegen.
 Der Spieler stempelt also anfangs im Wechsel: Vorgang, nachtinten, Vorgang,
 nachtinten. Wer das nicht einplant, SETZT AUS. Das halbiert den Durchsatz -
 und genau diese Fessel kauft er sich im Fortbildungsplan wieder ab.
@@ -896,9 +898,10 @@ Die doppelte Ausbeute muss man sich also selbst erzielen, indem man den Stempel
 ueber die Luecke haelt; fuer vier ueber den Kreuzungspunkt. CONFIG.areaSpread
 steuert die Grosszuegigkeit: bei 1,4 liegt das Trefferband bei 40 % einer
 Platzbreite rund um die Luecke.
-Der Stempelumriss waechst sichtbar auf die Flaeche mit, und die abgedeckten
-Plaetze werden amber umrandet - man sieht VOR dem Schlag, was getroffen wird.
-Das ist Pflicht: eine Flaeche ohne Vorschau waere Raterei.
+Der Stempel behaelt immer seine Groesse. Die Reichweite zeigen ausschliesslich
+die AMBER UMRANDETEN PLAETZE - so sieht man vor dem Schlag, was getroffen wird,
+ohne dass ein riesiger Stempelumriss den Tisch verdeckt. Die Vorschau ist
+Pflicht: eine Flaeche ohne Vorschau waere Raterei.
 Hinweis: Mit dem breiten (nur einen Platz hohen) Stempel genau zwischen zwei
 ZEILEN zu stehen trifft nichts. Das ist gewollt - der Stempel liegt dann
 zwischen den Vorgaengen - und die Vorschau zeigt es sofort.

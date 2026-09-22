@@ -150,13 +150,19 @@
     backdrop-filter:blur(1px);
   }
   #stamp.faded .body{
-    border-color:var(--muted); color:var(--muted);
-    background:color-mix(in srgb, var(--muted) 14%, #0000);
+    border-color:var(--muted); border-style:solid;
+    color:var(--surface); font-size:11px;
+    background:var(--muted);
   }
+  #stamp.faded #ring .fg{stroke:var(--muted);}
+  #stamp.faded #ring .bg{stroke:color-mix(in srgb, var(--muted) 30%, #0000);}
   #warn{
-    position:absolute; left:calc(50% + 40px); top:calc(50% - 30px);
-    font-family:var(--font-stamp); font-size:30px; font-weight:700; line-height:1;
-    color:var(--bad); text-shadow:0 1px 3px rgba(0,0,0,.4);
+    position:absolute; left:calc(50% + 46px); top:calc(50% - 40px);
+    width:28px; height:28px; border-radius:50%; box-sizing:border-box;
+    background:var(--bad); color:#fff; border:2px solid var(--paper);
+    font-family:var(--font-stamp); font-size:19px; font-weight:700; line-height:1;
+    display:grid; place-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.4);
     animation:warnpulse .9s ease-in-out infinite;
   }
   @keyframes warnpulse{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.55; transform:scale(.88)}}
@@ -808,12 +814,13 @@ function startRound(){
   resetStats();
   S = {
     t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
+    wasDry:null,
     combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
-  buildDesk(); buildRack(); renderRack(); renderQueue(); resetStampSize();
+  buildDesk(); buildRack(); renderRack(); renderQueue();
   for(let i=0;i<6;i++) spawnForm();
   el.veil.hidden = true;
   el.home.hidden = true;
@@ -832,15 +839,11 @@ function startRound(){
   rafId = requestAnimationFrame(loop);
 }
 
-function resetStampSize(){
-  el.stampBody.style.width = '';
-  el.stampBody.style.height = '';
-}
-
 function setStampColor(){
   const st = STAMPS.find(s => s.id === S.stamp);
   el.stamp.style.setProperty('--c', st.color);
   el.stampBody.textContent = st.name;
+  if(S) S.wasDry = null;   // Beschriftung im naechsten Takt neu bestimmen
 }
 
 function tick(dt, now){
@@ -878,17 +881,18 @@ function tick(dt, now){
   const dry = S.freshness <= 0;
   el.stamp.classList.toggle('faded', dry);
   el.warn.hidden = !dry || lifted;
+  if(dry !== S.wasDry){
+    S.wasDry = dry;
+    el.stampBody.textContent = dry
+      ? 'TINTE LEER'
+      : STAMPS.find(st => st.id === S.stamp).name;
+  }
 
   // Zeigen, welche Plaetze der Abdruck gerade abdeckt
   for(const sl of el.desk.children) sl.classList.remove('aim');
   if(!lifted && STATS.hitCount > 1){
     for(const i of hitSlots(pointer.x, pointer.y)){
       if(el.desk.children[i]) el.desk.children[i].classList.add('aim');
-    }
-    const fp = stampFootprint();
-    if(fp){
-      el.stampBody.style.width  = Math.round(fp.w) + 'px';
-      el.stampBody.style.height = Math.round(fp.h) + 'px';
     }
   }
 

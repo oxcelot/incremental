@@ -25,7 +25,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Stempel | GENEHMIGT, NACHFORDERUNG, WEITERLEITEN, ABGELEHNT |
 | Stempelwechsel | auf das fremde Kissen stempeln — kostet einen Takt und die Kombo |
 | Nachtinten | auf das eigene Kissen stempeln — kostet einen Takt, **hält** die Kombo |
-| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel grau, ein rotes `!` erscheint — er stempelt **gar nicht** mehr |
+| Kissenkapazität | **1 Vorgang**. Danach wird der Stempel komplett grau, zeigt „TINTE LEER" und ein rotes Warnabzeichen — er stempelt **gar nicht** mehr |
 | Hand gehoben | Maus außerhalb des Tisches — keine Tinte, Takt trotzdem weg |
 | Tinte | Kostenposten, 0,50 € pro Druck, Abrechnung bei Dienstschluss |
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
@@ -95,9 +95,12 @@ nichts ein. Getroffen wird, wessen Platzmitte unter der Fläche liegt:
 Wer die doppelte Ausbeute will, muss den Stempel also selbst über die Lücke
 halten; für vier über den Kreuzungspunkt. `CONFIG.areaSpread` steuert, wie
 großzügig das ist: bei 1,4 liegt das Trefferband bei 40 % einer Platzbreite
-rund um die Lücke. Der Stempelumriss wächst sichtbar auf die Fläche mit, und
-die abgedeckten Plätze werden amber umrandet — man sieht vor dem Schlag genau,
-was getroffen wird.
+rund um die Lücke.
+
+Der Stempel selbst behält dabei immer seine Größe — die Reichweite zeigen
+ausschließlich die **amber umrandeten Plätze**. Man sieht vor jedem Schlag
+genau, was getroffen wird, ohne dass ein riesiger Stempelumriss den Tisch
+verdeckt.
 
 Ein breiter Abdruck trifft **alle** Vorgänge unter sich, auch die, die einen
 anderen Stempel verlangen — die zählen als Beschwerde. Damit wird die Fläche
