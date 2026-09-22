@@ -85,6 +85,7 @@
     grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(3,1fr);
   }
   .slot{border:1px dashed var(--desk-grid); border-radius:3px; position:relative;}
+  .slot.aim{outline:2px solid var(--s-amber); outline-offset:-2px; border-color:transparent;}
 
   .form{
     position:absolute; inset:0; background:var(--paper); color:var(--ink);
@@ -122,17 +123,21 @@
   @keyframes slam{to{transform:rotate(-8deg) scale(1); opacity:.92;}}
 
   /* ---------- Stempelablage ---------- */
-  .rack{display:flex; gap:8px; flex-wrap:wrap;}
+  .rack{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
   .pad{
-    flex:1 1 90px; background:var(--surface); border:1px solid var(--line);
-    border-top:4px solid var(--c); border-radius:3px; padding:7px 8px 6px;
-    position:relative; min-width:0;
+    flex:0 0 122px; height:104px; box-sizing:border-box;
+    background:var(--surface); border:1px solid var(--line);
+    border-top:5px solid var(--c); border-radius:4px; padding:9px 9px 8px;
+    position:relative; display:flex; flex-direction:column; gap:3px;
   }
-  .pad .nm{font-family:var(--font-stamp); font-size:12px; font-weight:700; color:var(--c); letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .pad .st{font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600;}
+  .pad .nm{
+    font-family:var(--font-stamp); font-size:13px; font-weight:700; color:var(--c);
+    letter-spacing:.03em; line-height:1.15; hyphens:manual;
+  }
+  .pad .st{font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin-top:auto;}
   .pad.held{background:color-mix(in srgb, var(--c) 14%, var(--surface)); border-color:var(--c);}
   .pad.held .st{color:var(--c);}
-  .fresh{height:3px; background:var(--line); border-radius:2px; margin-top:5px; overflow:hidden;}
+  .fresh{height:5px; background:var(--line); border-radius:3px; margin-top:4px; overflow:hidden;}
   .fresh i{display:block; height:100%; background:var(--c); transform-origin:left;}
 
   /* ---------- Stempel-Cursor ---------- */
@@ -156,7 +161,7 @@
   }
   @keyframes warnpulse{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.55; transform:scale(.88)}}
   .pad .dry{
-    position:absolute; top:5px; right:8px; font-family:var(--font-stamp);
+    position:absolute; top:6px; right:9px; font-family:var(--font-stamp);
     font-size:17px; font-weight:700; color:var(--bad); line-height:1;
   }
   #stamp.press{animation:press .16s ease-out;}
@@ -254,12 +259,12 @@
     position:absolute; left:8px; bottom:6px; font-size:10px; color:var(--muted);
     letter-spacing:.04em; pointer-events:none;
   }
-  #tree .link{stroke:var(--line); stroke-width:2.5;}
+  #tree .link{stroke:var(--line); stroke-width:3;}
   #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
   #tree .box{fill:var(--surface); stroke:var(--line); stroke-width:2;}
-  #tree .ico{fill:none; stroke:var(--line); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
-  #tree .cost{font-family:var(--font-stamp); font-size:15px; font-weight:700; fill:var(--muted); text-anchor:middle;}
+  #tree .ico{fill:none; stroke:var(--line); stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  #tree .cost{font-family:var(--font-stamp); font-size:21px; font-weight:700; fill:var(--muted); text-anchor:middle;}
   #tree .costbg{fill:var(--bg); stroke:none;}
 
   #tree .nd{cursor:pointer;}
@@ -391,8 +396,8 @@ const CONFIG = {
 
 const STAMPS = [
   { id:'gen',  name:'GENEHMIGT',     color:'var(--s-green)' },
-  { id:'nach', name:'NACHFORDERUNG', color:'var(--s-amber)' },
-  { id:'weit', name:'WEITERLEITEN',  color:'var(--s-blue)'  },
+  { id:'nach', name:'NACHFORDERUNG', pad:'NACH\u00ADFORDERUNG', color:'var(--s-amber)' },
+  { id:'weit', name:'WEITERLEITEN',  pad:'WEITER\u00ADLEITEN', color:'var(--s-blue)'  },
   { id:'abl',  name:'ABGELEHNT',     color:'var(--s-red)'   },
 ];
 
@@ -429,6 +434,12 @@ function resetStats(){
   STATS.wrongPenalty = CONFIG.wrongPenalty;
   STATS.swapCost     = 1;   // Anteil eines Taktes fuer den Stempelwechsel
   STATS.reinkCost    = 1;   // Anteil eines Taktes fuers Nachtinten
+  STATS.swapInk      = 1;   // kostet der Stempelwechsel Tinte?
+  STATS.critChance   = 0;   // ohne Fortbildung gibt es keine Volltreffer
+  STATS.critMult     = 2;   // Multiplikator eines Volltreffers
+  STATS.hitCount     = 1;   // Vorgaenge, die ein Abdruck gleichzeitig trifft
+  STATS.echoChance   = 0;   // Durchschlagpapier: zweiter Vorgang gratis
+  STATS.bonusPerForm = 0;   // Verwaltungsgebuehr je erledigtem Vorgang
   for(const n of TREE) if(meta.owned[n.id] && n.apply) n.apply(STATS);
 }
 
@@ -448,61 +459,131 @@ const ICONS = {
   droprot:  '<path d="M9 0a9 9 0 1 1-3-6.7"/><path d="M9.5 -8.5v6H4"/><path d="M-1 3c2 2.5 3 3.8 3 5a3 3 0 0 1-6 0c0-1.2 1-2.5 3-5z"/>',
   dropmin:  '<path d="M-3 -10c4 5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5 6-10z"/><path d="M6 4h9"/>',
   shield:   '<path d="M0 -11l9 4v6.5C9 5.5 4.5 8.8 0 11c-4.5-2.2-9-5.5-9-11.5V-7z"/><path d="M-3.5 1.5h7"/>',
+  pad3:     '<rect x="-12" y="5" width="24" height="7" rx="2"/><rect x="-9" y="-1" width="18" height="5" rx="1"/><path d="M0 -12c3.5 4.5 5.5 6.5 5.5 8.5a5.5 5.5 0 0 1-11 0c0-2 2-4 5.5-8.5z"/>',
+  drops:    '<path d="M-6 -11c3 3.5 4.5 5.5 4.5 7.5a4.5 4.5 0 0 1-9 0c0-2 1.5-4 4.5-7.5z"/><path d="M6 -11c3 3.5 4.5 5.5 4.5 7.5a4.5 4.5 0 0 1-9 0c0-2 1.5-4 4.5-7.5z"/><path d="M0 2c3 3.5 4.5 5.5 4.5 7.5a4.5 4.5 0 0 1-9 0C-4.5 7.5-3 5.5 0 2z"/>',
+  spark:    '<path d="M0 -12l2.6 7.4L10 -2l-7.4 2.6L0 8l-2.6-7.4L-10 -2l7.4-2.6z"/>',
+  spark2:   '<path d="M-2 -12l2.4 6.8L7 -3l-6.6 2.4L-2 6l-2.4-6.6L-11 -3l6.6-2.4z"/><path d="M8 4l1.2 3.4L12 8.6l-2.8 1.2L8 13l-1.2-3.2L4 8.6l2.8-1.2z"/>',
+  spark3:   '<path d="M-3 -12l2.2 6.2L5 -4l-5.8 2.2L-3 4l-2.2-5.8L-11 -4l5.8-2.2z"/><path d="M7 -2l1.2 3.4L11 2.6 8.2 3.8 7 7 5.8 3.8 3 2.6l2.8-1.2z"/><path d="M6 9l.8 2.2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',
+  eye:      '<path d="M-12 0s4.5-7 12-7 12 7 12 7-4.5 7-12 7-12-7-12-7z"/><circle cx="0" cy="0" r="3.2"/>',
+  copy:     '<rect x="-11" y="-11" width="15" height="17" rx="2"/><path d="M-6 9h13V-4"/>',
+  two:      '<rect x="-12" y="-6" width="11" height="12" rx="2"/><rect x="1" y="-6" width="11" height="12" rx="2"/>',
+  four:     '<rect x="-12" y="-12" width="11" height="11" rx="2"/><rect x="1" y="-12" width="11" height="11" rx="2"/><rect x="-12" y="1" width="11" height="11" rx="2"/><rect x="1" y="1" width="11" height="11" rx="2"/>',
+  nodrop:   '<path d="M0 -11c4 5 6 7.5 6 10a6 6 0 0 1-12 0c0-2.5 2-5 6-10z"/><path d="M-11 11L11 -11"/>',
+  coin:     '<circle cx="0" cy="0" r="10"/><path d="M-3.5 -3.5h7M-3.5 3.5h7M0 -7v14"/>',
+  coin2:    '<circle cx="-3" cy="-1" r="8.5"/><path d="M-6 -4h6M-6 1h6M-3 -7v12"/><path d="M6 6l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/>',
 };
 
+// Knoten werden radial gesetzt: a = Winkel, r = Abstand vom Zentrum,
+// o = seitlicher Versatz. Gabelungen entstehen durch +o und -o auf gleichem r.
 const TREE = [
-  { id:'start', x:380, y:350, icon:'start', cost:0, name:'Dienstantritt',
+  { id:'start', a:0, r:0, icon:'start', cost:0, name:'Dienstantritt',
     eff:'Ein Tisch, vier Stempel und keine Wahl.' },
 
-  { id:'ueber', x:380, y:220, icon:'clock', cost:40, name:'\u00DCberstunden',
-    eff:'Der Arbeitstag dauert 6 Sekunden l\u00e4nger.',
-    apply:st => st.roundMs += 6000 },
-  { id:'gleit', x:380, y:85, icon:'clockp', cost:120, name:'Gleitzeit',
-    eff:'Noch einmal 8 Sekunden mehr Dienstzeit.',
-    apply:st => st.roundMs += 8000 },
+  // ---- Kissen und Tinte (unten) ------------------------------------------
+  { id:'voll', a:90, r:150, icon:'pad1', cost:40, name:'Volles Kissen',
+    eff:'Das Stempelkissen tr\u00e4gt zwei Vorg\u00e4nge statt einem.',
+    apply:st => st.freshnessMax = 2 },
+  { id:'xxl', a:90, r:300, o:-95, icon:'pad2', cost:150, name:'Stempelkissen XXL',
+    eff:'Vier Vorg\u00e4nge pro F\u00fcllung. Nachtinten wird zur Nebensache.',
+    apply:st => st.freshnessMax = 4 },
+  { id:'fass', a:90, r:450, o:-95, icon:'pad3', cost:320, name:'Fasspumpe',
+    eff:'Sechs Vorg\u00e4nge pro F\u00fcllung.',
+    apply:st => st.freshnessMax = 6 },
+  { id:'spar', a:90, r:300, o:95, icon:'dropmin', cost:40, name:'Sparsames Kissen',
+    eff:'Ein Stempeldruck kostet 0,35 \u20ac Tinte statt 0,50 \u20ac.',
+    apply:st => st.inkCost = 0.35 },
+  { id:'gross', a:90, r:450, o:95, icon:'drops', cost:180, name:'Gro\u00dfbestellung',
+    eff:'Tinte im Gebinde: 0,22 \u20ac pro Druck.',
+    apply:st => st.inkCost = 0.22 },
 
-  { id:'routi', x:553, y:285, icon:'chev', cost:60, name:'Routine',
-    eff:'Der Stempeltakt sinkt von 1,50 s auf 1,35 s.',
-    apply:st => st.beatMs -= 150 },
-  { id:'blind', x:726, y:218, icon:'chev3', cost:140, name:'Blindstempeln',
-    eff:'Der Takt sinkt um weitere 0,20 s. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
-    apply:st => st.beatMs -= 200 },
+  // ---- Volltreffer (oben rechts) -----------------------------------------
+  { id:'krit1', a:-30, r:150, icon:'spark', cost:60, name:'Ge\u00fcbter Blick',
+    eff:'Jeder f\u00fcnfte Abdruck sitzt perfekt: 20 % Volltreffer mit doppeltem Ertrag.',
+    apply:st => { st.critChance = 0.20; st.critMult = 2; } },
+  { id:'krit2', a:-30, r:300, o:-95, icon:'spark2', cost:140, name:'Routiniertes Auge',
+    eff:'Ein Volltreffer bringt das Dreifache.',
+    apply:st => st.critMult = 3 },
+  { id:'krit4', a:-30, r:450, o:-95, icon:'spark3', cost:300, name:'Blick f\u00fcr das Detail',
+    eff:'Ein Volltreffer bringt das Vierfache.',
+    apply:st => st.critMult = 4 },
+  { id:'krit3', a:-30, r:300, o:95, icon:'eye', cost:130, name:'Sechster Sinn',
+    eff:'Volltreffer in 35 % der F\u00e4lle.',
+    apply:st => st.critChance = 0.35 },
+  { id:'durch', a:-30, r:450, o:95, icon:'copy', cost:260, name:'Durchschlagpapier',
+    eff:'Mit 5 % Wahrscheinlichkeit erledigt ein Abdruck nebenbei einen zweiten, zuf\u00e4lligen Vorgang.',
+    apply:st => st.echoChance = 0.05 },
 
-  { id:'bote1', x:553, y:415, icon:'tray1', cost:40, name:'Flinker Bote',
+  // ---- Fl\u00e4chenstempel und Nachschub (unten rechts) --------------------
+  { id:'flach1', a:30, r:150, icon:'two', cost:120, name:'Breiter Stempel',
+    eff:'Ein Abdruck trifft zwei nebeneinander liegende Vorg\u00e4nge \u2013 und kostet nur einmal Tinte.',
+    apply:st => st.hitCount = 2 },
+  { id:'flach2', a:30, r:300, o:-95, icon:'four', cost:340, name:'Amtsstempel XXL',
+    eff:'Ein Abdruck deckt vier Vorg\u00e4nge ab. Vorsicht: falsch gestempelte z\u00e4hlen mit.',
+    apply:st => st.hitCount = 4 },
+  { id:'bote1', a:30, r:300, o:95, icon:'tray1', cost:40, name:'Flinker Bote',
     eff:'Vorg\u00e4nge r\u00fccken alle 1,3 s nach statt alle 1,6 s.',
     apply:st => st.spawnMs = 1300 },
-  { id:'bote2', x:726, y:482, icon:'tray2', cost:110, name:'Zweiter Bote',
+  { id:'bote2', a:30, r:450, o:95, icon:'tray2', cost:110, name:'Zweiter Bote',
     eff:'Vorg\u00e4nge r\u00fccken alle 1,0 s nach. Der Tisch bleibt voll.',
     apply:st => st.spawnMs = 1000 },
 
-  { id:'voll', x:380, y:480, icon:'pad1', cost:40, name:'Volles Kissen',
-    eff:'Das Stempelkissen tr\u00e4gt zwei Vorg\u00e4nge statt einem.',
-    apply:st => st.freshnessMax = 2 },
-  { id:'xxl', x:380, y:615, icon:'pad2', cost:150, name:'Stempelkissen XXL',
-    eff:'Das Kissen tr\u00e4gt vier Vorg\u00e4nge. Nachtinten wird zur Nebensache.',
-    apply:st => st.freshnessMax = 4 },
-
-  { id:'hand', x:207, y:415, icon:'rot', cost:80, name:'Handgelenkdrehung',
+  // ---- Ergonomie am Stempelhalter (unten links) --------------------------
+  { id:'hand', a:150, r:150, icon:'rot', cost:80, name:'Handgelenkdrehung',
     eff:'Der Stempelwechsel kostet nur noch einen halben Takt.',
     apply:st => st.swapCost = 0.5 },
-  { id:'vorbei', x:34, y:482, icon:'droprot', cost:90, name:'Nachtinten im Vorbeigehen',
+  { id:'trocken', a:150, r:300, o:-95, icon:'nodrop', cost:70, name:'Trockenwechsel',
+    eff:'Der Stempelwechsel verbraucht keine Tinte mehr.',
+    apply:st => st.swapInk = 0 },
+  { id:'vorbei', a:150, r:300, o:95, icon:'droprot', cost:90, name:'Nachtinten im Vorbeigehen',
     eff:'Auch das Nachtinten kostet nur noch einen halben Takt.',
     apply:st => st.reinkCost = 0.5 },
 
-  { id:'spar', x:207, y:285, icon:'dropmin', cost:40, name:'Sparsames Kissen',
-    eff:'Ein Stempeldruck kostet 0,35 \u20ac Tinte statt 0,50 \u20ac.',
-    apply:st => st.inkCost = 0.35 },
-  { id:'vorsc', x:34, y:218, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
+  // ---- Takt und Dienstzeit (oben) ----------------------------------------
+  { id:'routi', a:-90, r:150, icon:'chev', cost:60, name:'Routine',
+    eff:'Der Stempeltakt sinkt von 1,50 s auf 1,35 s.',
+    apply:st => st.beatMs -= 150 },
+  { id:'blind', a:-90, r:300, o:-95, icon:'chev3', cost:140, name:'Blindstempeln',
+    eff:'Der Takt sinkt um weitere 0,20 s. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
+    apply:st => st.beatMs -= 200 },
+  { id:'ueber', a:-90, r:300, o:95, icon:'clock', cost:90, name:'\u00dcberstunden',
+    eff:'Der Arbeitstag dauert 6 Sekunden l\u00e4nger.',
+    apply:st => st.roundMs += 6000 },
+  { id:'gleit', a:-90, r:450, o:95, icon:'clockp', cost:200, name:'Gleitzeit',
+    eff:'Noch einmal 8 Sekunden mehr Dienstzeit.',
+    apply:st => st.roundMs += 8000 },
+
+  // ---- Amtsautorit\u00e4t (oben links) --------------------------------------
+  { id:'vorsc', a:210, r:150, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
     eff:'Eine Beschwerde kostet nur noch 1,00 \u20ac statt 2,00 \u20ac.',
     apply:st => st.wrongPenalty = 1 },
+  { id:'gebuehr', a:210, r:300, icon:'coin', cost:160, name:'Verwaltungsgeb\u00fchr',
+    eff:'Jeder erledigte Vorgang bringt zus\u00e4tzlich 0,60 \u20ac.',
+    apply:st => st.bonusPerForm = 0.60 },
+  { id:'saeum', a:210, r:450, icon:'coin2', cost:380, name:'S\u00e4umniszuschlag',
+    eff:'Der Zuschlag steigt auf 1,40 \u20ac je Vorgang.',
+    apply:st => st.bonusPerForm = 1.40 },
 ];
+
+// Radialkoordinaten in Bildpunkte umrechnen. Der Baum wird dabei elliptisch
+// in die Breite gezogen, weil die Anzeige breiter als hoch ist - so werden die
+// Kaestchen bei eingepasster Ansicht groesser.
+const SPREAD_X = 1.4, SPREAD_Y = 0.78;
+for(const n of TREE){
+  const t = (n.a || 0) * Math.PI / 180, o = n.o || 0, r = n.r || 0;
+  n.x = 800 + SPREAD_X * (r * Math.cos(t) + o * Math.cos(t + Math.PI/2));
+  n.y = 600 + SPREAD_Y * (r * Math.sin(t) + o * Math.sin(t + Math.PI/2));
+}
+
 const LINKS = [
-  ['start','ueber'],['ueber','gleit'],
-  ['start','routi'],['routi','blind'],
-  ['start','bote1'],['bote1','bote2'],
-  ['start','voll'], ['voll','xxl'],
-  ['start','hand'], ['hand','vorbei'],
-  ['start','spar'], ['spar','vorsc'],
+  ['start','voll'],  ['voll','xxl'],    ['xxl','fass'],
+                     ['voll','spar'],   ['spar','gross'],
+  ['start','krit1'], ['krit1','krit2'], ['krit2','krit4'],
+                     ['krit1','krit3'], ['krit3','durch'],
+  ['start','flach1'],['flach1','flach2'],
+                     ['flach1','bote1'],['bote1','bote2'],
+  ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
+  ['start','routi'], ['routi','blind'], ['routi','ueber'], ['ueber','gleit'],
+  ['start','vorsc'], ['vorsc','gebuehr'],['gebuehr','saeum'],
 ];
 
 // ---------------------------------------------------------------- Elemente
@@ -544,6 +625,7 @@ let pointer = { x:-999, y:-999 };
 let lastMove = 0;
 let rafId = 0;
 let roundToken = 0;
+let deskCols = 4;
 let meta = { day:1, best:0, account:0, owned:{ start:true } };
 
 const eur = n => n.toFixed(2).replace('.', ',');
@@ -596,6 +678,8 @@ const SFX = {
   thud(){ noise(0.09, 260, 0.7, 0.22); tone(88, 0.10, 'sine', 0.30, 52); },
   correct(tier){ const f = 392 * Math.pow(2, tier/12); tone(f, 0.11, 'triangle', 0.16, f*1.5); },
   wrong(){ tone(150, 0.26, 'sawtooth', 0.14, 70); },
+  crit(){ tone(880,0.10,'triangle',0.15,1760); tone(1320,0.16,'sine',0.09,2640); },
+  echo(){ tone(660,0.12,'sine',0.10,990); noise(0.06,900,1.6,0.06); },
   miss(){ noise(0.07, 130, 0.5, 0.14); },
   dry(){ noise(0.05, 190, 1.1, 0.07); tone(120, 0.05, 'sine', 0.05); },
   reink(){ noise(0.16, 700, 1.4, 0.13); tone(200, 0.13, 'sine', 0.09, 300); },
@@ -612,13 +696,29 @@ function buildDesk(){
     s.className = 'slot'; s.dataset.slot = String(i);
     el.desk.appendChild(s);
   }
+  const tpl = getComputedStyle(el.desk).gridTemplateColumns.split(/\s+/).filter(Boolean);
+  deskCols = Math.max(1, tpl.length);
+}
+
+// Welche Plaetze deckt ein Abdruck ab? Der Block wird an den Rand geschoben,
+// damit der angeklickte Vorgang immer dabei ist.
+function hitGroup(idx){
+  const n = STATS.hitCount, cols = deskCols, total = STATS.slots;
+  if(n <= 1 || cols < 2) return [idx];
+  const rows = Math.ceil(total / cols);
+  const r = Math.floor(idx / cols);
+  const c = Math.min(idx % cols, cols - 2);
+  if(n < 4) return [r*cols + c, r*cols + c + 1].filter(i => i >= 0 && i < total);
+  const r2 = Math.min(r, Math.max(0, rows - 2));
+  return [r2*cols + c, r2*cols + c + 1, (r2+1)*cols + c, (r2+1)*cols + c + 1]
+    .filter(i => i >= 0 && i < total);
 }
 function buildRack(){
   el.rack.innerHTML = '';
   for(const st of STAMPS){
     const p = document.createElement('div');
     p.className = 'pad'; p.dataset.pad = st.id; p.style.setProperty('--c', st.color);
-    p.innerHTML = '<div class="nm">'+st.name+'</div>'
+    p.innerHTML = '<div class="nm">'+(st.pad || st.name)+'</div>'
                 + '<div class="st" data-role="st">Kissen</div>'
                 + '<div class="fresh"><i data-role="fresh"></i></div>'
                 + '<div class="dry" data-role="dry" hidden>!</div>';
@@ -672,7 +772,7 @@ function startRound(){
   S = {
     t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
     combo:0, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
-    swaps:0, reinks:0, bestCombo:0, dryBeats:0,
+    swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
@@ -737,6 +837,16 @@ function tick(dt, now){
   el.stamp.classList.toggle('faded', dry);
   el.warn.hidden = !dry || lifted;
 
+  // Zeigen, welche Plaetze der Abdruck abdeckt
+  for(const sl of el.desk.children) sl.classList.remove('aim');
+  if(!lifted && STATS.hitCount > 1){
+    const under = document.elementFromPoint(pointer.x, pointer.y);
+    const sl = under && under.closest('.slot');
+    if(sl) for(const i of hitGroup(Number(sl.dataset.slot))){
+      if(el.desk.children[i]) el.desk.children[i].classList.add('aim');
+    }
+  }
+
   // HUD
   const secs = Math.ceil(left/1000);
   el.clock.textContent = String(Math.floor(secs/60)).padStart(2,'0')
@@ -792,7 +902,7 @@ function strike(now){
   }
   // 2) Fremdes Kissen -> Stempelwechsel (kostet Takt + Kombo)
   if(pad){
-    charge();
+    if(STATS.swapInk) charge();
     S.stamp = pad.dataset.pad; S.combo = 0; S.swaps++;
     S.freshness = STATS.freshnessMax;   // lag auf seinem eigenen Kissen
     S.accBeat += STATS.beatMs * (1 - STATS.swapCost);
@@ -800,22 +910,18 @@ function strike(now){
     float(STAMPS.find(s=>s.id===S.stamp).name, 'var(--muted)');
     renderRack(); return;
   }
-  // 3) Formular
+  // 3) Formular - ein Abdruck kann mehrere Plaetze treffen, kostet aber
+  //    nur einmal Tinte
   if(form){
     charge(); wear();
-    const t = TYPES.find(x => x.id === form.dataset.form);
-    if(t.want === S.stamp){
-      const gain = t.value * mult();
-      S.earned += gain; S.done++; S.combo++;
-      S.bestCombo = Math.max(S.bestCombo, S.combo);
-      SFX.correct(Math.min(S.combo, 14));
-      float('+' + eur(gain), 'var(--good)');
-      finish(form, true);
-    } else {
-      S.wrongs++; S.combo = 0;
-      SFX.wrong(); float('Beschwerde', 'var(--bad)');
-      finish(form, false);
+    const idx = Number(form.parentElement.dataset.slot);
+    let any = false;
+    for(const i of hitGroup(idx)){
+      const slot = el.desk.children[i];
+      const f = slot && slot.querySelector('[data-form]');
+      if(f) any = resolveForm(f) || any;
     }
+    if(any && Math.random() < STATS.echoChance) echoBonus();
     renderRack(); return;
   }
   // 4) Tisch -> Fehldruck
@@ -824,6 +930,43 @@ function strike(now){
   if(CONFIG.missBreaksCombo) S.combo = 0;
   SFX.miss(); float('daneben', 'var(--muted)');
   renderRack();
+}
+
+// Ein einzelner Vorgang unter dem Abdruck
+function resolveForm(f){
+  const t = TYPES.find(x => x.id === f.dataset.form);
+  if(!t) return false;
+  if(t.want !== S.stamp){
+    S.wrongs++; S.combo = 0;
+    SFX.wrong(); float('Beschwerde', 'var(--bad)');
+    finish(f, false);
+    return false;
+  }
+  const crit = Math.random() < STATS.critChance;
+  let gain = (t.value + STATS.bonusPerForm) * mult();
+  if(crit){ gain *= STATS.critMult; S.crits++; }
+  S.earned += gain; S.done++; S.combo++;
+  S.bestCombo = Math.max(S.bestCombo, S.combo);
+  if(crit){ SFX.crit(); float('VOLLTREFFER +' + eur(gain), 'var(--s-amber)'); }
+  else     { SFX.correct(Math.min(S.combo, 14)); float('+' + eur(gain), 'var(--good)'); }
+  finish(f, true);
+  return true;
+}
+
+// Durchschlagpapier: ein zweiter Vorgang erledigt sich von selbst - und zwar
+// immer mit dem richtigen Stempel, egal was gerade in der Hand liegt.
+function echoBonus(){
+  const rest = [...el.desk.querySelectorAll('[data-form]')];
+  if(!rest.length) return;
+  const f = rest[Math.random() * rest.length | 0];
+  const t = TYPES.find(x => x.id === f.dataset.form);
+  if(!t) return;
+  const gain = (t.value + STATS.bonusPerForm) * mult();
+  S.earned += gain; S.done++; S.echoes++;
+  const held = S.stamp; S.stamp = t.want;
+  finish(f, true);
+  S.stamp = held;
+  SFX.echo(); float('Durchschlag +' + eur(gain), 'var(--s-blue)');
 }
 
 function charge(){ S.presses++; S.inkSpent += STATS.inkCost; }
@@ -845,7 +988,8 @@ function finish(form, ok){
 function float(txt, color){
   const d = document.createElement('div');
   d.className = 'float'; d.textContent = txt; d.style.color = color;
-  d.style.left = (pointer.x + 24) + 'px'; d.style.top = (pointer.y - 12) + 'px';
+  d.style.left = (pointer.x + 24 + (Math.random()*40 - 20)) + 'px';
+  d.style.top  = (pointer.y - 12 + (Math.random()*28 - 14)) + 'px';
   document.body.appendChild(d);
   setTimeout(() => d.remove(), 780);
 }
@@ -874,6 +1018,8 @@ function endRound(){
   + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
   + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
+  + (S.crits ? row('davon Volltreffer (' + S.crits + ')', '—') : '')
+  + (S.echoes ? row('davon Durchschl&auml;ge (' + S.echoes + ')', '—') : '')
   + (S.dryBeats ? row('Leerschl&auml;ge ohne Tinte (' + S.dryBeats + ')', '—') : '')
   + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'
   + '</table>'
@@ -896,12 +1042,19 @@ const row = (k,v) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
 const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
 
 // ---------------------------------------------------------------- Homescreen
-const BOX = 56, HALF = BOX/2;
+const BOX = 76, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
 const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
 // --- Ansicht: verschieben und zoomen ---------------------------------------
-const VIEW0 = { x:0, y:45, w:760, h:640 };
+const VIEW0 = (() => {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for(const n of TREE){
+    x0 = Math.min(x0, n.x - HALF - 16); x1 = Math.max(x1, n.x + HALF + 16);
+    y0 = Math.min(y0, n.y - HALF - 16); y1 = Math.max(y1, n.y + HALF + 42);
+  }
+  return { x:x0, y:y0, w:x1 - x0, h:y1 - y0 };
+})();
 let view = Object.assign({}, VIEW0);
 // Ein einzelner Zeiger steuert beides: ziehen verschiebt, tippen kauft.
 // Der Kauf laeuft bewusst NICHT ueber das click-Event - sobald das SVG den
@@ -1005,11 +1158,12 @@ function renderTree(){
          + (st === 'owned' ? ', freigeschaltet' : ', ' + n.cost + ' Euro') + '">'
          + '<rect class="box" x="' + (n.x - HALF) + '" y="' + (n.y - HALF) + '"'
          + ' width="' + BOX + '" height="' + BOX + '" rx="3"></rect>'
-         + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ')">' + ICONS[n.icon] + '</g>'
+         + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ') scale(1.45)">'
+         + ICONS[n.icon] + '</g>'
          + (st === 'owned' ? ''
-            : '<rect class="costbg" x="' + (n.x - 22) + '" y="' + (n.y + HALF + 3)
-              + '" width="44" height="20" rx="3"></rect>'
-              + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 18) + '">'
+            : '<rect class="costbg" x="' + (n.x - 32) + '" y="' + (n.y + HALF + 4)
+              + '" width="64" height="27" rx="3"></rect>'
+              + '<text class="cost" x="' + n.x + '" y="' + (n.y + HALF + 24) + '">'
               + n.cost + '\u20ac</text>')
          + '</g>';
   }

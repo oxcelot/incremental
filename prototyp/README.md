@@ -31,7 +31,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan: 13 Icon-Knoten, zoom- und verschiebbar |
+| Homescreen | Fortbildungsplan: 25 Icon-Knoten, zoom- und verschiebbar |
 | Voraussetzungen | Ring 2 ist gesperrt, bis der Knoten davor freigeschaltet ist |
 | Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
@@ -70,14 +70,35 @@ jedem Rundenstart aus `CONFIG` plus allen gekauften Knoten neu auf. Neue
 Upgrades brauchen daher nur einen Eintrag in `TREE` — keine Änderung an der
 Spiellogik.
 
-| Speiche | Ring 1 | Ring 2 |
-|---|---|---|
-| Dienstzeit | Überstunden (+6 s) | Gleitzeit (+8 s) |
-| Takt | Routine (−0,15 s) | Blindstempeln (−0,20 s) |
-| Nachschub | Flinker Bote (1,3 s) | Zweiter Bote (1,0 s) |
-| Kissen | Volles Kissen (2 Vorgänge) | Stempelkissen XXL (4) |
-| Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Nachtinten im Vorbeigehen (½ Takt) |
-| Beschaffung | Sparsames Kissen (0,35 €) | Dienst nach Vorschrift (Beschwerde 1,00 €) |
+Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
+
+| Speiche | Ring 1 | Gabelung A | Gabelung B |
+|---|---|---|---|
+| Kissen & Tinte | Volles Kissen (2 Vorgänge) | XXL (4) → Fasspumpe (6) | Sparsames Kissen (0,35 €) → Großbestellung (0,22 €) |
+| Volltreffer | Geübter Blick (20 %, ×2) | Routiniertes Auge (×3) → Blick für das Detail (×4) | Sechster Sinn (35 %) → Durchschlagpapier (5 %) |
+| Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | Flinker Bote (1,3 s) → Zweiter Bote (1,0 s) |
+| Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
+| Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
+| Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr (+0,60 €/Vorgang) → Säumniszuschlag (+1,40 €) | — |
+
+### Der Flächenstempel ist kein reiner Gewinn
+
+Ein breiter Abdruck trifft **alle** Vorgänge unter sich, auch die, die einen
+anderen Stempel verlangen — die zählen als Beschwerde. Der Block wird so an den
+Rand geschoben, dass der angeklickte Vorgang immer dabei ist. Damit wird die
+Fläche zur Abwägung statt zum Freifahrtschein: Man sucht Nester gleichartiger
+Vorgänge, statt blind draufzuhalten. Die betroffenen Plätze werden beim Zielen
+amber umrandet.
+
+### Volltreffer und Durchschlag
+
+Ohne Fortbildung gibt es **keine** Volltreffer (`critChance` startet bei 0).
+„Geübter Blick" schaltet sie überhaupt erst frei — danach trennen sich die Wege
+zwischen höherem Multiplikator und höherer Wahrscheinlichkeit.
+
+„Durchschlagpapier" erledigt mit 5 % Wahrscheinlichkeit einen zweiten,
+zufälligen Vorgang auf dem Tisch — und zwar immer mit dem *richtigen* Stempel,
+egal was gerade in der Hand liegt. Das Durchschlagpapier hat eben mitkopiert.
 
 ## Das leere Kissen
 

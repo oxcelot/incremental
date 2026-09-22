@@ -853,3 +853,56 @@ DIE SECHS SPEICHEN (alle implementiert)
 Ein aufgenommener Stempel ist immer frisch - er lag ja auf seinem eigenen
 Kissen. Der Wechsel bleibt trotzdem schlechter als das Nachtinten, weil er
 die Kombo bricht.
+
+
+################################################################################
+# TEIL 1E - AUSBAU DES FORTBILDUNGSPLANS (22.09.2026)
+################################################################################
+Von 13 auf 25 Knoten. Sechs Speichen, an fuenf davon gabelt sich der Weg -
+der Spieler muss also fuenfmal waehlen statt nur einer Kette zu folgen.
+
+  Kissen & Tinte      Volles Kissen
+                        -> XXL -> Fasspumpe          (Kapazitaet)
+                        -> Sparsames Kissen -> Grossbestellung (Kosten)
+  Volltreffer         Geuebter Blick
+                        -> Routiniertes Auge -> Blick fuer das Detail (Hoehe)
+                        -> Sechster Sinn -> Durchschlagpapier        (Haeufigkeit)
+  Flaeche & Nachschub Breiter Stempel
+                        -> Amtsstempel XXL           (Flaeche)
+                        -> Flinker Bote -> Zweiter Bote (Nachschub)
+  Ergonomie           Handgelenkdrehung
+                        -> Trockenwechsel            (Wechsel ohne Tinte)
+                        -> Nachtinten im Vorbeigehen (halber Takt)
+  Takt & Dienstzeit   Routine
+                        -> Blindstempeln             (Takt)
+                        -> Ueberstunden -> Gleitzeit (Dienstzeit)
+  Amtsautoritaet      Dienst nach Vorschrift -> Verwaltungsgebuehr
+                        -> Saeumniszuschlag
+
+UEBERSTUNDEN wandert bewusst aus Ring 1 nach Ring 2. Ring 1 gehoert jetzt den
+Entscheidungen, die den Arbeitstag VERAENDERN (Kissen, Volltreffer, Flaeche,
+Wechsel, Takt) - mehr Zeit ist die langweiligste Verbesserung und darf warten.
+
+DER FLAECHENSTEMPEL IST KEIN REINER GEWINN
+Ein breiter Abdruck trifft ALLE Vorgaenge unter sich, auch die mit einem anderen
+Sollstempel - die zaehlen als Beschwerde. Das war eine bewusste Entscheidung:
+ein Flaechenstempel, der nur die passenden Vorgaenge erwischt, waere ein
+Freifahrtschein ohne Entscheidung. So sucht der Spieler Nester gleichartiger
+Vorgaenge, statt blind draufzuhalten. Der Block schiebt sich am Rand so zurecht,
+dass der angeklickte Vorgang immer dabei ist; die betroffenen Plaetze werden
+beim Zielen amber umrandet.
+
+VOLLTREFFER
+Ohne Fortbildung gibt es KEINE Volltreffer (critChance startet bei 0). Erst
+"Geuebter Blick" schaltet sie frei - 20 % mit doppeltem Ertrag. Danach trennen
+sich Hoehe (x3, x4) und Haeufigkeit (35 %). Beide Wege sind etwa gleich stark,
+der Spieler waehlt nach Geschmack.
+
+DURCHSCHLAGPAPIER
+5 % Wahrscheinlichkeit, dass ein Abdruck nebenbei einen zweiten, zufaelligen
+Vorgang erledigt - immer mit dem RICHTIGEN Stempel, egal was in der Hand liegt.
+Das Durchschlagpapier hat eben mitkopiert.
+
+STEMPELKISSEN
+Die Kissen im Halter sind jetzt annaehernd quadratisch (122 x 104), damit sie
+wie echte Stempelkissen aussehen und der Fuellstand Platz hat.
