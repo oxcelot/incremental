@@ -122,8 +122,16 @@ Ohne Fortbildung gibt es **keine** Volltreffer (`critChance` startet bei 0).
 zwischen höherem Multiplikator und höherer Wahrscheinlichkeit.
 
 „Durchschlagpapier" erledigt mit 5 % Wahrscheinlichkeit einen zweiten,
-zufälligen Vorgang auf dem Tisch — und zwar immer mit dem *richtigen* Stempel,
-egal was gerade in der Hand liegt. Das Durchschlagpapier hat eben mitkopiert.
+zufälligen Vorgang auf dem Tisch — und zwar **immer mit der richtigen Aktion**,
+egal was gerade in der Hand liegt. Ein Durchschlag kann also nie eine
+Beschwerde auslösen und bringt stets den vollen Ertrag.
+
+Damit die 5 % nicht untergehen, bekommt der betroffene Vorgang eine eigene
+Animation: Die Karte springt kurz auf und kippt weg, eine blaue Ringwelle läuft
+nach außen, und der Aufdruck erscheint als **blauer Doppeldruck** — der
+korrekte Stempelname zweimal, leicht versetzt, wie ein verrutschter
+Durchschlag — mit „DURCHSCHLAG" darunter. Dazu ein eigener Ton und die blaue
+Zahl am Zeiger. Kein anderer Vorgang im Spiel sieht so aus.
 
 ## Das leere Kissen
 

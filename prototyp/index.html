@@ -113,6 +113,38 @@
   }
   .form .value{position:absolute; bottom:5px; right:6px; font-size:10px; font-weight:700; color:#7A7362;}
   .form.done{animation:done .22s ease-in forwards;}
+  .form.echoing{
+    animation:echoPop .62s cubic-bezier(.22,1.2,.36,1) forwards;
+    z-index:2;
+  }
+  @keyframes echoPop{
+    0%{transform:scale(1) rotate(0); box-shadow:0 2px 0 rgba(0,0,0,.18);}
+    22%{transform:scale(1.10) rotate(-2.5deg);
+        box-shadow:0 0 0 4px color-mix(in srgb, var(--s-blue) 55%, #0000);}
+    60%{transform:scale(1.03) rotate(1deg);}
+    100%{transform:scale(.86) rotate(5deg); opacity:0;}
+  }
+  .imprint.echo{color:var(--s-blue); border-style:double; border-width:5px;}
+  .imprint.echo.ghost{
+    opacity:.4; animation:none;
+    transform:rotate(-8deg) translate(4px, 3px);
+  }
+  .echotag{
+    position:absolute; left:0; right:0; bottom:9px; text-align:center;
+    font-family:var(--font-stamp); font-size:9px; font-weight:700;
+    letter-spacing:.18em; color:var(--s-blue); pointer-events:none;
+    animation:slam .28s .08s ease-out both;
+  }
+  .ripple{
+    position:absolute; inset:0; border-radius:3px; pointer-events:none;
+    border:3px solid var(--s-blue);
+    animation:ripple .62s ease-out forwards;
+  }
+  @keyframes ripple{
+    0%{transform:scale(.72); opacity:0;}
+    20%{opacity:.95;}
+    100%{transform:scale(1.45); opacity:0;}
+  }
   @keyframes done{to{transform:scale(.88) rotate(3deg); opacity:0;}}
   .imprint{
     position:absolute; inset:0; display:grid; place-items:center; pointer-events:none;
@@ -1036,24 +1068,46 @@ function echoBonus(){
   if(!t) return;
   const gain = (t.value + STATS.bonusPerForm) * mult();
   S.earned += gain; S.done++; S.echoes++;
-  const held = S.stamp; S.stamp = t.want;
-  finish(f, true);
-  S.stamp = held;
+  // Immer die RICHTIGE Aktion - der Durchschlag kann keine Beschwerde ausloesen
+  finish(f, true, STAMPS.find(x => x.id === t.want).name);
   SFX.echo(); float('Durchschlag +' + eur(gain), 'var(--s-blue)');
 }
 
 function charge(){ S.presses++; S.inkSpent += STATS.inkCost; }
 function wear(){ S.freshness = Math.max(0, S.freshness - 1); }
 
-function finish(form, ok){
+// echoLabel gesetzt = Durchschlag: blauer Doppeldruck mit Ringwelle, damit
+// sofort erkennbar ist, dass die 5 % gegriffen haben.
+function finish(form, ok, echoLabel){
   const st = STAMPS.find(s => s.id === S.stamp);
+  const label = echoLabel || st.name;
   form.removeAttribute('data-form');
   form.style.pointerEvents = 'none';
+
+  if(echoLabel){
+    const ghost = document.createElement('div');
+    ghost.className = 'imprint echo ghost';
+    ghost.textContent = label;
+    form.appendChild(ghost);
+  }
   const imp = document.createElement('div');
-  imp.className = 'imprint';
-  imp.style.color = ok ? st.color : 'var(--bad)';
-  imp.textContent = st.name;
+  imp.className = 'imprint' + (echoLabel ? ' echo' : '');
+  if(!echoLabel) imp.style.color = ok ? st.color : 'var(--bad)';
+  imp.textContent = label;
   form.appendChild(imp);
+
+  if(echoLabel){
+    const tag = document.createElement('div');
+    tag.className = 'echotag';
+    tag.textContent = 'DURCHSCHLAG';
+    form.appendChild(tag);
+    const rip = document.createElement('div');
+    rip.className = 'ripple';
+    form.appendChild(rip);
+    form.classList.add('echoing');
+    setTimeout(() => form.remove(), 620);
+    return;
+  }
   form.classList.add('done');
   setTimeout(() => form.remove(), 240);
 }

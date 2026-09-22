@@ -921,8 +921,23 @@ der Spieler waehlt nach Geschmack.
 
 DURCHSCHLAGPAPIER
 5 % Wahrscheinlichkeit, dass ein Abdruck nebenbei einen zweiten, zufaelligen
-Vorgang erledigt - immer mit dem RICHTIGEN Stempel, egal was in der Hand liegt.
-Das Durchschlagpapier hat eben mitkopiert.
+Vorgang erledigt - immer mit der RICHTIGEN Aktion, egal was in der Hand liegt.
+Ein Durchschlag kann also nie eine Beschwerde ausloesen und bringt stets den
+vollen Ertrag. Das Durchschlagpapier hat eben mitkopiert.
+
+EIGENE ANIMATION (Pflicht bei seltenen Ereignissen)
+Bei 5 % Wahrscheinlichkeit sieht ein Spieler das Ereignis vielleicht zweimal
+pro Runde. Ohne eigenes Aussehen haelt er es fuer einen normalen Abdruck und
+bemerkt nie, dass er etwas gekauft hat, das wirkt. Der Durchschlag hat deshalb:
+  * eine blaue Ringwelle, die ueber die Karte nach aussen laeuft
+  * ein kurzes Aufspringen der Karte, bevor sie weg kippt
+  * einen BLAUEN DOPPELDRUCK: der korrekte Stempelname zweimal, leicht
+    versetzt - wie ein verrutschter Durchschlag
+  * die Zeile "DURCHSCHLAG" darunter
+  * einen eigenen Ton und eine blaue Zahl am Zeiger
+=> MERKE: Jedes seltene Ereignis braucht ein eigenes Aussehen, sonst ist das
+   Upgrade, das es freischaltet, fuer den Spieler unsichtbar - und damit
+   wertlos, egal wie gut die Zahl dahinter ist.
 
 STEMPELKISSEN
 Die Kissen im Halter sind jetzt annaehernd quadratisch (122 x 104), damit sie
