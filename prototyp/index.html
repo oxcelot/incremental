@@ -342,6 +342,14 @@
   #tree .nd.short .box{stroke:var(--s-amber); stroke-dasharray:5 4; opacity:.6;}
   #tree .nd.short .ico{stroke:var(--s-amber); opacity:.6;}
   #tree .nd.locked{opacity:.38;}
+  #tree .nd.started .box{
+    fill:color-mix(in srgb, var(--s-green) 16%, var(--surface));
+  }
+  #tree .pip{fill:#0000; stroke:var(--line); stroke-width:1.4;}
+  #tree .pip.on{fill:var(--s-amber); stroke:var(--s-amber);}
+  #tree .nd.owned .pip{stroke:var(--s-green);}
+  #tree .nd.owned .pip.on{fill:var(--s-green); stroke:var(--s-green);}
+  #tree .nd.locked .pip{stroke:var(--line);}
   #tree .nd:hover .box{stroke-width:3.5;}
   #tree .nd:focus-visible{outline:none;}
   #tree .nd:focus-visible .box{stroke:var(--s-blue); stroke-width:3.5;}
@@ -355,6 +363,10 @@
     border-left:4px solid var(--c,var(--line)); border-radius:3px; padding:9px 12px;
   }
   .detail .dn{font-family:var(--font-stamp); font-size:15px; font-weight:700; letter-spacing:.03em;}
+  .detail .dr{
+    font-family:var(--font-stamp); font-size:11.5px; font-weight:700;
+    letter-spacing:.07em; color:var(--c,var(--s-amber)); margin-top:1px;
+  }
   .detail .de{font-size:12.5px; color:var(--text); margin-top:2px; line-height:1.4;}
   .detail .dc{font-size:10.5px; color:var(--muted); margin-top:4px;}
   .gostart{
@@ -496,6 +508,12 @@ const LEGEND = [
 // Laufende Werte. Upgrades aus dem Fortbildungsplan schreiben spaeter hier
 // hinein - CONFIG bleibt der Startwert, STATS ist der aktuelle Stand.
 const STATS = {};
+
+// Stufen: meta.owned[id] haelt die Anzahl gekaufter Stufen. Knoten ohne
+// ranks-Angabe haben genau eine Stufe und verhalten sich wie bisher.
+function rankOf(n){ return meta.owned[n.id] || 0; }
+function maxRank(n){ return n.ranks || 1; }
+
 function resetStats(){
   STATS.roundMs      = CONFIG.roundSeconds * 1000;
   STATS.beatMs       = CONFIG.beatMs;
@@ -514,7 +532,15 @@ function resetStats(){
   STATS.hitCount     = 1;   // Vorgaenge, die ein Abdruck gleichzeitig trifft
   STATS.echoChance   = 0;   // Durchschlagpapier: zweiter Vorgang gratis
   STATS.bonusPerForm = 0;   // Verwaltungsgebuehr je erledigtem Vorgang
-  for(const n of TREE) if(meta.owned[n.id] && n.apply) n.apply(STATS);
+  STATS.critFree     = 0;   // Volltreffer nutzen das Kissen nicht ab
+  for(const n of TREE){
+    const r = rankOf(n);
+    if(r > 0 && n.apply) n.apply(STATS, r);
+  }
+  // Sicherheitsgrenzen, damit keine Kombination unter sinnvolle Werte rutscht
+  STATS.beatMs  = Math.max(800, STATS.beatMs);
+  STATS.spawnMs = Math.max(800, STATS.spawnMs);
+  STATS.inkCost = Math.max(0.05, STATS.inkCost);
 }
 
 // ---------------------------------------------------------------- Fortbildungsplan
@@ -574,18 +600,27 @@ const TREE = [
   { id:'krit1', a:-30, r:150, icon:'spark', cost:60, name:'Ge\u00fcbter Blick',
     eff:'Jeder f\u00fcnfte Abdruck sitzt perfekt: 20 % Volltreffer mit doppeltem Ertrag.',
     apply:st => { st.critChance = 0.20; st.critMult = 2; } },
-  { id:'krit2', a:-30, r:300, o:-95, icon:'spark2', cost:140, name:'Routiniertes Auge',
-    eff:'Ein Volltreffer bringt das Dreifache.',
-    apply:st => st.critMult = 3 },
-  { id:'krit4', a:-30, r:450, o:-95, icon:'spark3', cost:300, name:'Blick f\u00fcr das Detail',
-    eff:'Ein Volltreffer bringt das Vierfache.',
-    apply:st => st.critMult = 4 },
-  { id:'krit3', a:-30, r:300, o:95, icon:'eye', cost:130, name:'Sechster Sinn',
-    eff:'Volltreffer in 35 % der F\u00e4lle.',
-    apply:st => st.critChance = 0.35 },
-  { id:'durch', a:-30, r:450, o:95, icon:'copy', cost:260, name:'Durchschlagpapier',
-    eff:'Mit 5 % Wahrscheinlichkeit erledigt ein Abdruck nebenbei einen zweiten, zuf\u00e4lligen Vorgang.',
-    apply:st => st.echoChance = 0.05 },
+
+  { id:'krit2', a:-30, r:300, o:-95, icon:'spark2', cost:140, ranks:5,
+    name:'Routiniertes Auge',
+    eff:'Wie viel ein Volltreffer einbringt.',
+    valueAt:r => '\u00d7' + num(2 + 0.5 * r, 1),
+    apply:(st, r) => st.critMult += 0.5 * r },
+  { id:'glueck', a:-30, r:450, o:-95, icon:'spark3', cost:300,
+    name:'Gl\u00fcckliche Hand',
+    eff:'Ein Volltreffer nutzt das Kissen nicht ab \u2013 der Abdruck sass ja perfekt.',
+    apply:st => st.critFree = 1 },
+
+  { id:'krit3', a:-30, r:300, o:95, icon:'eye', cost:130, ranks:5,
+    name:'Sechster Sinn',
+    eff:'Wie oft ein Abdruck perfekt sitzt.',
+    valueAt:r => num(20 + 5 * r) + ' %',
+    apply:(st, r) => st.critChance += 0.05 * r },
+  { id:'durch', a:-30, r:450, o:95, icon:'copy', cost:260, ranks:5,
+    name:'Durchschlagpapier',
+    eff:'Wie oft ein Abdruck nebenbei einen zweiten, zuf\u00e4lligen Vorgang erledigt.',
+    valueAt:r => num(2.5 + 2.5 * r, 1) + ' %',
+    apply:(st, r) => st.echoChance = 0.025 + 0.025 * r },
 
   // ---- Fl\u00e4chenstempel und Nachschub (unten rechts) --------------------
   { id:'flach1', a:30, r:150, icon:'two', cost:120, name:'Breiter Stempel',
@@ -594,12 +629,17 @@ const TREE = [
   { id:'flach2', a:30, r:300, o:-95, icon:'four', cost:340, name:'Amtsstempel XXL',
     eff:'Ein Abdruck deckt vier Vorg\u00e4nge ab. Vorsicht: falsch gestempelte z\u00e4hlen mit.',
     apply:st => st.hitCount = 4 },
-  { id:'bote1', a:30, r:300, o:95, icon:'tray1', cost:40, name:'Flinker Bote',
-    eff:'Vorg\u00e4nge r\u00fccken alle 1,3 s nach statt alle 1,6 s.',
-    apply:st => st.spawnMs = 1300 },
-  { id:'bote2', a:30, r:450, o:95, icon:'tray2', cost:110, name:'Zweiter Bote',
-    eff:'Vorg\u00e4nge r\u00fccken alle 1,0 s nach. Der Tisch bleibt voll.',
-    apply:st => st.spawnMs = 1000 },
+
+  { id:'bote1', a:30, r:300, o:95, icon:'tray1', cost:40, ranks:4,
+    name:'Flinker Bote',
+    eff:'Wie schnell Vorg\u00e4nge vom Stapel nachr\u00fccken.',
+    valueAt:r => num((1600 - 100 * r) / 1000, 2) + ' s',
+    apply:(st, r) => st.spawnMs -= 100 * r },
+  { id:'bote2', a:30, r:450, o:95, icon:'tray2', cost:110, ranks:4, needsMaxParent:true,
+    name:'Zweiter Bote',
+    eff:'Ein zweiter Bote holt noch mehr heran. Der Tisch bleibt voll.',
+    valueAt:r => num((1200 - 100 * r) / 1000, 2) + ' s',
+    apply:(st, r) => st.spawnMs -= 100 * r },
 
   // ---- Ergonomie am Stempelhalter (unten links) --------------------------
   { id:'hand', a:150, r:150, icon:'rot', cost:80, name:'Handgelenkdrehung',
@@ -651,7 +691,7 @@ for(const n of TREE){
 const LINKS = [
   ['start','voll'],  ['voll','xxl'],    ['xxl','fass'],
                      ['voll','spar'],   ['spar','gross'],
-  ['start','krit1'], ['krit1','krit2'], ['krit2','krit4'],
+  ['start','krit1'], ['krit1','krit2'], ['krit2','glueck'],
                      ['krit1','krit3'], ['krit3','durch'],
   ['start','flach1'],['flach1','flach2'],
                      ['flach1','bote1'],['bote1','bote2'],
@@ -703,9 +743,10 @@ let lastMove = 0;
 let rafId = 0;
 let roundToken = 0;
 let deskCols = 4;
-let meta = { day:1, best:0, account:0, owned:{ start:true } };
+let meta = { day:1, best:0, account:0, owned:{ start:1 } };
 
 const eur = n => n.toFixed(2).replace('.', ',');
+const num = (v, d = 0) => v.toFixed(d).replace('.', ',');
 
 function pickType(){
   const total = TYPES.reduce((s,t)=>s+t.weight,0);
@@ -1024,8 +1065,12 @@ function strike(now){
     .filter(Boolean);
   if(under.length){
     charge(); wear();
+    const critsBefore = S.crits;
     let any = false;
     for(const f of under) any = resolveForm(f) || any;
+    if(STATS.critFree && S.crits > critsBefore){
+      S.freshness = Math.min(STATS.freshnessMax, S.freshness + 1);
+    }
     if(any && Math.random() < STATS.echoChance) echoBonus();
     renderRack(); return;
   }
@@ -1175,7 +1220,11 @@ const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
 
 // Im Demo-Modus kostet jede Fortbildung 1 EUR. Die echten Preise bleiben in
 // TREE stehen - CONFIG.demoCheapUpgrades auf false setzen und sie gelten wieder.
-const costOf = n => CONFIG.demoCheapUpgrades ? (n.cost > 0 ? 1 : 0) : n.cost;
+// Preis der NAECHSTEN Stufe. Jede weitere Stufe kostet das 1,6-fache.
+const costOf = n => {
+  if(CONFIG.demoCheapUpgrades) return n.cost > 0 ? 1 : 0;
+  return Math.round(n.cost * Math.pow(n.growth || 1.6, rankOf(n)));
+};
 
 // --- Ansicht: verschieben und zoomen ---------------------------------------
 const VIEW0 = (() => {
@@ -1263,11 +1312,30 @@ document.getElementById('zFit').onclick = resetView;
 
 // --- Knoten ----------------------------------------------------------------
 // Ein Knoten wird erst kaufbar, wenn sein Vorgaenger freigeschaltet ist.
+// needsMaxParent verlangt, dass der Vorgaenger VOLL ausgebaut ist - so laesst
+// sich eine Kette wie Flinker Bote -> Zweiter Bote nicht ueberspringen.
 function nodeState(n){
-  if(meta.owned[n.id]) return 'owned';
+  if(rankOf(n) >= maxRank(n)) return 'owned';
   const par = PARENT[n.id];
-  if(par && !meta.owned[par]) return 'locked';
+  if(par){
+    const p = byId[par];
+    if(rankOf(p) < (n.needsMaxParent ? maxRank(p) : 1)) return 'locked';
+  }
   return meta.account >= costOf(n) ? 'afford' : 'short';
+}
+
+// Stufenpunkte am unteren Rand des Kaestchens
+function pips(n){
+  const max = maxRank(n);
+  if(max < 2) return '';
+  const r = rankOf(n), w = 9, gap = 3;
+  let x = n.x - (max * w + (max - 1) * gap) / 2, out = '';
+  for(let k = 0; k < max; k++){
+    out += '<rect class="pip' + (k < r ? ' on' : '') + '" x="' + x + '" y="'
+         + (n.y + HALF - 17) + '" width="' + w + '" height="6" rx="1.5"></rect>';
+    x += w + gap;
+  }
+  return out;
 }
 
 function renderTree(){
@@ -1284,13 +1352,17 @@ function renderTree(){
   }
   for(const n of TREE){
     const st = nodeState(n);
-    out += '<g class="nd ' + st + '" data-node="' + n.id + '" tabindex="0" role="button"'
+    const started = rankOf(n) > 0 && st !== 'owned' ? ' started' : '';
+    out += '<g class="nd ' + st + started + '" data-node="' + n.id + '" tabindex="0" role="button"'
          + ' aria-label="' + n.name
-         + (st === 'owned' ? ', freigeschaltet' : ', ' + costOf(n) + ' Euro') + '">'
+         + (maxRank(n) > 1 ? ', Stufe ' + rankOf(n) + ' von ' + maxRank(n) : '')
+         + (st === 'owned' ? ', fertig ausgebaut' : ', ' + costOf(n) + ' Euro') + '">'
          + '<rect class="box" x="' + (n.x - HALF) + '" y="' + (n.y - HALF) + '"'
          + ' width="' + BOX + '" height="' + BOX + '" rx="3"></rect>'
-         + '<g class="ico" transform="translate(' + n.x + ',' + n.y + ') scale(1.45)">'
+         + '<g class="ico" transform="translate(' + n.x + ','
+         + (n.y - (maxRank(n) > 1 ? 7 : 0)) + ') scale(1.45)">'
          + ICONS[n.icon] + '</g>'
+         + pips(n)
          + (st === 'owned' ? ''
             : '<rect class="costbg" x="' + (n.x - 32) + '" y="' + (n.y + HALF + 4)
               + '" width="64" height="27" rx="3"></rect>'
@@ -1312,7 +1384,7 @@ function renderTree(){
 function buy(n){
   if(nodeState(n) !== 'afford'){ showDetail(n); return; }
   meta.account -= costOf(n);
-  meta.owned[n.id] = true;
+  meta.owned[n.id] = rankOf(n) + 1;
   resetStats();
   el.hAcct.textContent = eur(meta.account);
   renderTree();
@@ -1323,15 +1395,29 @@ function buy(n){
 }
 
 function showDetail(n){
-  const st = nodeState(n);
+  const st = nodeState(n), r = rankOf(n), max = maxRank(n);
   el.detail.style.setProperty('--c',
     st === 'owned' ? 'var(--s-green)' : st === 'locked' ? 'var(--line)' : 'var(--s-amber)');
+
+  let stufe = '';
+  if(max > 1){
+    const val = !n.valueAt ? ''
+      : ' \u00b7 ' + (r === 0 ? n.valueAt(1)
+          : n.valueAt(r) + (r < max ? ' \u2192 ' + n.valueAt(r + 1) : ''));
+    stufe = '<div class="dr">Stufe ' + r + ' / ' + max + val + '</div>';
+  }
+
+  const par = PARENT[n.id] && byId[PARENT[n.id]];
   const status =
-      st === 'owned'  ? 'Freigeschaltet.'
-    : st === 'locked' ? 'Gesperrt \u2014 erst ' + byId[PARENT[n.id]].name + ' freischalten.'
-    : st === 'afford' ? eur(costOf(n)) + ' \u20ac \u2014 klicken zum Freischalten.'
+      st === 'owned'  ? (max > 1 ? 'Vollst\u00e4ndig ausgebaut.' : 'Freigeschaltet.')
+    : st === 'locked' ? 'Gesperrt \u2014 erst ' + par.name
+                        + (n.needsMaxParent ? ' vollst\u00e4ndig ausbauen.' : ' freischalten.')
+    : st === 'afford' ? eur(costOf(n)) + ' \u20ac \u2014 klicken f\u00fcr '
+                        + (max > 1 ? 'Stufe ' + (r + 1) : 'das Upgrade') + '.'
     : eur(costOf(n)) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
+
   el.detail.innerHTML = '<div class="dn">' + n.name + '</div>'
+                      + stufe
                       + '<div class="de">' + n.eff + '</div>'
                       + '<div class="dc">' + status + '</div>';
 }
@@ -1397,7 +1483,8 @@ window.addEventListener('pointerdown', e => {
 // ---------------------------------------------------------------- Boot
 function boot(data){
   if(data && typeof data.day === 'number') meta = data;
-  if(!meta.owned) meta.owned = { start:true };
+  if(!meta.owned) meta.owned = { start:1 };
+  for(const k in meta.owned) if(meta.owned[k] === true) meta.owned[k] = 1;
   if(typeof meta.account !== 'number') meta.account = 0;
   if(typeof meta.best !== 'number') meta.best = 0;
   resetStats();

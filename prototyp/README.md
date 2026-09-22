@@ -76,11 +76,36 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | Speiche | Ring 1 | Gabelung A | Gabelung B |
 |---|---|---|---|
 | Kissen & Tinte | Volles Kissen (2 Vorgänge) | XXL (4) → Fasspumpe (6) | Sparsames Kissen (0,35 €) → Großbestellung (0,22 €) |
-| Volltreffer | Geübter Blick (20 %, ×2) | Routiniertes Auge (×3) → Blick für das Detail (×4) | Sechster Sinn (35 %) → Durchschlagpapier (5 %) |
-| Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | Flinker Bote (1,3 s) → Zweiter Bote (1,0 s) |
+| Volltreffer | Geübter Blick (20 %, ×2) | **Routiniertes Auge ×5** → Glückliche Hand | **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
+| Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | **Flinker Bote ×4** → **Zweiter Bote ×4** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
 | Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr (+0,60 €/Vorgang) → Säumniszuschlag (+1,40 €) | — |
+
+### Mehrstufige Upgrades
+
+Fünf Knoten lassen sich mehrfach ausbauen. `meta.owned[id]` hält die Stufenzahl
+statt eines Ja/Nein; Knoten ohne `ranks` haben genau eine Stufe und verhalten
+sich wie vorher. Jede weitere Stufe kostet das **1,6-fache** der vorigen.
+
+| Knoten | Stufen | Wert | Preise |
+|---|---|---|---|
+| Sechster Sinn | 5 | 20 % → 45 % *(+5 pp)* | 130 / 208 / 333 / 532 / 852 € |
+| Routiniertes Auge | 5 | ×2 → ×4,5 *(+0,5)* | 140 / 224 / 358 / 573 / 917 € |
+| Durchschlagpapier | 5 | 5 % → 15 % *(+2,5 pp)* | 260 / 416 / 666 / 1065 / 1704 € |
+| Flinker Bote | 4 | 1,60 s → 1,20 s *(−0,10 s)* | 40 / 64 / 102 / 164 € |
+| Zweiter Bote | 4 | 1,20 s → 0,80 s *(−0,10 s)* | 110 / 176 / 282 / 451 € |
+
+Die Kästchen zeigen die Stufen als Punktleiste am unteren Rand, die Detailkarte
+den aktuellen und den nächsten Wert.
+
+**`needsMaxParent`** steht beim Zweiten Boten: Er wird erst kaufbar, wenn der
+Flinke Bote **voll** ausgebaut ist. Sonst ließe sich die Kette überspringen und
+die Nachrückrate auf Umwegen unter 0,80 s drücken. Alle anderen Knoten öffnen
+sich schon bei Stufe 1 des Vorgängers.
+
+`resetStats()` klemmt zur Sicherheit ab: Takt und Nachrücken nie unter 0,80 s,
+Tinte nie unter 0,05 €. Das fängt Kombinationen ab, die beim Balancing entstehen.
 
 ### Der Flächenstempel muss gezielt werden
 

@@ -949,3 +949,43 @@ sich der ganze Baum in wenigen Runden durchprobieren laesst. Auf dem Homescreen
 weist ein rotes Schild darauf hin. Die echten Preise stehen unveraendert in
 TREE - Flag auf false, und sie gelten wieder. VOR DEM ERSTEN OEFFENTLICHEN
 TEST ausschalten, sonst misst man ein Spiel ohne Oekonomie.
+
+
+################################################################################
+# TEIL 1F - MEHRSTUFIGE UPGRADES (22.09.2026)
+################################################################################
+Fuenf Knoten lassen sich mehrfach ausbauen. meta.owned[id] haelt die Stufenzahl
+statt eines Ja/Nein; Knoten ohne ranks-Angabe haben genau eine Stufe und
+verhalten sich wie bisher. Jede weitere Stufe kostet das 1,6-fache der vorigen.
+
+  Sechster Sinn        5 Stufen   20 % -> 45 %      (+5 Prozentpunkte)
+  Routiniertes Auge    5 Stufen   x2   -> x4,5      (+0,5)
+  Durchschlagpapier    5 Stufen    5 % -> 15 %      (+2,5 Prozentpunkte)
+  Flinker Bote         4 Stufen   1,60 -> 1,20 s    (-0,10 s)
+  Zweiter Bote         4 Stufen   1,20 -> 0,80 s    (-0,10 s)
+
+WARUM NUR DIESE FUENF
+Stufen passen zu REGLERN, nicht zu SCHALTERN. "Geuebter Blick" schaltet
+Volltreffer ueberhaupt erst frei, "Breiter Stempel" trifft zwei Vorgaenge,
+"Trockenwechsel" spart Tinte - 2,4 Vorgaenge gleichzeitig oder ein halb
+freigeschalteter Volltreffer ergeben keinen Sinn. Diese bleiben einstufig.
+
+DIE KETTE FLINKER BOTE -> ZWEITER BOTE
+Der Zweite Bote traegt needsMaxParent: er wird erst kaufbar, wenn der Flinke
+Bote VOLL ausgebaut ist. Sonst liesse sich die Kette ueberspringen und die
+Nachrueckrate auf Umwegen unter 0,80 s druecken. Alle anderen Knoten oeffnen
+sich schon bei Stufe 1 des Vorgaengers - eine Volllast-Sperre ueberall waere
+zu zaeh.
+=> MUSTER FUER SPAETER: Wenn zwei Knoten denselben Wert weiterdrehen, gehoert
+   needsMaxParent an den zweiten. Wenn sie verschiedene Werte drehen, nicht.
+
+SICHERHEITSGRENZEN
+resetStats() klemmt ab: Takt und Nachrueckrate nie unter 0,80 s, Tinte nie
+unter 0,05 EUR. Bei frei kombinierbaren Stufen entstehen sonst beim Balancing
+Werte, die das Spiel unspielbar machen, ohne dass es jemand merkt.
+
+NEUER KNOTEN: GLUECKLICHE HAND
+Ersetzt "Blick fuer das Detail" (x4), das durch die Stufen des Routinierten
+Auges ueberfluessig wurde. Wirkung: Ein Volltreffer nutzt das Kissen nicht ab -
+der Abdruck sass ja perfekt. Verzahnt den Volltreffer-Zweig mit dem Kissen,
+dem wichtigsten Engpass des Spiels.
