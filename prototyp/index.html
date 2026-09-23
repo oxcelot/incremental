@@ -10,6 +10,8 @@
     --ink:#22282F; --text:#22282F; --muted:#6E6757;
     --s-green:#2F6B4F; --s-red:#A33227; --s-amber:#AF7016; --s-blue:#2B5E86;
     --good:#2F6B4F; --bad:#A33227;
+    --gold:#9A6B08; --gold-paper:#F6E6B4; --gold-edge:#C9A43C;
+    --dia:#177A8C;  --dia-paper:#D7EEF3;  --dia-edge:#4FA8BA;
     --font-ui:"IBM Plex Sans",system-ui,sans-serif;
     --font-stamp:"Oswald",Impact,sans-serif;
     --font-form:"Courier Prime","Courier New",monospace;
@@ -22,6 +24,8 @@
       --text:#E4E1D7; --muted:#9AA093;
       --s-green:#4E9C77; --s-red:#D05A4C; --s-amber:#D79A38; --s-blue:#5B95C4;
       --good:#4E9C77; --bad:#D05A4C;
+      --gold:#6B4A00; --gold-paper:#EFD98F; --gold-edge:#A8871F;
+      --dia:#0C5C6B;  --dia-paper:#BFE4EC;  --dia-edge:#2F8DA0;
     }
   }
   :root[data-theme="dark"]{
@@ -31,6 +35,8 @@
     --text:#E4E1D7; --muted:#9AA093;
     --s-green:#4E9C77; --s-red:#D05A4C; --s-amber:#D79A38; --s-blue:#5B95C4;
     --good:#4E9C77; --bad:#D05A4C;
+    --gold:#6B4A00; --gold-paper:#EFD98F; --gold-edge:#A8871F;
+    --dia:#0C5C6B;  --dia-paper:#BFE4EC;  --dia-edge:#2F8DA0;
   }
 
   /* Ohne diese Regel greift hidden nicht: .veil und #home setzen selbst ein
@@ -108,9 +114,30 @@
     animation:drop .18s ease-out;
   }
   @keyframes drop{from{transform:translateY(-10px) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+  /* Seltene Vorgaenge muessen sich auf einen Blick vom Papierstapel abheben -
+     Farbe allein reicht nicht, deshalb zusaetzlich Rand und Randvermerk. */
+  .form.gold{
+    background:var(--gold-paper); border-color:var(--gold-edge); border-width:2px;
+    box-shadow:0 2px 0 rgba(0,0,0,.18), inset 0 0 0 1px color-mix(in srgb, var(--gold-edge) 50%, #0000);
+  }
+  .form.dia{
+    background:var(--dia-paper); border-color:var(--dia-edge); border-width:2px;
+    box-shadow:0 2px 0 rgba(0,0,0,.18), inset 0 0 0 1px color-mix(in srgb, var(--dia-edge) 50%, #0000);
+  }
+  .form .rare{
+    position:absolute; bottom:4px; left:6px;
+    font-family:var(--font-stamp); font-size:11px; font-weight:700;
+    letter-spacing:.08em; line-height:1;
+  }
+  .form.gold .rare{color:var(--gold);}
+  .form.dia   .rare{color:var(--dia);}
+  .form.gold .value{color:var(--gold); font-weight:700;}
+  .form.dia   .value{color:var(--dia);}
   .form .az{font-size:9px; color:#7A7362; letter-spacing:.04em;}
   .form .betreff{font-size:11px; font-weight:700; line-height:1.2; text-wrap:balance;}
-  .form .rows{margin-top:auto; display:flex; flex-direction:column; gap:2px;}
+  /* Unterster Streifen gehoert dem Randvermerk und dem Betrag - ohne die
+     Reserve laeuft die rot gestrichelte Fehlzeile quer durch beide. */
+  .form .rows{margin-top:auto; padding-bottom:13px; display:flex; flex-direction:column; gap:2px;}
   .form .row{height:3px; background:var(--paper-line); border-radius:1px;}
   .form .row.empty{height:9px; background:transparent; border:1px dashed var(--bad); border-radius:2px;}
   .form .seal{
@@ -137,6 +164,9 @@
     100%{transform:scale(.86) rotate(5deg); opacity:0;}
   }
   .imprint.echo{color:var(--s-blue); border-style:double; border-width:5px;}
+  .imprint.dia{color:var(--dia); border-style:double; border-width:5px;}
+  .echotag.dia{color:var(--dia);}
+  .ripple.dia{border-color:var(--dia);}
   .imprint.echo.ghost{
     opacity:.4; animation:none;
     transform:rotate(-8deg) translate(4px, 3px);
@@ -558,6 +588,8 @@ function resetStats(){
   STATS.startForms   = 6;   // Vorgaenge, die zu Dienstbeginn schon liegen
   STATS.critEcho     = 0;   // Volltreffer loest immer Durchschlagpapier aus
   STATS.areaBonus    = 0;   // Zuschlag je zusaetzlichem Vorgang unter einem Abdruck
+  STATS.goldChance   = 0;   // Eilvermerk: Vorgang ist das Dreifache wert
+  STATS.diaChance    = 0;   // Sammelverfuegung: reisst die acht Nachbarn mit
   for(const n of TREE){
     const r = rankOf(n);
     if(r > 0 && n.apply) n.apply(STATS, r);
@@ -606,6 +638,8 @@ const ICONS = {
   stampno:  '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-3 -7l6 6M3 -7l-6 6"/>',
   stampq:   '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-2 -6.5a2.2 2.2 0 1 1 2 3.2v1"/><path d="M0 -0.5v.6"/>',
   stampfwd: '<rect x="-11" y="5" width="22" height="5" rx="1"/><rect x="-9" y="-10" width="11" height="12" rx="2"/><path d="M5 -4h7"/><path d="M9 -7l3 3-3 3"/>',
+  eilt:     '<rect x="-9" y="-11" width="18" height="22" rx="2"/><path d="M0 -6.5l2 4.6 5 .5-3.8 3.3 1.1 4.9L0 4.3l-4.3 2.5 1.1-4.9L-7 -1.4l5-.5z"/>',
+  gem:      '<path d="M0 11L-11 -2l4.5-9h13L11 -2z"/><path d="M-11 -2h22M-6.5 -11L-4 -2 0 11 4 -2l2.5-9"/>',
   hour:     '<path d="M-8 -11h16M-8 11h16"/><path d="M-7 -11c0 7 7 8 7 11 0-3 7-4 7-11"/><path d="M-7 11c0-7 7-8 7-11 0 3 7 4 7 11"/>',
   stackin:  '<rect x="-11" y="6" width="22" height="5" rx="1"/><rect x="-8" y="-1" width="16" height="5" rx="1"/><rect x="-8" y="-9" width="16" height="5" rx="1"/>',
   gridfull: '<rect x="-11" y="-11" width="22" height="22" rx="2"/><path d="M-11 -3.7h22M-11 3.7h22M-3.7 -11v22M3.7 -11v22"/>',
@@ -668,6 +702,18 @@ const TREE = [
     eff:'Wie oft ein Abdruck nebenbei einen zweiten, zuf\u00e4lligen Vorgang erledigt.',
     valueAt:r => num(2.5 + 2.5 * r, 1) + ' %',
     apply:(st, r) => st.echoChance = 0.025 + 0.025 * r },
+
+  // Seltene Vorgaenge - haengen am Geuebten Blick, weil beides Aufmerksamkeit ist
+  { id:'eilt', hx:185, hy:-660, icon:'eilt', cost:180, ranks:4,
+    name:'Eilvermerk',
+    eff:'Wie oft ein Vorgang mit Eilvermerk hereinkommt. Goldenes Papier, dreifacher Wert \u2013 man sieht ihn liegen, bevor man ihn stempelt.',
+    valueAt:r => num(2 * r) + ' %',
+    apply:(st, r) => st.goldChance += 0.02 * r },
+  { id:'sammelv', hx:185, hy:-800, icon:'gem', cost:480, ranks:4, needsMaxParent:true,
+    name:'Sammelverf\u00fcgung',
+    eff:'Wie oft eine Sammelverf\u00fcgung hereinkommt. Wer sie mit dem RICHTIGEN Stempel trifft, erledigt die acht Nachbarfelder gleich mit \u2013 neun Felder auf einen Schlag.',
+    valueAt:r => num(2 * r) + ' %',
+    apply:(st, r) => st.diaChance += 0.02 * r },
 
   // Wo Volltreffer und Durchschlagpapier zusammenlaufen
   { id:'kritdurch', hx:770, hy:-530, icon:'sparkcpy', cost:900, needsMaxParent:true,
@@ -837,6 +883,7 @@ const LINKS = [
   ['start','serie'],
   ['serie','krit1'],   ['krit1','krit2'], ['krit2','glueck'],
                        ['krit1','krit3'], ['krit3','durch'],
+  ['krit1','eilt'],      ['eilt','sammelv'],
   ['krit3','kritdurch'], ['durch','kritdurch'],
   ['serie','praemie'],
   ['serie','kmerk'],   ['kmerk','beharr'],  ['beharr','kurz'],
@@ -955,6 +1002,7 @@ const SFX = {
   wrong(){ tone(150, 0.26, 'sawtooth', 0.14, 70); },
   crit(){ tone(880,0.10,'triangle',0.15,1760); tone(1320,0.16,'sine',0.09,2640); },
   echo(){ tone(660,0.12,'sine',0.10,990); noise(0.06,900,1.6,0.06); },
+  dia(){ tone(1046,0.09,'sine',0.11,1568); setTimeout(()=>tone(1568,0.22,'sine',0.09,2093),70); },
   miss(){ noise(0.07, 130, 0.5, 0.14); },
   dry(){ noise(0.05, 190, 1.1, 0.07); tone(120, 0.05, 'sine', 0.05); },
   reink(){ noise(0.16, 700, 1.4, 0.13); tone(200, 0.13, 'sine', 0.09, 300); },
@@ -1052,6 +1100,16 @@ function spawnForm(){
   const t = pickType();
   const f = document.createElement('div');
   f.className = 'form'; f.dataset.form = t.id;
+  // Seltenheit wird beim Auflegen gewuerfelt, nicht beim Stempeln: der Spieler
+  // soll sie sehen und einplanen koennen. Sammelverfuegung sticht Eilvermerk.
+  let rare = '';
+  if(Math.random() < STATS.diaChance){
+    f.dataset.dia = '1'; f.classList.add('dia');
+    rare = '<div class="rare">&#9670; SAMMEL</div>';
+  } else if(Math.random() < STATS.goldChance){
+    f.dataset.gold = '1'; f.classList.add('gold');
+    rare = '<div class="rare">EILT &times;3</div>';
+  }
   let extra = '';
   let rows = '<div class="row"></div><div class="row"></div><div class="row"></div>';
   if(t.id === 'unvoll') rows = '<div class="row"></div><div class="row empty"></div><div class="row"></div>';
@@ -1061,7 +1119,8 @@ function spawnForm(){
               + '<div class="betreff">' + t.betreff[Math.random()*t.betreff.length|0] + '</div>'
               + extra
               + '<div class="rows">' + rows + '</div>'
-              + '<div class="value">' + eur(t.value) + '</div>';
+              + rare
+              + '<div class="value">' + eur(baseValue(t, f)) + '</div>';
   slot.appendChild(f);
 }
 
@@ -1080,6 +1139,7 @@ function startRound(){
     wasDry:null,
     combo:STATS.comboStart, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
+    golds:0, dias:0, diaForms:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
     extraLeft:STATS.extraBeats, extraUsed:0, overSeen:false,
@@ -1199,6 +1259,9 @@ function tick(dt, now){
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
+// Ein Eilvermerk verdreifacht den Grundwert. Zuschlaege und Kombo kommen wie
+// gehabt obendrauf - sonst wuerde Gold spaete Upgrades unsinnig verstaerken.
+const baseValue = (t, f) => t.value * (f.dataset.gold ? 3 : 1);
 // Ohne "Sammelbearbeitung" zerfaellt jede Serie sofort: die
 // Kombo zaehlt nicht hoch und der Multiplikator bleibt bei x1,0.
 const STAMP_TYPE = {};
@@ -1306,14 +1369,50 @@ function resolveForm(f){
     finish(f, false);
     return false;
   }
+  const slot = f.parentElement;
+  const dia = !!f.dataset.dia;
   const crit = Math.random() < STATS.critChance;
-  let gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
+  let gain = (baseValue(t, f) + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
   if(crit){ gain *= STATS.critMult; S.crits++; }
   S.earned += gain; S.done++; bumpCombo();
+  if(f.dataset.gold) S.golds++;
   if(crit){ SFX.crit(); float('VOLLTREFFER +' + eur(gain), 'var(--s-amber)'); }
   else     { SFX.correct(Math.min(S.combo, 14)); float('+' + eur(gain), 'var(--good)'); }
   finish(f, true);
+  // Eine Sammelverfuegung zieht die acht Nachbarn mit. Sie greift nur beim
+  // RICHTIGEN Stempel - ein Fehlgriff soll sich nicht auch noch auszahlen.
+  if(dia) diaBurst(slot);
   return true;
+}
+
+// Alle acht Nachbarfelder im Tischraster, zusammen also neun Felder. Die
+// Nachbarn werden immer richtig bearbeitet - wie beim Durchschlagpapier kann
+// daraus keine Beschwerde entstehen. Eine Sammelverfuegung unter den Nachbarn
+// zuendet NICHT weiter, sonst raeumt ein Treffer den halben Tisch ab.
+function diaBurst(slot){
+  const slots = [...el.desk.children];
+  const idx = slots.indexOf(slot);
+  if(idx < 0) return;
+  const cols = deskCols, row = Math.floor(idx / cols), col = idx % cols;
+  let got = 0, sum = 0;
+  for(let dr = -1; dr <= 1; dr++) for(let dc = -1; dc <= 1; dc++){
+    if(!dr && !dc) continue;
+    const r = row + dr, c = col + dc;
+    if(r < 0 || c < 0 || c >= cols) continue;
+    const sl = slots[r * cols + c];
+    if(!sl) continue;
+    const g = sl.querySelector('[data-form]');
+    if(!g) continue;
+    const t = TYPES.find(x => x.id === g.dataset.form);
+    if(!t) continue;
+    const gain = (baseValue(t, g) + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
+    S.earned += gain; S.done++; sum += gain; got++;
+    if(g.dataset.gold) S.golds++;
+    finish(g, true, STAMPS.find(x => x.id === t.want).name, 'dia');
+  }
+  S.dias++; S.diaForms += got;
+  SFX.dia();
+  float('Sammelverf\u00fcgung +' + eur(sum), 'var(--dia)');
 }
 
 // Durchschlagpapier: ein zweiter Vorgang erledigt sich von selbst - und zwar
@@ -1324,8 +1423,9 @@ function echoBonus(){
   const f = rest[Math.random() * rest.length | 0];
   const t = TYPES.find(x => x.id === f.dataset.form);
   if(!t) return;
-  const gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
+  const gain = (baseValue(t, f) + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
   S.earned += gain; S.done++; S.echoes++;
+  if(f.dataset.gold) S.golds++;
   // Immer die RICHTIGE Aktion - der Durchschlag kann keine Beschwerde ausloesen
   finish(f, true, STAMPS.find(x => x.id === t.want).name);
   SFX.echo(); float('Durchschlag +' + eur(gain), 'var(--s-blue)');
@@ -1336,31 +1436,32 @@ function wear(){ S.freshness = Math.max(0, S.freshness - 1); }
 
 // echoLabel gesetzt = Durchschlag: blauer Doppeldruck mit Ringwelle, damit
 // sofort erkennbar ist, dass die 5 % gegriffen haben.
-function finish(form, ok, echoLabel){
+function finish(form, ok, echoLabel, tone){
   const st = STAMPS.find(s => s.id === S.stamp);
   const label = echoLabel || st.name;
+  const kind = tone === 'dia' ? 'dia' : 'echo';
   form.removeAttribute('data-form');
   form.style.pointerEvents = 'none';
 
   if(echoLabel){
     const ghost = document.createElement('div');
-    ghost.className = 'imprint echo ghost';
+    ghost.className = 'imprint ' + kind + ' ghost';
     ghost.textContent = label;
     form.appendChild(ghost);
   }
   const imp = document.createElement('div');
-  imp.className = 'imprint' + (echoLabel ? ' echo' : '');
+  imp.className = 'imprint' + (echoLabel ? ' ' + kind : '');
   if(!echoLabel) imp.style.color = ok ? st.color : 'var(--bad)';
   imp.textContent = label;
   form.appendChild(imp);
 
   if(echoLabel){
     const tag = document.createElement('div');
-    tag.className = 'echotag';
-    tag.textContent = 'DURCHSCHLAG';
+    tag.className = 'echotag ' + kind;
+    tag.textContent = tone === 'dia' ? 'SAMMELVERF\u00dcGUNG' : 'DURCHSCHLAG';
     form.appendChild(tag);
     const rip = document.createElement('div');
-    rip.className = 'ripple';
+    rip.className = 'ripple ' + kind;
     form.appendChild(rip);
     form.classList.add('echoing');
     setTimeout(() => form.remove(), 620);
@@ -1410,6 +1511,9 @@ function endRound(){
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
   + (S.crits ? row('davon Volltreffer (' + S.crits + ')', '—') : '')
   + (S.echoes ? row('davon Durchschl&auml;ge (' + S.echoes + ')', '—') : '')
+  + (S.golds ? row('davon Eilvermerke (' + S.golds + ')', '—') : '')
+  + (S.dias ? row('Sammelverf&uuml;gungen (' + S.dias + ')', '—') : '')
+  + (S.dias ? sub('dadurch mitbearbeitet: ' + S.diaForms + ' Vorg&auml;nge', '') : '')
   + (S.dryBeats ? row('Leerschl&auml;ge ohne Tinte (' + S.dryBeats + ')', '—') : '')
   + (S.extraUsed ? row('Nachspielzeit (' + S.extraUsed + ' Takte)', '—') : '')
   + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'

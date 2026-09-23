@@ -106,6 +106,35 @@ Lesehilfe:
     Stellschraube: echoChance = 0.025 + 0.025 * r  (je Stufe)
     Vorgaenger: Sechster Sinn
 
+[eilt]  Eilvermerk
+    4 Stufen   180 / 288 / 461 / 737 EUR
+    Wirkung: Wie oft ein Vorgang mit Eilvermerk hereinkommt. Goldenes Papier,
+    dreifacher Wert - man sieht ihn liegen, bevor man ihn stempelt.
+    Stufenwerte: 2 % / 4 % / 6 % / 8 %
+    Stellschraube: goldChance += 0.02 * r  (je Stufe), gewuerfelt in spawnForm()
+    Vorgaenger: Geuebter Blick
+    Verdreifacht wird der GRUNDWERT des Vorgangs. Verwaltungsgebuehr,
+    Stempelzuschlag und Kombo kommen danach obendrauf - sonst wuerde Gold
+    jedes spaete Ertrags-Upgrade doppelt verstaerken.
+
+[sammelv]  Sammelverfuegung
+    4 Stufen   480 / 768 / 1.229 / 1.966 EUR
+    Wirkung: Wie oft eine Sammelverfuegung hereinkommt. Wer sie mit dem
+    RICHTIGEN Stempel trifft, erledigt die acht Nachbarfelder gleich mit -
+    neun Felder auf einen Schlag.
+    Stufenwerte: 2 % / 4 % / 6 % / 8 %
+    Stellschraube: diaChance += 0.02 * r  (je Stufe), gewuerfelt in spawnForm()
+    Vorgaenger: Eilvermerk (vollstaendig ausgebaut)
+    DREI REGELN, die beim Bauen festgelegt wurden:
+      - Nur der richtige Stempel zuendet sie. Ein Fehlgriff gibt eine
+        Beschwerde wie sonst auch und raeumt gar nichts ab.
+      - Die acht Nachbarn werden immer RICHTIG bearbeitet, wie beim
+        Durchschlagpapier - daraus kann keine Beschwerde entstehen.
+      - Eine Sammelverfuegung unter den Nachbarn zuendet NICHT weiter.
+        Sonst raeumt ein Treffer den halben Tisch ab.
+    Am Rand des Tisches sind es entsprechend weniger Felder (6 an der Kante,
+    4 in der Ecke) - die Nachbarschaft bricht nicht in die Nachbarzeile um.
+
 [kmerk]  Aktenzeichen-Gedächtnis
     4 Stufen   150 / 240 / 384 / 614 EUR
     Wirkung: Wie hoch die Kombo steigen kann.
@@ -396,6 +425,10 @@ sonst nichts.
     inflowMs       Zulauf in den Posteingang                       (1000)
     slots          Tischplaetze                                    (12)
     startForms     Vorgaenge zu Dienstbeginn, gedeckelt auf slots  (6)
+
+  SELTENE VORGAENGE
+    goldChance     Anteil Vorgaenge mit Eilvermerk (dreifacher Wert) (0)
+    diaChance      Anteil Sammelverfuegungen (reissen 8 Nachbarn mit) (0)
 
   TINTE UND KISSEN
     inkCost        Kosten je Stempeldruck, Untergrenze 0,05        (0,50)

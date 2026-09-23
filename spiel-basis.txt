@@ -1251,3 +1251,55 @@ Widerspruch zwischen beiden hat den Fehler sichtbar gemacht.
 REGEL DARAUS: Was eine Umgebung stillschweigend mitliefert, muss die Datei
 selbst mitbringen. Und: ein Screenshot ist kein Luxus - er prueft etwas
 anderes als das DOM.
+
+
+==============================================================================
+# TEIL 1M - SELTENE VORGAENGE (23.09.2026)
+==============================================================================
+
+ZWEI NEUE KNOTEN, BEIDE AM GEUEBTEN BLICK
+
+  [eilt]    Eilvermerk        4 Stufen  2/4/6/8 %  goldenes Papier, 3x Wert
+  [sammelv] Sammelverfuegung  4 Stufen  2/4/6/8 %  raeumt 9 Felder auf einmal
+                                                   (erst wenn eilt gemaxt ist)
+
+DIE NEUE ACHSE: SELTENHEIT AM VORGANG, NICHT AM ABDRUCK
+Bisher war jeder Zufall im Spiel am STEMPEL aufgehaengt: Volltreffer und
+Durchschlagpapier wuerfeln erst im Moment des Abdrucks. Der Spieler erfaehrt
+also immer erst hinterher, ob er Glueck hatte. Die zwei neuen Knoten drehen
+das um: gewuerfelt wird beim AUFLEGEN, und das Ergebnis liegt sichtbar auf dem
+Tisch. Aus Glueck wird damit eine Planungsaufgabe - man sieht den goldenen
+Vorgang liegen und entscheidet, ob man den Stempel dafuer wechselt.
+
+Das ist der eigentliche Gewinn dieser Runde, nicht der Ertrag: die erste
+Zufallsquelle im Spiel, auf die man REAGIEREN kann.
+
+DREI REGELN FUER DIE SAMMELVERFUEGUNG
+1. Nur der RICHTIGE Stempel zuendet sie. Sonst waere der stumpfe Dauerabdruck
+   die beste Antwort auf das staerkste Ereignis im Spiel.
+2. Die acht Nachbarn werden immer richtig bearbeitet - wie beim
+   Durchschlagpapier kann daraus keine Beschwerde entstehen.
+3. Nachbarn zuenden NICHT weiter. Ohne diese Grenze raeumt bei 8 % Anteil ein
+   Treffer regelmaessig den halben Tisch ab, und der Tisch ist die einzige
+   Ressource, um die das Spiel gespielt wird.
+
+REGEL DARAUS (allgemein): Ein Ereignis, das sich selbst ausloesen kann, braucht
+eine Grenze, BEVOR es gebaut wird. Kettenreaktionen sind nicht dadurch
+begrenzt, dass sie selten sind - sie sind selten UND gelegentlich total.
+
+WARUM x3 NUR AUF DEN GRUNDWERT
+Der Eilvermerk verdreifacht t.value, nicht den fertigen Ertrag. Verwaltungs-
+gebuehr, Stempelzuschlag und Kombo kommen danach additiv bzw. multiplikativ
+obendrauf. Andernfalls hinge der Wert des Eilvermerks daran, wie weit der
+Ertrags-Ast ausgebaut ist, und zwei Upgrades wuerden sich gegenseitig
+hochschaukeln, statt je fuer sich zu wirken.
+
+NEBENBEI BEHOBEN: DER UNTERE RAND DER VORGANGSKARTE
+Der Betrag unten rechts lag schon immer UEBER den Zeilenstrichen. Bei einem
+unvollstaendigen Vorgang laeuft dort eine rot gestrichelte Fehlzeile - und der
+neue Randvermerk unten links machte daraus ein unlesbares Durcheinander. Die
+Zeilen bekommen jetzt einen reservierten Streifen (padding-bottom), der
+Vermerk und Betrag gehoert.
+
+REGEL DARAUS: Zwei absolut positionierte Elemente im selben Eck sind kein
+Layout, sondern eine Wette. Sichtbar wurde es erst, als ein drittes dazukam.

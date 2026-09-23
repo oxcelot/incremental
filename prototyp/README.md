@@ -68,7 +68,7 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 
 ## Der Fortbildungsplan
 
-Alle 40 Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
+Alle 42 Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
 `apply`-Funktion, die in `STATS` schreibt; `resetStats()` baut die Werte bei
 jedem Rundenstart aus `CONFIG` plus allen gekauften Knoten neu auf. Neue
 Upgrades brauchen daher nur einen Eintrag in `TREE` — keine Änderung an der
@@ -107,6 +107,7 @@ Von der Wurzel gehen vier Äste ab:
 | Ast | Knoten |
 |---|---|
 | Volltreffer | Geübter Blick → **Routiniertes Auge ×5** → Glückliche Hand · **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
+| Seltene Vorgänge | Geübter Blick → **Eilvermerk ×4** → **Sammelverfügung ×4** |
 | Kombo-Deckel | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit ⟶ |
 | Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** → Ordnungsliebe, und ⟶ |
 | Auszahlung | **Leistungsprämie ×5** — hängt direkt an der Wurzel |
@@ -141,6 +142,40 @@ bringt die Regel jetzt selbst mit:
 
 Gefunden nicht im Spiel, sondern beim Screenshot: der Fortbildungsplan lag
 laut DOM offen, auf dem Bild war aber die Dienstanweisung zu sehen.
+
+### Seltene Vorgänge
+
+Zwei Knoten geben eingehenden Vorgängen eine Seltenheit, die **beim Auflegen**
+gewürfelt wird — nicht beim Stempeln. Der Spieler soll sie liegen sehen und
+einplanen können; das ist der ganze Punkt.
+
+| | Papier | Randvermerk | Wirkung | Wahrscheinlichkeit |
+|---|---|---|---|---|
+| **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert** | 2 / 4 / 6 / 8 % |
+| **Sammelverfügung** | diamant | `◆ SAMMEL` | erledigt die 8 Nachbarfelder mit | 2 / 4 / 6 / 8 % |
+
+Die Sammelverfügung sticht den Eilvermerk: erst wird auf sie gewürfelt, nur
+wenn sie nicht fällt, auf Gold. Ein Vorgang trägt also nie beides.
+
+Drei Entscheidungen, die die Sammelverfügung erst zu einer Entscheidung machen:
+
+1. **Nur der richtige Stempel zündet sie.** Ein Fehlgriff gibt eine Beschwerde
+   wie sonst auch und räumt nichts ab — man muss den Typ erkennen.
+2. **Die acht Nachbarn werden immer richtig bearbeitet**, wie beim
+   Durchschlagpapier. Daraus kann keine Beschwerde entstehen.
+3. **Nachbarn zünden nicht weiter.** Eine Sammelverfügung, die von einer
+   anderen mitgerissen wird, löst keine eigene Welle aus — sonst räumt ein
+   Treffer den halben Tisch ab.
+
+Am Rand sind es entsprechend weniger Felder: 6 an der Kante, 4 in der Ecke.
+Die Nachbarschaft rechnet über `deskCols` und bricht **nicht** in die
+Nachbarzeile um — auf dem schmalen Layout (3 Spalten × 4 Zeilen) stimmt sie
+dadurch genauso.
+
+Der dreifache Wert gilt für den **Grundwert** des Vorgangs. Verwaltungsgebühr,
+Stempelzuschlag und Kombo kommen danach obendrauf, nicht mit ×3 multipliziert —
+sonst würde Gold jedes späte Ertrags-Upgrade doppelt verstärken. Die Karte
+zeigt den verdreifachten Betrag direkt an, damit die Rechnung sichtbar ist.
 
 ### Layout-Prüfungen
 
