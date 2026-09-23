@@ -1309,7 +1309,7 @@ Layout, sondern eine Wette. Sichtbar wurde es erst, als ein drittes dazukam.
 # TEIL 1N - DIE FRIST DES EILVERMERKS (23.09.2026)
 ==============================================================================
 
-Ein Eilvermerk gilt jetzt nur noch 3 Sekunden (CONFIG.goldMs). Oben auf der
+Ein Eilvermerk gilt jetzt nur noch 5 Sekunden (CONFIG.goldMs). Oben auf der
 Karte laeuft ein Balken ab, in der letzten Sekunde wird er rot. Laeuft er aus,
 wird der Vorgang ein ganz normaler Vorgang DERSELBEN ART - gleiche Sorte,
 gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
@@ -1317,7 +1317,7 @@ gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
 WAS DAS AM SPIEL AENDERT
 Ohne Frist war der Eilvermerk eine Belohnung, die man einsammelt: man sieht
 ihn liegen und nimmt ihn irgendwann mit. Mit Frist ist er eine UNTERBRECHUNG.
-Bei 2,0 s Takt sind drei Sekunden ein bis zwei Schlaege - die Frage lautet
+Bei 2,0 s Takt sind fuenf Sekunden zwei bis drei Schlaege - die Frage lautet
 also: lohnt sich der Stempelwechsel fuer den einen Vorgang, oder laeuft die
 Serie weiter? Genau das ist die Entscheidung, um die das Spiel gebaut ist.
 
@@ -1333,7 +1333,7 @@ ZWEI FESTLEGUNGEN
 2. Waehrend der Aufwaermphase steht die Frist still. In diesen 2 Sekunden
    stempelt der Spieler gar nicht - eine Frist, die dort ablaeuft, waere nicht
    zu halten, sondern nur unfair. Ein Eilvermerk, der zu Dienstbeginn schon
-   liegt, bekommt seine vollen 3 Sekunden ab dem ersten Schlag.
+   liegt, bekommt seine vollen 5 Sekunden ab dem ersten Schlag.
 
 REGEL DARAUS: Eine Frist darf nur laufen, solange der Spieler handeln kann.
 Sonst bestraft sie ihn fuer eine Pause, die das Spiel ihm auferlegt hat.
@@ -1342,3 +1342,10 @@ OFFEN FUER SPAETER
 goldMs ist eine Stellschraube in STATS, kein fester Wert. Ein Knoten
 "Fristverlaengerung" (3 s -> 4/5/6 s) waere der naheliegende naechste Schritt
 im selben Ast und braucht keine neue Mechanik.
+
+NACHTRAG 23.09.2026: Die Frist startet bei 5 Sekunden, nicht bei 3. Drei
+Sekunden waren bei 2,0 s Takt ein bis zwei Schlaege - wer erst den Stempel
+wechseln musste, konnte die Frist am schnellsten Takt kaum halten, und ein
+Eilvermerk, den man nie erreicht, ist keine Entscheidung, sondern Dekoration.
+Fuenf Sekunden lassen Platz fuer Wechsel UND Abdruck. Die Entscheidung bleibt
+damit eine Abwaegung statt eines Reflexes - was Teil 0.3 verlangt.

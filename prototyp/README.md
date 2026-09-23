@@ -151,20 +151,22 @@ einplanen können; das ist der ganze Punkt.
 
 | | Papier | Randvermerk | Wirkung | Wahrscheinlichkeit |
 |---|---|---|---|---|
-| **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert**, 3 s lang | 2 / 4 / 6 / 8 % |
+| **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert**, 5 s lang | 2 / 4 / 6 / 8 % |
 | **Sammelverfügung** | diamant | `◆ SAMMEL` | erledigt die 8 Nachbarfelder mit | 2 / 4 / 6 / 8 % |
 
 #### Die Frist des Eilvermerks
 
-Ein Eilvermerk gilt nur `CONFIG.goldMs` lang — 3 Sekunden. Oben auf der Karte
+Ein Eilvermerk gilt nur `CONFIG.goldMs` lang — 5 Sekunden. Oben auf der Karte
 läuft ein Balken ab, in der letzten Sekunde wird er rot und der Randvermerk
 pulst. Läuft er aus, wird der Vorgang ein **ganz normaler Vorgang derselben
 Art**: gleiche Sorte, gleicher Sollstempel, nur zum Grundwert. Er verschwindet
 nicht — man verliert die Prämie, nicht die Arbeit.
 
-Bei 2,0 s Takt sind drei Sekunden **ein bis zwei Schläge**. Der Eilvermerk ist
+Bei 2,0 s Takt sind fünf Sekunden **zwei bis drei Schläge**. Der Eilvermerk ist
 damit keine Belohnung, die man einsammelt, sondern eine Unterbrechung: lohnt
 sich der Stempelwechsel für den einen Vorgang, oder läuft die Serie weiter?
+Fünf Sekunden lassen Platz für den Wechsel **und** den Abdruck — bei drei
+Sekunden war beides zusammen am schnellsten Takt kaum zu schaffen.
 
 Zwei Dinge, die dabei feststehen:
 
@@ -174,7 +176,7 @@ Zwei Dinge, die dabei feststehen:
 - **Während der Aufwärmphase steht sie still.** In diesen 2 Sekunden kann der
   Spieler gar nicht stempeln — eine Frist, die dort abläuft, wäre nicht zu
   halten. Ein Eilvermerk, der zu Dienstbeginn schon liegt, bekommt seine vollen
-  3 Sekunden erst ab dem ersten Schlag.
+  5 Sekunden erst ab dem ersten Schlag.
 
 Die Sammelverfügung sticht den Eilvermerk: erst wird auf sie gewürfelt, nur
 wenn sie nicht fällt, auf Gold. Ein Vorgang trägt also nie beides.
