@@ -82,7 +82,7 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | *(Volltreffer und Kombo bilden einen eigenen Zweig, siehe unten)* | | | |
 | Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4) → **Sammelakte ×4** | **Flinker Bote ×4** → **Zweiter Bote ×4** → **Ablagekorb ×3** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
-| Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) → **Nachspielzeit ×3** |
+| Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) · **Nachspielzeit ×3** |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
 
 ### Der Serien-Zweig

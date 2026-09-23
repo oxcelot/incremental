@@ -315,7 +315,10 @@ Lesehilfe:
     kommt dann keiner mehr - es zaehlt nur, was noch liegt.
     Stufenwerte: 1 / 2 / 3 Takte
     Stellschraube: extraBeats += r  (je Stufe), ausgewertet in tick()
-    Vorgaenger: Gleitzeit
+    Vorgaenger: Ueberstunden (eine Stufe reicht)
+    Haengt bewusst NEBEN der Gleitzeit statt dahinter: beide setzen an
+    Ueberstunden an, man waehlt also zwischen mehr Uhrzeit und mehr
+    Schlaegen nach dem Gong.
     SICHTBAR GEMACHT durch drei getrennte Zeichen: ein Banner ueber dem
     Tisch mit einem Punkt je verbleibendem Schlag, ein sichtbar geschlossener
     Posteingang ("Schalter geschlossen") und die goldene Uhr. Das Banner

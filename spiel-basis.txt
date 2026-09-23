@@ -1207,6 +1207,7 @@ der das Spiel rechnet.
 Aus 15 Vorschlaegen hat der Auftraggeber sechs ausgewaehlt. Eingebaut sind:
 
   [nachspiel] Nachspielzeit          3 Stufen  1/2/3 Takte nach Dienstschluss
+                                                (haengt an Ueberstunden)
   [ablage]    Ablagekorb             3 Stufen  8/10/12 Vorgaenge liegen schon da
   [praemie]   Leistungspraemie       5 Stufen  0,20-1,00 EUR je Kombo-Stufe
   [ordnung]   Ordnungsliebe          1 Stufe   voller Tisch: Kombo waechst doppelt
@@ -1419,3 +1420,14 @@ Spieler.
 REGEL DARAUS: Zwei Ereignisse mit derselben Wahrscheinlichkeit sind nicht
 gleich haeufig SPUERBAR. Die Obergrenze gehoert an die Wirkung gekoppelt, nicht
 an die Systematik der Stufenleiter.
+
+NACHTRAG 23.09.2026: Die Nachspielzeit haengt jetzt direkt an Ueberstunden
+statt hinter der Gleitzeit. Damit gabelt sich der Zweig: von Ueberstunden geht
+es entweder in die Gleitzeit (mehr Uhrzeit, Zulauf laeuft weiter) oder in die
+Nachspielzeit (mehr Schlaege nach dem Gong, kein Zulauf mehr). Zwei
+verschiedene Antworten auf dieselbe Frage - und eine Stufe Ueberstunden reicht,
+um sie zu stellen, waehrend die Gleitzeit weiterhin ausgebaute Ueberstunden
+verlangt.
+
+Das entspricht 0.21: oft Gabelungen einbauen, damit man zwischen Pfaden waehlen
+muss, statt eine Kette abzuarbeiten.
