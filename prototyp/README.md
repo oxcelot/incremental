@@ -152,7 +152,7 @@ einplanen können; das ist der ganze Punkt.
 | | Papier | Randvermerk | Wirkung | Wahrscheinlichkeit |
 |---|---|---|---|---|
 | **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert**, 7 s lang | 2 / 4 / 6 / 8 % |
-| **Sammelverfügung** | diamant | `◆ SAMMEL` | erledigt die 8 Nachbarfelder mit | 2 / 4 / 6 / 8 % |
+| **Sammelverfügung** | diamant | `◆ SAMMEL` | erledigt die 8 Nachbarfelder mit | 2 / 3 / 4 / 5 % |
 
 #### Die Frist des Eilvermerks
 

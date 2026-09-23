@@ -1260,7 +1260,7 @@ anderes als das DOM.
 ZWEI NEUE KNOTEN, BEIDE AM GEUEBTEN BLICK
 
   [eilt]    Eilvermerk        4 Stufen  2/4/6/8 %  goldenes Papier, 3x Wert
-  [sammelv] Sammelverfuegung  4 Stufen  2/4/6/8 %  raeumt 9 Felder auf einmal
+  [sammelv] Sammelverfuegung  4 Stufen  2/3/4/5 %  raeumt 9 Felder auf einmal
                                                    (erst wenn eilt gemaxt ist)
 
 DIE NEUE ACHSE: SELTENHEIT AM VORGANG, NICHT AM ABDRUCK
@@ -1408,3 +1408,14 @@ Treffererkennung das mitbekommen. Hier tut sie es, weil ensureMeasured() den
 Tisch bei jeder Groessenaenderung neu vermisst - dieselbe Vorrichtung, die aus
 dem Fehler in Teil 1C entstanden ist. Geprueft: alle zwoelf Plaetze treffen
 nach dem Umbruch richtig.
+
+NACHTRAG 23.09.2026: Die Sammelverfuegung ist auf 5 % gedeckelt (2/3/4/5 statt
+2/4/6/8). Sie ist nicht mit dem Eilvermerk vergleichbar, obwohl beide gleich
+gewuerfelt werden: der Eilvermerk zahlt mehr fuer EINEN Vorgang, die
+Sammelverfuegung raeumt bis zu NEUN Felder ab. Bei 8 % und zwoelf Plaetzen
+liegt fast immer eine auf dem Tisch, und dann raeumt der Zufall ab, nicht der
+Spieler.
+
+REGEL DARAUS: Zwei Ereignisse mit derselben Wahrscheinlichkeit sind nicht
+gleich haeufig SPUERBAR. Die Obergrenze gehoert an die Wirkung gekoppelt, nicht
+an die Systematik der Stufenleiter.

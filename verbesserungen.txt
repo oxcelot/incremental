@@ -128,8 +128,11 @@ Lesehilfe:
     Wirkung: Wie oft eine Sammelverfuegung hereinkommt. Wer sie mit dem
     RICHTIGEN Stempel trifft, erledigt die acht Nachbarfelder gleich mit -
     neun Felder auf einen Schlag.
-    Stufenwerte: 2 % / 4 % / 6 % / 8 %
-    Stellschraube: diaChance += 0.02 * r  (je Stufe), gewuerfelt in spawnForm()
+    Stufenwerte: 2 % / 3 % / 4 % / 5 %
+    Stellschraube: diaChance += 0.01 * (1 + r)  (je Stufe), in spawnForm()
+    Gedeckelt auf 5 %: ein Treffer raeumt bis zu neun Felder ab, haeufiger
+    darf das nicht passieren, sonst raeumt der Zufall den Tisch statt des
+    Spielers.
     Vorgaenger: Eilvermerk (vollstaendig ausgebaut)
     DREI REGELN, die beim Bauen festgelegt wurden:
       - Nur der richtige Stempel zuendet sie. Ein Fehlgriff gibt eine

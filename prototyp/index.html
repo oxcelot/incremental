@@ -794,8 +794,8 @@ const TREE = [
   { id:'sammelv', hx:185, hy:-800, icon:'gem', cost:480, ranks:4, needsMaxParent:true,
     name:'Sammelverf\u00fcgung',
     eff:'Wie oft eine Sammelverf\u00fcgung hereinkommt. Wer sie mit dem RICHTIGEN Stempel trifft, erledigt die acht Nachbarfelder gleich mit \u2013 neun Felder auf einen Schlag.',
-    valueAt:r => num(2 * r) + ' %',
-    apply:(st, r) => st.diaChance += 0.02 * r },
+    valueAt:r => num(1 + r) + ' %',
+    apply:(st, r) => st.diaChance += 0.01 * (1 + r) },
 
   // Wo Volltreffer und Durchschlagpapier zusammenlaufen
   { id:'kritdurch', hx:770, hy:-530, icon:'sparkcpy', cost:900, needsMaxParent:true,
