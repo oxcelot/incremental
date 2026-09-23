@@ -113,7 +113,7 @@ Lesehilfe:
     Stufenwerte: 2 % / 4 % / 6 % / 8 %
     Stellschraube: goldChance += 0.02 * r  (je Stufe), gewuerfelt in spawnForm()
     Vorgaenger: Geuebter Blick
-    FRIST: Ein Eilvermerk gilt nur CONFIG.goldMs lang (5 Sekunden). Oben auf
+    FRIST: Ein Eilvermerk gilt nur CONFIG.goldMs lang (7 Sekunden). Oben auf
     der Karte laeuft ein Balken ab, in der letzten Sekunde wird er rot. Laeuft
     er aus, wird der Vorgang ein ganz normaler Vorgang DERSELBEN ART - gleiche
     Sorte, gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
@@ -313,8 +313,10 @@ Lesehilfe:
     Stufenwerte: 1 / 2 / 3 Takte
     Stellschraube: extraBeats += r  (je Stufe), ausgewertet in tick()
     Vorgaenger: Gleitzeit
-    Die Uhr-Anzeige wird gold und heisst waehrenddessen "Nachspielzeit", die
-    Takte-Anzeige zaehlt die Zugabe herunter.
+    SICHTBAR GEMACHT durch drei getrennte Zeichen: ein Banner ueber dem
+    Tisch mit einem Punkt je verbleibendem Schlag, ein sichtbar geschlossener
+    Posteingang ("Schalter geschlossen") und die goldene Uhr. Das Banner
+    verdeckt keine Vorgaenge - der Tisch bekommt dafuer eine Kopfzeile.
 
 ##############################################################################
 # AMTSAUTORITAET UND ERTRAG
@@ -425,6 +427,7 @@ sonst nichts.
     beatMs         Stempeltakt, Untergrenze 800                    (2000)
     startDelayMs   Aufwaermphase vor dem ersten Schlag             (2000)
     extraBeats     Takte, die nach Dienstschluss noch fallen       (0)
+    outroMs        Tisch bleibt nach dem letzten Takt sichtbar      (1000)
 
   NACHSCHUB
     spawnMs        Abstand, in dem Vorgaenge nachruecken, min. 800 (1600)
@@ -434,7 +437,7 @@ sonst nichts.
 
   SELTENE VORGAENGE
     goldChance     Anteil Vorgaenge mit Eilvermerk (dreifacher Wert) (0)
-    goldMs         Frist eines Eilvermerks in Millisekunden         (5000)
+    goldMs         Frist eines Eilvermerks in Millisekunden         (7000)
     diaChance      Anteil Sammelverfuegungen (reissen 8 Nachbarn mit) (0)
 
   TINTE UND KISSEN

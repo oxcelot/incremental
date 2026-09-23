@@ -1309,7 +1309,7 @@ Layout, sondern eine Wette. Sichtbar wurde es erst, als ein drittes dazukam.
 # TEIL 1N - DIE FRIST DES EILVERMERKS (23.09.2026)
 ==============================================================================
 
-Ein Eilvermerk gilt jetzt nur noch 5 Sekunden (CONFIG.goldMs). Oben auf der
+Ein Eilvermerk gilt jetzt nur noch 7 Sekunden (CONFIG.goldMs). Oben auf der
 Karte laeuft ein Balken ab, in der letzten Sekunde wird er rot. Laeuft er aus,
 wird der Vorgang ein ganz normaler Vorgang DERSELBEN ART - gleiche Sorte,
 gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
@@ -1317,7 +1317,7 @@ gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
 WAS DAS AM SPIEL AENDERT
 Ohne Frist war der Eilvermerk eine Belohnung, die man einsammelt: man sieht
 ihn liegen und nimmt ihn irgendwann mit. Mit Frist ist er eine UNTERBRECHUNG.
-Bei 2,0 s Takt sind fuenf Sekunden zwei bis drei Schlaege - die Frage lautet
+Bei 2,0 s Takt sind sieben Sekunden drei bis vier Schlaege - die Frage lautet
 also: lohnt sich der Stempelwechsel fuer den einen Vorgang, oder laeuft die
 Serie weiter? Genau das ist die Entscheidung, um die das Spiel gebaut ist.
 
@@ -1333,7 +1333,7 @@ ZWEI FESTLEGUNGEN
 2. Waehrend der Aufwaermphase steht die Frist still. In diesen 2 Sekunden
    stempelt der Spieler gar nicht - eine Frist, die dort ablaeuft, waere nicht
    zu halten, sondern nur unfair. Ein Eilvermerk, der zu Dienstbeginn schon
-   liegt, bekommt seine vollen 5 Sekunden ab dem ersten Schlag.
+   liegt, bekommt seine vollen 7 Sekunden ab dem ersten Schlag.
 
 REGEL DARAUS: Eine Frist darf nur laufen, solange der Spieler handeln kann.
 Sonst bestraft sie ihn fuer eine Pause, die das Spiel ihm auferlegt hat.
@@ -1349,3 +1349,61 @@ wechseln musste, konnte die Frist am schnellsten Takt kaum halten, und ein
 Eilvermerk, den man nie erreicht, ist keine Entscheidung, sondern Dekoration.
 Fuenf Sekunden lassen Platz fuer Wechsel UND Abdruck. Die Entscheidung bleibt
 damit eine Abwaegung statt eines Reflexes - was Teil 0.3 verlangt.
+
+NACHTRAG 2, 23.09.2026: Die Frist steht jetzt bei 7 Sekunden (vorher 5, davor
+3). Der Wert ist zweimal nach oben korrigiert worden, und zwar aus demselben
+Grund: gemessen wurde er am Takt von 2,0 s, aber entscheidend ist der voll
+ausgebaute Takt von 1,0 s zusammen mit einem Stempelwechsel. Sieben Sekunden
+lassen Platz fuer Wechsel, Abdruck und den Weg zurueck in die Serie.
+
+REGEL DARAUS: Eine Frist am Startwert einer Stellschraube zu messen ist
+falsch, wenn dieselbe Stellschraube spaeter das Vierfache leistet. Solche
+Werte gehoeren gegen das ENDE der Aufruestkurve geprueft, nicht gegen den
+Anfang.
+
+
+==============================================================================
+# TEIL 1O - DIENSTSCHLUSS IN DREI SCHRITTEN (23.09.2026)
+==============================================================================
+
+Das Rundenende lief bisher in einem Sprung: letzter Takt, und im selben
+Moment liegt der Abrechnungsbogen ueber dem Bild. Jetzt sind es drei Phasen:
+
+  1. NACHSPIELZEIT   Uhr steht, Stempel faellt noch extraBeats mal,
+                     kein Zulauf, kein Nachruecken
+  2. ABSPANN         CONFIG.outroMs (1 s): gar nichts. Kein Takt, keine Frist.
+                     Nur der Tisch, so wie er liegen geblieben ist.
+  3. ABRECHNUNGSBOGEN
+
+WARUM DER ABSPANN
+Der Bogen verdeckte den Tisch in genau dem Moment, in dem der letzte Abdruck
+fiel. Man sah nie, was uebrig blieb - und der Rueckstand ist die zentrale
+Druckquelle des Spiels. Eine Sekunde reicht, um das zu sehen, bevor der Bogen
+eine Zahl daraus macht. Die Glocke laeutet jetzt zu Beginn des Abspanns statt
+beim Bogen: sie markiert den Dienstschluss, nicht die Buchhaltung.
+
+DREI ZEICHEN FUER DIE NACHSPIELZEIT
+Die Nachspielzeit aendert die REGELN - kein Nachschub mehr. Eine umgefaerbte
+Anzeige in der Kopfzeile war dafuer zu wenig. Jetzt:
+  - Banner ueber dem Tisch mit einem PUNKT JE VERBLEIBENDEM SCHLAG. Die
+    Punkte erloeschen einzeln; man sieht die Zugabe ablaufen, ohne eine Zahl
+    lesen zu muessen.
+  - Der Posteingang macht sichtbar zu ("Schalter geschlossen", abgeblendet).
+    Das ist die halbe Botschaft: es kommt nichts mehr nach.
+  - Die Uhr wird gold und heisst "Nachspielzeit".
+
+DAS BANNER DARF NICHTS VERDECKEN
+Erster Entwurf legte das Banner ueber den Tisch - und damit ueber drei
+Vorgaenge. Ausgerechnet in der Phase, deren Satz lautet "es zaehlt, was noch
+liegt". Jetzt macht der Tisch oben Platz (padding-top 10 -> 44). Die Kacheln
+rutschen dabei einmalig rund 23 Pixel nach unten.
+
+REGEL DARAUS: Eine Einblendung, die einen Zustand erklaert, darf nicht das
+verdecken, worum es in diesem Zustand geht. Lieber Platz schaffen als
+darueberlegen - auch wenn das Layout dafuer nachgeben muss.
+
+ZWEITE REGEL: Wenn das Layout mitten in der Runde nachgibt, muss die
+Treffererkennung das mitbekommen. Hier tut sie es, weil ensureMeasured() den
+Tisch bei jeder Groessenaenderung neu vermisst - dieselbe Vorrichtung, die aus
+dem Fehler in Teil 1C entstanden ist. Geprueft: alle zwoelf Plaetze treffen
+nach dem Umbruch richtig.

@@ -151,22 +151,22 @@ einplanen können; das ist der ganze Punkt.
 
 | | Papier | Randvermerk | Wirkung | Wahrscheinlichkeit |
 |---|---|---|---|---|
-| **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert**, 5 s lang | 2 / 4 / 6 / 8 % |
+| **Eilvermerk** | gold | `EILT ×3` | dreifacher **Grundwert**, 7 s lang | 2 / 4 / 6 / 8 % |
 | **Sammelverfügung** | diamant | `◆ SAMMEL` | erledigt die 8 Nachbarfelder mit | 2 / 4 / 6 / 8 % |
 
 #### Die Frist des Eilvermerks
 
-Ein Eilvermerk gilt nur `CONFIG.goldMs` lang — 5 Sekunden. Oben auf der Karte
+Ein Eilvermerk gilt nur `CONFIG.goldMs` lang — 7 Sekunden. Oben auf der Karte
 läuft ein Balken ab, in der letzten Sekunde wird er rot und der Randvermerk
 pulst. Läuft er aus, wird der Vorgang ein **ganz normaler Vorgang derselben
 Art**: gleiche Sorte, gleicher Sollstempel, nur zum Grundwert. Er verschwindet
 nicht — man verliert die Prämie, nicht die Arbeit.
 
-Bei 2,0 s Takt sind fünf Sekunden **zwei bis drei Schläge**. Der Eilvermerk ist
-damit keine Belohnung, die man einsammelt, sondern eine Unterbrechung: lohnt
-sich der Stempelwechsel für den einen Vorgang, oder läuft die Serie weiter?
-Fünf Sekunden lassen Platz für den Wechsel **und** den Abdruck — bei drei
-Sekunden war beides zusammen am schnellsten Takt kaum zu schaffen.
+Bei 2,0 s Takt sind sieben Sekunden **drei bis vier Schläge**. Der Eilvermerk
+ist damit keine Belohnung, die man einsammelt, sondern eine Unterbrechung:
+lohnt sich der Stempelwechsel für den einen Vorgang, oder läuft die Serie
+weiter? Sieben Sekunden lassen Platz für den Wechsel, den Abdruck **und** den
+Weg zurück — auch bei voll ausgebautem Tempo-Ast.
 
 Zwei Dinge, die dabei feststehen:
 
@@ -176,7 +176,7 @@ Zwei Dinge, die dabei feststehen:
 - **Während der Aufwärmphase steht sie still.** In diesen 2 Sekunden kann der
   Spieler gar nicht stempeln — eine Frist, die dort abläuft, wäre nicht zu
   halten. Ein Eilvermerk, der zu Dienstbeginn schon liegt, bekommt seine vollen
-  5 Sekunden erst ab dem ersten Schlag.
+  7 Sekunden erst ab dem ersten Schlag.
 
 Die Sammelverfügung sticht den Eilvermerk: erst wird auf sie gewürfelt, nur
 wenn sie nicht fällt, auf Gold. Ein Vorgang trägt also nie beides.
@@ -200,6 +200,39 @@ Der dreifache Wert gilt für den **Grundwert** des Vorgangs. Verwaltungsgebühr,
 Stempelzuschlag und Kombo kommen danach obendrauf, nicht mit ×3 multipliziert —
 sonst würde Gold jedes späte Ertrags-Upgrade doppelt verstärken. Die Karte
 zeigt den verdreifachten Betrag direkt an, damit die Rechnung sichtbar ist.
+
+### Dienstschluss in drei Schritten
+
+Das Rundenende läuft nicht mehr in einem Sprung, sondern in drei Phasen:
+
+| Phase | Was passiert | Was man sieht |
+|---|---|---|
+| **Nachspielzeit** | Die Uhr steht, der Stempel fällt noch `extraBeats` mal. Kein Zulauf, kein Nachrücken. | Banner über dem Tisch, geschlossener Posteingang, goldene Uhr |
+| **Abspann** (`CONFIG.outroMs`, 1 s) | Nichts mehr. Kein Takt, keine Frist. | Der Tisch, so wie er liegen geblieben ist |
+| **Abrechnungsbogen** | — | Der Bogen |
+
+Die Nachspielzeit ändert die **Regeln** — kein Nachschub mehr —, deshalb trägt
+sie drei getrennte Zeichen, nicht eines:
+
+1. **Ein Banner quer über dem Tisch**: Titel, der Satz *„Kein Nachschub · es
+   zählt, was noch liegt"* und **ein Punkt je verbleibendem Schlag**. Die
+   Punkte erlöschen einzeln — man sieht die Zugabe ablaufen, ohne eine Zahl
+   lesen zu müssen.
+2. **Der Posteingang macht sichtbar zu**: abgeblendet, mit einem schrägen
+   *„Schalter geschlossen"* darüber. Das ist die halbe Botschaft — nichts
+   kommt mehr nach.
+3. **Die Uhr** wird gold und heißt *Nachspielzeit*.
+
+Das Banner liegt **nicht über** den Vorgängen: der Tisch bekommt dafür eine
+Kopfzeile (`padding-top` 10 → 44 px). Während einer Phase, in der es darauf
+ankommt, was noch liegt, darf kein Vorgang verdeckt sein. Die Kacheln rutschen
+dadurch einmalig ~23 px nach unten; `ensureMeasured()` misst den Tisch neu, die
+Treffererkennung bleibt also richtig (geprüft: alle 12 Plätze nach dem Umbruch).
+
+Der **Abspann** existiert, weil der Abrechnungsbogen sonst den Tisch in dem
+Moment verdeckt, in dem der letzte Abdruck fällt. Eine Sekunde reicht, um zu
+sehen, was übrig blieb — und erst dann macht der Bogen eine Zahl daraus. Die
+Glocke läutet jetzt zu Beginn des Abspanns, nicht beim Bogen.
 
 ### Layout-Prüfungen
 

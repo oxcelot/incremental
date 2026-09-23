@@ -89,7 +89,59 @@
   .pile{flex:1 1 auto; width:100%; display:flex; flex-direction:column-reverse; justify-content:flex-start; gap:1px; overflow:hidden; padding-top:6px;}
   .pile i{display:block; height:3px; background:var(--paper); border:1px solid var(--paper-edge); border-radius:1px;}
 
-  .deskwrap{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:10px;}
+  .deskwrap{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:10px; position:relative;}
+
+  /* Nachspielzeit: der auffaelligste Zustand im Spiel, weil er die Regeln
+     aendert. Deshalb ein Banner quer ueber den Tisch statt nur einer
+     umgefaerbten Anzeige in der Kopfzeile. */
+  /* Der Tisch macht oben Platz, statt dass das Banner Vorgaenge verdeckt -
+     waehrend der Nachspielzeit zaehlt gerade, was noch liegt. Die Kacheln
+     werden dadurch etwas flacher; ensureMeasured() misst den Tisch neu, die
+     Treffererkennung bleibt also richtig. */
+  /* Einzeilig, damit der Tisch nur wenig nachgeben muss: jeder Pixel
+     Kopfzeile verschiebt die Kacheln mitten in der Runde. */
+  .desk.nachspiel{padding-top:44px;}
+  #overtime{
+    position:absolute; left:50%; top:7px; transform:translateX(-50%);
+    z-index:5; pointer-events:none;
+    display:flex; align-items:center; gap:12px; white-space:nowrap;
+    background:var(--s-amber); color:var(--surface);
+    border-radius:4px; padding:5px 16px 6px;
+    box-shadow:0 3px 12px rgba(0,0,0,.35);
+    animation:otin .28s cubic-bezier(.2,1.3,.4,1);
+  }
+  @keyframes otin{from{transform:translateX(-50%) translateY(-12px); opacity:0;}}
+  #overtime b{
+    font-family:var(--font-stamp); font-size:17px; font-weight:700;
+    letter-spacing:.13em; text-transform:uppercase; line-height:1.1;
+  }
+  #overtime i{
+    font-style:normal; font-size:10.5px; font-weight:600;
+    letter-spacing:.05em; opacity:.92;
+  }
+  #overtime .dots{display:flex; gap:4px; align-items:center;}
+  #overtime .dots s{
+    display:block; width:15px; height:9px; border-radius:2px;
+    background:var(--surface); text-decoration:none;
+  }
+  #overtime .dots s.weg{background:color-mix(in srgb, var(--ink) 38%, #0000);}
+  .desk.nachspiel{border-color:var(--s-amber);}
+  @media (max-width:760px){
+    #overtime i{display:none;}          /* auf schmal bleibt Titel und Punkte */
+  }
+
+  /* Der Posteingang macht sichtbar zu - das ist die halbe Botschaft */
+  .inbox{position:relative;}
+  .inbox .zu{
+    position:absolute; inset:0; display:none; place-content:center;
+    border-radius:3px; text-align:center;
+    background:color-mix(in srgb, var(--bg) 78%, #0000);
+    color:var(--bad); font-family:var(--font-stamp); font-size:13px;
+    font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    line-height:1.25; transform:rotate(-8deg);
+  }
+  .inbox.zu .zu{display:grid;}
+  .inbox.zu .pile, .inbox.zu .cnt{opacity:.3;}
   .desk{
     flex:1 1 auto; min-height:0;
     background:var(--desk); border:3px solid var(--desk-edge); border-radius:4px;
@@ -455,13 +507,19 @@
   </div>
 
   <div id="stage">
-    <div class="inbox">
+    <div class="inbox" id="inbox">
       <div class="pile" id="pile"></div>
       <div class="cnt" id="queueCnt">0</div>
       <div class="lbl">Post&shy;eingang</div>
+      <div class="zu">Schalter<br>geschlossen</div>
     </div>
     <div class="deskwrap">
       <div class="desk" id="desk"></div>
+      <div id="overtime" hidden>
+        <b>Nachspielzeit</b>
+        <i>Kein Nachschub &middot; es z&auml;hlt, was noch liegt</i>
+        <div class="dots" id="otDots"></div>
+      </div>
       <div class="rack" id="rack"></div>
     </div>
   </div>
@@ -536,8 +594,10 @@ const CONFIG = {
                           // muss, damit er als getroffen zaehlt (Anteil der
                           // Stempelflaeche). Verhindert, dass ein Pixel
                           // Beruehrung schon einen Vorgang mitnimmt.
-  goldMs:         5000,   // Frist eines Eilvermerks, danach ist er ein
+  goldMs:         7000,   // Frist eines Eilvermerks, danach ist er ein
                           // normaler Vorgang derselben Art
+  outroMs:        1000,   // Nach dem letzten Takt bleibt der Tisch noch
+                          // sichtbar, bevor der Abrechnungsbogen kommt
   demoCheapUpgrades: true, // DEMO: jede Fortbildung kostet 1 EUR.
                            // Auf false setzen fuer die echten Preise.
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
@@ -947,6 +1007,9 @@ const el = {
   sheet: document.getElementById('sheet'),
   clock: document.querySelector('#clock b'),
   clockBox: document.getElementById('clock'),
+  inbox: document.getElementById('inbox'),
+  overtime: document.getElementById('overtime'),
+  otDots: document.getElementById('otDots'),
   clockLbl: document.querySelector('#clock span'),
   clockBar: document.querySelector('#clock .timebar i'),
   beats: document.querySelector('#beats b'),
@@ -1168,6 +1231,7 @@ function startRound(){
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
     extraLeft:STATS.extraBeats, extraUsed:0, overSeen:false,
+    outroLeft:null, otShown:-1,
     comboBonus:0, areaBonus:0,
   };
   buildDesk(); buildRack(); renderRack(); renderQueue();
@@ -1206,15 +1270,24 @@ function tick(dt, now){
   // Dienstschluss: die Uhr steht, aber die Nachspielzeit laesst den Stempel
   // noch ein paar Mal fallen. Nachschub kommt dann keiner mehr.
   const over = left <= 0;
+  // Abspann: gearbeitet wird nicht mehr, aber der Tisch bleibt noch eine
+  // Sekunde stehen. Man soll sehen, was liegen geblieben ist, bevor der
+  // Abrechnungsbogen daraus eine Zahl macht.
+  const outro = over && S.extraLeft <= 0;
   if(over && !S.overSeen){
     S.overSeen = true;
     if(S.extraLeft > 0){ SFX.overtime(); float('Nachspielzeit', 'var(--s-amber)'); }
+  }
+  if(outro && S.outroLeft === null){
+    S.outroLeft = CONFIG.outroMs;
+    SFX.bell();
+    el.stamp.classList.add('lifted');
   }
 
   if(S.graceLeft > 0){
     S.graceLeft = Math.max(0, S.graceLeft - dt);
     if(S.graceLeft === 0){ S.accBeat = STATS.beatMs; S.preticked = true; }
-  } else {
+  } else if(!outro){
     S.accBeat += dt;
   }
   S.accSpawn += dt;
@@ -1222,7 +1295,8 @@ function tick(dt, now){
 
   // Waehrend der Aufwaermphase laeuft keine Frist: in dieser Zeit kann der
   // Spieler gar nicht stempeln, eine Frist waere also nicht zu halten.
-  if(S.graceLeft === 0) ageUrgent(dt);
+  // Im Abspann steht sie ebenfalls - es gibt nichts mehr zu entscheiden.
+  if(S.graceLeft === 0 && !outro) ageUrgent(dt);
 
   if(!over){
     if(S.accInflow >= STATS.inflowMs){ S.accInflow -= STATS.inflowMs; S.queue++; renderQueue(); }
@@ -1233,7 +1307,7 @@ function tick(dt, now){
     ? 1 - S.graceLeft / STATS.startDelayMs
     : S.accBeat / STATS.beatMs;
   if(p >= 0.82 && !S.preticked){ S.preticked = true; SFX.pretick(); }
-  if(S.graceLeft === 0 && S.accBeat >= STATS.beatMs){
+  if(!outro && S.graceLeft === 0 && S.accBeat >= STATS.beatMs){
     S.accBeat -= STATS.beatMs; S.preticked = false;
     strike(now);
     if(over){ S.extraLeft--; S.extraUsed++; }
@@ -1260,6 +1334,21 @@ function tick(dt, now){
 
   el.desk.classList.toggle('full', !!STATS.fullDeskBonus && onDesk() >= STATS.slots);
 
+  // Drei Zeichen fuer denselben Zustand: Banner ueber dem Tisch, geschlossener
+  // Posteingang, goldene Uhr. Die Nachspielzeit aendert die Regeln, also darf
+  // man sie nicht uebersehen.
+  const nachspiel = over && S.extraLeft > 0;
+  el.overtime.hidden = !nachspiel;
+  el.inbox.classList.toggle('zu', over);
+  el.desk.classList.toggle('nachspiel', nachspiel);
+  if(nachspiel && S.extraLeft !== S.otShown){
+    S.otShown = S.extraLeft;
+    let d = '';
+    for(let i = 0; i < STATS.extraBeats; i++)
+      d += '<s' + (i < S.extraLeft ? '' : ' class="weg"') + '></s>';
+    el.otDots.innerHTML = d;
+  }
+
   // Zeigen, welche Plaetze der Abdruck gerade abdeckt
   for(const sl of el.desk.children) sl.classList.remove('aim');
   if(!lifted && STATS.hitCount > 1){
@@ -1277,14 +1366,18 @@ function tick(dt, now){
   el.beats.textContent = over
     ? Math.max(0, S.extraLeft)
     : (left < untilNext ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs));
-  el.clockBox.classList.toggle('over', over);
-  el.clockLbl.textContent = over ? 'Nachspielzeit' : 'Dienstzeit';
+  el.clockBox.classList.toggle('over', nachspiel);
+  el.clockLbl.textContent = nachspiel ? 'Nachspielzeit'
+    : (over ? 'Dienstschluss' : 'Dienstzeit');
   el.combo.textContent = '×' + multFor().toFixed(1).replace('.',',');
   el.earned.textContent = eur(S.earned);
   el.ink.textContent = eur(S.inkSpent);
   el.backlog.textContent = S.queue + onDesk();
 
-  if(over && S.extraLeft <= 0) endRound();
+  if(outro){
+    S.outroLeft -= dt;
+    if(S.outroLeft <= 0) endRound();
+  }
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
@@ -1546,7 +1639,10 @@ function endRound(){
   running = false;
   cancelAnimationFrame(rafId);
   el.stamp.hidden = true; el.warn.hidden = true;
-  SFX.bell();
+  el.overtime.hidden = true;
+  el.inbox.classList.remove('zu');
+  el.desk.classList.remove('nachspiel');
+  if(S.outroLeft === null) SFX.bell();   // direkt beendet, ohne Abspann
 
   const backlog = S.queue + onDesk();
   const inkTotal = S.inkSpent;
