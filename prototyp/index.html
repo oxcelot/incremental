@@ -432,12 +432,35 @@
     position:absolute; left:8px; bottom:6px; font-size:10px; color:var(--muted);
     letter-spacing:.04em; pointer-events:none;
   }
-  .demohint{
-    position:absolute; left:8px; top:8px; font-size:10px; font-weight:600;
-    color:var(--bad); letter-spacing:.06em; text-transform:uppercase;
-    border:1px solid var(--bad); border-radius:3px; padding:3px 7px;
-    pointer-events:none;
+  /* Schalter fuer den Demo-Modus - sitzt da, wo frueher nur der Hinweis stand */
+  .demosw{
+    position:absolute; left:8px; top:8px; z-index:6;
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+    background:var(--surface); border:1px solid var(--line); border-radius:4px;
+    padding:5px 10px 5px 8px; user-select:none;
   }
+  .demosw:hover{border-color:var(--s-amber);}
+  .demosw input{position:absolute; opacity:0; width:0; height:0;}
+  .demosw .sw{
+    flex:0 0 auto; width:30px; height:17px; border-radius:9px;
+    background:var(--line); position:relative; transition:background .14s;
+  }
+  .demosw .sw::after{
+    content:''; position:absolute; left:2px; top:2px; width:13px; height:13px;
+    border-radius:50%; background:var(--surface); transition:transform .14s;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  .demosw input:checked + .sw{background:var(--bad);}
+  .demosw input:checked + .sw::after{transform:translateX(13px);}
+  .demosw input:focus-visible + .sw{outline:2px solid var(--s-amber); outline-offset:2px;}
+  .demosw .tx{display:flex; flex-direction:column; line-height:1.2;}
+  .demosw b{
+    font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text);
+  }
+  .demosw i{font-style:normal; font-size:9.5px; color:var(--muted); letter-spacing:.03em;}
+  .demosw.an b{color:var(--bad);}
+  .demosw.an i{color:var(--bad);}
   #tree .link{stroke:var(--line); stroke-width:3;}
   #tree .link.open{stroke:var(--s-amber); stroke-dasharray:6 5;}
   #tree .link.done{stroke:var(--s-green);}
@@ -554,7 +577,11 @@
       <button type="button" id="zFit" aria-label="Ansicht zur&uuml;cksetzen">&#8634;</button>
     </div>
     <div class="zoomhint">Ziehen zum Verschieben &middot; Mausrad zum Zoomen</div>
-    <div class="demohint" id="demoHint" hidden>Demo-Modus: jede Fortbildung kostet 1 &euro;</div>
+    <label class="demosw" id="demoSw">
+      <input type="checkbox" id="demoBox">
+      <span class="sw" aria-hidden="true"></span>
+      <span class="tx"><b>Demo-Modus</b><i id="demoTx">Preise gelten</i></span>
+    </label>
   </div>
   <div class="homefoot">
     <div class="detail" id="detail"></div>
@@ -598,8 +625,10 @@ const CONFIG = {
                           // normaler Vorgang derselben Art
   outroMs:        2000,   // Nach dem letzten Takt bleibt der Tisch noch
                           // sichtbar, bevor der Abrechnungsbogen kommt
-  demoCheapUpgrades: true, // DEMO: jede Fortbildung kostet 1 EUR.
-                           // Auf false setzen fuer die echten Preise.
+  demoStart:      false,  // Startzustand des Demo-Schalters im Fortbildungs-
+                          // plan. Eingeschaltet kostet jede Fortbildung 0 EUR,
+                          // ausgeschaltet gelten die Preise aus TREE.
+                          // Umschaltbar im Spiel; der Stand liegt in meta.demo.
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
 };
 
@@ -998,7 +1027,9 @@ const el = {
   home: document.getElementById('home'),
   tree: document.getElementById('tree'),
   detail: document.getElementById('detail'),
-  demoHint: document.getElementById('demoHint'),
+  demoSw: document.getElementById('demoSw'),
+  demoBox: document.getElementById('demoBox'),
+  demoTx: document.getElementById('demoTx'),
   goDay: document.getElementById('goDay'),
   warn: document.getElementById('warn'),
   inkBar: document.getElementById('inkbar'),
@@ -1715,11 +1746,11 @@ function missingParents(n){
   });
 }
 
-// Im Demo-Modus kostet jede Fortbildung 1 EUR. Die echten Preise bleiben in
-// TREE stehen - CONFIG.demoCheapUpgrades auf false setzen und sie gelten wieder.
 // Preis der NAECHSTEN Stufe. Jede weitere Stufe kostet das 1,6-fache.
+// Im Demo-Modus (Schalter im Fortbildungsplan) kostet alles 0 EUR; die echten
+// Preise bleiben dabei unveraendert in TREE stehen.
 const costOf = n => {
-  if(CONFIG.demoCheapUpgrades) return n.cost > 0 ? 1 : 0;
+  if(meta.demo) return 0;
   return Math.round(n.cost * Math.pow(n.growth || 1.6, rankOf(n)));
 };
 
@@ -1887,7 +1918,25 @@ function buy(n){
   showDetail(n);
 }
 
+// Der zuletzt gezeigte Knoten - damit die Detailkarte nach dem Umschalten
+// den neuen Preis nennt und nicht den alten.
+let detailNode = null;
+
+function syncDemo(){
+  el.demoBox.checked = !!meta.demo;
+  el.demoSw.classList.toggle('an', !!meta.demo);
+  el.demoTx.textContent = meta.demo ? 'alles kostenlos' : 'Preise gelten';
+}
+
+function setDemo(an){
+  meta.demo = !!an;
+  syncDemo();
+  renderTree();
+  if(detailNode) showDetail(detailNode);
+}
+
 function showDetail(n){
+  detailNode = n;
   const st = nodeState(n), r = rankOf(n), max = maxRank(n);
   el.detail.style.setProperty('--c',
     st === 'owned' ? 'var(--s-green)' : st === 'locked' ? 'var(--line)' : 'var(--s-amber)');
@@ -1905,7 +1954,8 @@ function showDetail(n){
       st === 'owned'  ? (max > 1 ? 'Vollst\u00e4ndig ausgebaut.' : 'Freigeschaltet.')
     : st === 'locked' ? 'Gesperrt \u2014 erst ' + fehlt.join(' und ')
                         + (n.needsMaxParent ? ' vollst\u00e4ndig ausbauen.' : ' freischalten.')
-    : st === 'afford' ? eur(costOf(n)) + ' \u20ac \u2014 klicken f\u00fcr '
+    : st === 'afford' ? (meta.demo ? 'Demo-Modus: kostenlos' : eur(costOf(n)) + ' \u20ac')
+                        + ' \u2014 klicken f\u00fcr '
                         + (max > 1 ? 'Stufe ' + (r + 1) : 'das Upgrade') + '.'
     : eur(costOf(n)) + ' \u20ac \u2014 auf dem Konto sind ' + eur(meta.account) + ' \u20ac.';
 
@@ -1923,7 +1973,7 @@ function showHome(){
   el.hDay.textContent = meta.day;
   el.hBest.textContent = eur(meta.best);
   el.hAcct.textContent = eur(meta.account);
-  el.demoHint.hidden = !CONFIG.demoCheapUpgrades;
+  syncDemo();
   resetView();
   renderTree();
   showDetail(byId.start);
@@ -1980,6 +2030,9 @@ function boot(data){
   for(const k in meta.owned) if(meta.owned[k] === true) meta.owned[k] = 1;
   if(typeof meta.account !== 'number') meta.account = 0;
   if(typeof meta.best !== 'number') meta.best = 0;
+  if(typeof meta.demo !== 'boolean') meta.demo = !!CONFIG.demoStart;
+  el.demoBox.checked = !!meta.demo;
+  el.demoBox.addEventListener('change', () => setDemo(el.demoBox.checked));
   resetStats();
   showIntro();
 }

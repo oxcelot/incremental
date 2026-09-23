@@ -351,10 +351,19 @@ Vorgänge, statt blind draufzuhalten.
 
 ### Demo-Modus
 
-`CONFIG.demoCheapUpgrades` steht auf `true`: **jede Fortbildung kostet 1 €**,
-damit sich der ganze Baum in wenigen Runden durchprobieren lässt. Auf dem
-Homescreen weist ein rotes Schild darauf hin. Die echten Preise stehen
-unverändert in `TREE` — Flag auf `false`, und sie gelten wieder.
+Es gelten die **echten Preise** aus `TREE`. Oben links im Fortbildungsplan
+sitzt ein **Schalter**: eingeschaltet kostet jede Fortbildung **0 €**, damit
+sich der ganze Baum in einer Runde durchprobieren lässt, ausgeschaltet gelten
+wieder die Preise.
+
+Der Stand liegt in `meta.demo` und wird mitgespeichert; `CONFIG.demoStart`
+bestimmt nur, wie der Schalter beim allerersten Start steht (`false`). Beim
+Umschalten wird der Baum neu gezeichnet und die Detailkarte aktualisiert —
+sonst nennt sie den Preis von vorhin.
+
+`costOf()` liefert im Demo-Modus 0 und rechnet sonst
+`cost × 1,6^gekaufte Stufen`. Die Preise in `TREE` werden dabei **nie**
+angefasst, der Schalter ist also gefahrlos hin und her zu bewegen.
 
 ### Volltreffer und Durchschlag
 

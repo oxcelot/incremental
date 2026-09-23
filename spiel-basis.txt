@@ -968,11 +968,10 @@ Die Kissen im Halter sind jetzt annaehernd quadratisch (122 x 104), damit sie
 wie echte Stempelkissen aussehen und der Fuellstand Platz hat.
 
 DEMO-MODUS
-CONFIG.demoCheapUpgrades steht auf true: jede Fortbildung kostet 1 EUR, damit
-sich der ganze Baum in wenigen Runden durchprobieren laesst. Auf dem Homescreen
-weist ein rotes Schild darauf hin. Die echten Preise stehen unveraendert in
-TREE - Flag auf false, und sie gelten wieder. VOR DEM ERSTEN OEFFENTLICHEN
-TEST ausschalten, sonst misst man ein Spiel ohne Oekonomie.
+[UEBERHOLT am 23.09.2026 - siehe Teil 1P]
+Frueher ein festes Flag, das jede Fortbildung 1 EUR kosten liess. Jetzt gelten
+standardmaessig die echten Preise, und im Fortbildungsplan sitzt ein Schalter,
+der sie auf 0 EUR setzt.
 
 
 ################################################################################
@@ -1456,3 +1455,37 @@ REGEL DARAUS: Sobald ein Baum dicht wird, ist Platzsuche von Hand Rateraterei.
 Die Pruefungen, die den Fehler finden, koennen auch den richtigen Platz
 finden - man muss sie nur ueber alle Kandidaten laufen lassen statt ueber
 einen.
+
+
+==============================================================================
+# TEIL 1P - ECHTE PREISE, DEMO ALS SCHALTER (23.09.2026)
+==============================================================================
+
+Der Demo-Modus war ein festes Flag in CONFIG: jede Fortbildung 1 EUR. Das war
+zum Bauen richtig und zum Pruefen falsch - solange er an ist, laesst sich die
+einzige Frage nicht beantworten, die der Baum wirklich stellt: stimmen die
+Preise?
+
+JETZT
+  - Standard sind die ECHTEN Preise aus TREE.
+  - Oben links im Fortbildungsplan sitzt ein Schalter. An: alles kostet 0 EUR.
+    Aus: die Preise gelten.
+  - Der Stand liegt in meta.demo und wird mitgespeichert. CONFIG.demoStart
+    bestimmt nur, wie der Schalter beim allerersten Start steht.
+  - costOf() liefert im Demo-Modus 0 und rechnet sonst cost * 1,6^Stufen. Die
+    Preise in TREE werden NIE angefasst - der Schalter ist gefahrlos.
+
+WARUM 0 UND NICHT 1
+Bei 1 EUR je Stufe kostet ein voll ausgebauter Baum ueber 150 EUR, also
+mehrere Arbeitstage. Das ist kein Demo-Modus, sondern ein sehr billiges
+Spiel - man merkt den Unterschied erst, wenn man ihn nicht mehr wegdenken
+kann. Bei 0 EUR ist die Trennung sauber: entweder Oekonomie oder keine.
+
+REGEL DARAUS: Ein Testmodus, der eine Groesse nur VERKLEINERT, mischt sich
+weiter in die Messung ein. Er muss sie ABSCHALTEN, sonst misst man beides
+zugleich und weiss nicht, welches.
+
+ZWEITE REGEL: Ein Schalter, der Zahlen aendert, muss alles neu zeichnen, was
+Zahlen zeigt. Hier: der Baum UND die Detailkarte. Die Karte merkt sich dafuer
+den zuletzt gezeigten Knoten (detailNode) - sonst steht nach dem Umschalten
+der alte Preis da, und das ist schlimmer als gar keiner.
