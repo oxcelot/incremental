@@ -324,6 +324,17 @@ Lesehilfe:
     Posteingang ("Schalter geschlossen") und die goldene Uhr. Das Banner
     verdeckt keine Vorgaenge - der Tisch bekommt dafuer eine Kopfzeile.
 
+[nachtschicht]  Nachtschicht
+    3 Stufen   420 / 672 / 1.075 EUR
+    Wirkung: Das Licht ist aus, der Pfoertner ist weg, der Stempel geht
+    weiter. Noch einmal bis zu drei Takte nach Dienstschluss.
+    Stufenwerte: 4 / 5 / 6 Takte (zaehlt auf die Nachspielzeit obendrauf)
+    Stellschraube: extraBeats += r  (je Stufe), ausgewertet in tick()
+    Vorgaenger: Nachspielzeit (vollstaendig ausgebaut)
+    Sechs Takte nach dem Gong sind bei 20 s Grundrunde mehr als die Haelfte
+    eines ganzen Arbeitstages - und alle ohne Zulauf. Der Zweig belohnt
+    damit, den Tisch VOLL in den Dienstschluss zu tragen.
+
 ##############################################################################
 # AMTSAUTORITAET UND ERTRAG
 ##############################################################################

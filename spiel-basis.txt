@@ -1431,3 +1431,28 @@ verlangt.
 
 Das entspricht 0.21: oft Gabelungen einbauen, damit man zwischen Pfaden waehlen
 muss, statt eine Kette abzuarbeiten.
+
+NACHTRAG 23.09.2026: Die Nachspielzeit hat eine zweite Leiter bekommen -
+[nachtschicht] "Nachtschicht", 3 Stufen, noch einmal bis zu drei Takte, also
+sechs insgesamt. Freigeschaltet erst, wenn die Nachspielzeit vollstaendig
+ausgebaut ist; dasselbe Muster wie Routine/Blindstempeln und Flinker
+Bote/Zweiter Bote.
+
+Sechs Takte nach dem Gong sind bei 20 s Grundrunde mehr als die Haelfte eines
+ganzen Arbeitstages - und alle ohne Zulauf. Der Zweig belohnt damit immer
+staerker, den Tisch VOLL in den Dienstschluss zu tragen, statt ihn vorher
+leerzuraeumen. Zusammen mit Ordnungsliebe (voller Tisch, doppelte Kombo) ist
+das inzwischen eine eigene Spielweise: sammeln statt abarbeiten, und am Ende
+in Ruhe abraeumen.
+
+BEIM SETZEN GELERNT: Die rechte Haelfte des Baums ist voll. Der erste
+Wunschplatz (neben der Nachspielzeit) kollidierte mit dem Aktenzeichen-
+Gedaechtnis, der zweite kreuzte die Verbindung Sammelbearbeitung ->
+Geuebter Blick. Statt weiter zu raten, hat ein Suchskript alle Rasterplaetze
+gegen die drei Layout-Pruefungen getestet und zusaetzlich 150 px Luft zu
+jedem Nachbarn verlangt. Ergebnis: der freie Raum liegt oben links.
+
+REGEL DARAUS: Sobald ein Baum dicht wird, ist Platzsuche von Hand Rateraterei.
+Die Pruefungen, die den Fehler finden, koennen auch den richtigen Platz
+finden - man muss sie nur ueber alle Kandidaten laufen lassen statt ueber
+einen.

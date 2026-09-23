@@ -68,7 +68,7 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 
 ## Der Fortbildungsplan
 
-Alle 42 Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
+Alle 43 Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
 `apply`-Funktion, die in `STATS` schreibt; `resetStats()` baut die Werte bei
 jedem Rundenstart aus `CONFIG` plus allen gekauften Knoten neu auf. Neue
 Upgrades brauchen daher nur einen Eintrag in `TREE` — keine Änderung an der
@@ -82,7 +82,7 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | *(Volltreffer und Kombo bilden einen eigenen Zweig, siehe unten)* | | | |
 | Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4) → **Sammelakte ×4** | **Flinker Bote ×4** → **Zweiter Bote ×4** → **Ablagekorb ×3** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
-| Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) · **Nachspielzeit ×3** |
+| Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) · **Nachspielzeit ×3** → **Nachtschicht ×3** (→ 6 Takte) |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
 
 ### Der Serien-Zweig
@@ -207,7 +207,7 @@ Das Rundenende läuft nicht mehr in einem Sprung, sondern in drei Phasen:
 
 | Phase | Was passiert | Was man sieht |
 |---|---|---|
-| **Nachspielzeit** | Die Uhr steht, der Stempel fällt noch `extraBeats` mal. Kein Zulauf, kein Nachrücken. | Banner über dem Tisch, geschlossener Posteingang, goldene Uhr |
+| **Nachspielzeit** | Die Uhr steht, der Stempel fällt noch `extraBeats` mal (bis zu 6). Kein Zulauf, kein Nachrücken. | Banner über dem Tisch, geschlossener Posteingang, goldene Uhr |
 | **Abspann** (`CONFIG.outroMs`, 2 s) | Nichts mehr. Kein Takt, keine Frist. | Der Tisch, so wie er liegen geblieben ist |
 | **Abrechnungsbogen** | — | Der Bogen |
 

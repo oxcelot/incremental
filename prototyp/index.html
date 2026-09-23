@@ -722,6 +722,7 @@ const ICONS = {
   stampfwd: '<rect x="-11" y="5" width="22" height="5" rx="1"/><rect x="-9" y="-10" width="11" height="12" rx="2"/><path d="M5 -4h7"/><path d="M9 -7l3 3-3 3"/>',
   eilt:     '<rect x="-9" y="-11" width="18" height="22" rx="2"/><path d="M0 -6.5l2 4.6 5 .5-3.8 3.3 1.1 4.9L0 4.3l-4.3 2.5 1.1-4.9L-7 -1.4l5-.5z"/>',
   gem:      '<path d="M0 11L-11 -2l4.5-9h13L11 -2z"/><path d="M-11 -2h22M-6.5 -11L-4 -2 0 11 4 -2l2.5-9"/>',
+  mond:     '<path d="M7.5 5.5A10.5 10.5 0 1 1 -1.5 -10.2 8.4 8.4 0 0 0 7.5 5.5z"/><path d="M9 -10.5l.9 2.6 2.6.9-2.6.9L9 -3.5l-.9-2.6-2.6-.9 2.6-.9z"/>',
   hour:     '<path d="M-8 -11h16M-8 11h16"/><path d="M-7 -11c0 7 7 8 7 11 0-3 7-4 7-11"/><path d="M-7 11c0-7 7-8 7-11 0 3 7 4 7 11"/>',
   stackin:  '<rect x="-11" y="6" width="22" height="5" rx="1"/><rect x="-8" y="-1" width="16" height="5" rx="1"/><rect x="-8" y="-9" width="16" height="5" rx="1"/>',
   gridfull: '<rect x="-11" y="-11" width="22" height="22" rx="2"/><path d="M-11 -3.7h22M-11 3.7h22M-3.7 -11v22M3.7 -11v22"/>',
@@ -909,6 +910,11 @@ const TREE = [
     eff:'Nach Dienstschluss f\u00e4llt der Stempel noch einmal. Nachschub kommt dann keiner mehr \u2013 es z\u00e4hlt nur, was noch liegt.',
     valueAt:r => r + (r === 1 ? ' Takt' : ' Takte'),
     apply:(st, r) => st.extraBeats += r },
+  { id:'nachtschicht', hx:80, hy:-640, icon:'mond', cost:420, ranks:3, needsMaxParent:true,
+    name:'Nachtschicht',
+    eff:'Das Licht ist aus, der Pf\u00f6rtner ist weg, der Stempel geht weiter. Noch einmal bis zu drei Takte nach Dienstschluss.',
+    valueAt:r => (3 + r) + ' Takte',
+    apply:(st, r) => st.extraBeats += r },
 
   // ---- Amtsautorit\u00e4t (oben links) --------------------------------------
   { id:'vorsc', a:210, r:150, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
@@ -976,7 +982,7 @@ const LINKS = [
                      ['flach1','bote1'],['bote1','bote2'],['bote2','ablage'],
   ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
   ['start','routi'], ['routi','blind'], ['routi','ueber'], ['ueber','gleit'],
-                     ['ueber','nachspiel'],
+                     ['ueber','nachspiel'], ['nachspiel','nachtschicht'],
   ['start','vorsc'], ['vorsc','gebuehr'],['gebuehr','saeum'],
                      ['vorsc','ablehn'], ['ablehn','nachford'],
                      ['vorsc','weiter'],
