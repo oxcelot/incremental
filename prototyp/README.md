@@ -208,7 +208,7 @@ Das Rundenende läuft nicht mehr in einem Sprung, sondern in drei Phasen:
 | Phase | Was passiert | Was man sieht |
 |---|---|---|
 | **Nachspielzeit** | Die Uhr steht, der Stempel fällt noch `extraBeats` mal. Kein Zulauf, kein Nachrücken. | Banner über dem Tisch, geschlossener Posteingang, goldene Uhr |
-| **Abspann** (`CONFIG.outroMs`, 1 s) | Nichts mehr. Kein Takt, keine Frist. | Der Tisch, so wie er liegen geblieben ist |
+| **Abspann** (`CONFIG.outroMs`, 2 s) | Nichts mehr. Kein Takt, keine Frist. | Der Tisch, so wie er liegen geblieben ist |
 | **Abrechnungsbogen** | — | Der Bogen |
 
 Die Nachspielzeit ändert die **Regeln** — kein Nachschub mehr —, deshalb trägt
@@ -230,9 +230,9 @@ dadurch einmalig ~23 px nach unten; `ensureMeasured()` misst den Tisch neu, die
 Treffererkennung bleibt also richtig (geprüft: alle 12 Plätze nach dem Umbruch).
 
 Der **Abspann** existiert, weil der Abrechnungsbogen sonst den Tisch in dem
-Moment verdeckt, in dem der letzte Abdruck fällt. Eine Sekunde reicht, um zu
-sehen, was übrig blieb — und erst dann macht der Bogen eine Zahl daraus. Die
-Glocke läutet jetzt zu Beginn des Abspanns, nicht beim Bogen.
+Moment verdeckt, in dem der letzte Abdruck fällt. Zwei Sekunden reichen, um
+den Tisch abzusuchen — und erst dann macht der Bogen eine Zahl daraus. Die
+Glocke läutet zu Beginn des Abspanns, nicht beim Bogen.
 
 ### Layout-Prüfungen
 

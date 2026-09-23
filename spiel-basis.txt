@@ -1371,14 +1371,15 @@ Moment liegt der Abrechnungsbogen ueber dem Bild. Jetzt sind es drei Phasen:
 
   1. NACHSPIELZEIT   Uhr steht, Stempel faellt noch extraBeats mal,
                      kein Zulauf, kein Nachruecken
-  2. ABSPANN         CONFIG.outroMs (1 s): gar nichts. Kein Takt, keine Frist.
+  2. ABSPANN         CONFIG.outroMs (2 s): gar nichts. Kein Takt, keine Frist.
                      Nur der Tisch, so wie er liegen geblieben ist.
   3. ABRECHNUNGSBOGEN
 
 WARUM DER ABSPANN
 Der Bogen verdeckte den Tisch in genau dem Moment, in dem der letzte Abdruck
 fiel. Man sah nie, was uebrig blieb - und der Rueckstand ist die zentrale
-Druckquelle des Spiels. Eine Sekunde reicht, um das zu sehen, bevor der Bogen
+Druckquelle des Spiels. Zwei Sekunden reichen, um den Tisch abzusuchen,
+bevor der Bogen
 eine Zahl daraus macht. Die Glocke laeutet jetzt zu Beginn des Abspanns statt
 beim Bogen: sie markiert den Dienstschluss, nicht die Buchhaltung.
 
