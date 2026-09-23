@@ -68,7 +68,7 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 
 ## Der Fortbildungsplan
 
-Alle zwölf Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
+Alle 40 Knoten sind freischaltbar und wirken sofort. Jeder Knoten trägt eine
 `apply`-Funktion, die in `STATS` schreibt; `resetStats()` baut die Werte bei
 jedem Rundenstart aus `CONFIG` plus allen gekauften Knoten neu auf. Neue
 Upgrades brauchen daher nur einen Eintrag in `TREE` — keine Änderung an der
@@ -80,9 +80,9 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 |---|---|---|---|
 | Kissen & Tinte | Volles Kissen (2 Vorgänge) | XXL (4) → Fasspumpe (6) | Sparsames Kissen (0,35 €) → Großbestellung (0,22 €) |
 | *(Volltreffer und Kombo bilden einen eigenen Zweig, siehe unten)* | | | |
-| Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4 Vorgänge) | **Flinker Bote ×4** → **Zweiter Bote ×4** |
+| Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4) → **Sammelakte ×4** | **Flinker Bote ×4** → **Zweiter Bote ×4** → **Ablagekorb ×3** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
-| Takt & Dienstzeit | Routine (−0,15 s) | Blindstempeln (−0,20 s) | Überstunden (+6 s) → Gleitzeit (+8 s) |
+| Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) → **Nachspielzeit ×3** |
 | Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
 
 ### Der Serien-Zweig
@@ -108,10 +108,12 @@ Von der Wurzel gehen vier Äste ab:
 |---|---|
 | Volltreffer | Geübter Blick → **Routiniertes Auge ×5** → Glückliche Hand · **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
 | Kombo-Deckel | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit ⟶ |
-| Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** ⟶ |
-| Abschluss | **Der kurze Dienstweg** — hängt an **beiden** Ästen |
+| Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** → Ordnungsliebe, und ⟶ |
+| Auszahlung | **Leistungsprämie ×5** — hängt direkt an der Wurzel |
+| Abschluss | **Der kurze Dienstweg** — hängt an **beiden** Kombo-Ästen |
+| Kreuzung | **Doppelter Durchschlag** — hängt an Sechster Sinn **und** Durchschlagpapier |
 
-**Der kurze Dienstweg** schließt die zwei Kombo-Äste zusammen: Er wird erst
+**Zwei Knoten mit doppeltem Vorgänger.** *Der kurze Dienstweg* schließt die zwei Kombo-Äste zusammen, *Doppelter Durchschlag* (900 €) die beiden Volltreffer-Äste: ein Volltreffer löst dort immer einen Durchschlag aus. Beide funktionieren gleich: Er wird erst
 kaufbar, wenn Beharrlichkeit *und* Warmgelaufen **vollständig** ausgebaut sind.
 Dafür kann ein Knoten mehrere Vorgänger haben (`PARENTS` statt eines einzelnen
 Elternteils); `missingParents()` liefert die noch fehlenden, und die Detailkarte
@@ -122,6 +124,23 @@ gesetzt** — über `hx`/`hy` im **selben Raster** wie die radialen Knoten, nich
 in fertigen Bildpunkten. Erst zum Schluss zieht `SPREAD_X`/`SPREAD_Y` alles
 elliptisch in die Breite. Dadurch wirken Abstände in beiden Systemen gleich,
 und eine Änderung am Spreizfaktor zieht den ganzen Baum mit.
+
+### Die `hidden`-Falle
+
+`.veil`, `#home` und `#stamp` setzen selbst ein `display`, und **jede
+Autoren-Regel schlägt das `display:none`, das der Browser an `[hidden]`
+hängt**. Ohne eigene Regel bleiben die Overlays also sichtbar, egal was der
+Code setzt. Im Artifact-Rahmen fällt das nicht auf, weil der eine eigene
+`!important`-Regel mitliefert — die Datei direkt von der Platte geöffnet war
+dadurch kaputt, ohne dass es je jemandem aufgefallen wäre. Das Spiel-CSS
+bringt die Regel jetzt selbst mit:
+
+```css
+[hidden]{display:none !important;}
+```
+
+Gefunden nicht im Spiel, sondern beim Screenshot: der Fortbildungsplan lag
+laut DOM offen, auf dem Bild war aber die Dienstanweisung zu sehen.
 
 ### Layout-Prüfungen
 

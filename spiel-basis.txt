@@ -1198,3 +1198,56 @@ dieser Aenderung falsch und niemandem aufgefallen. Sie werden jetzt aus STATS
 berechnet (`beatsPerRound()`), genau wie die Takt-Anzeige im HUD. Jede Zahl,
 die der Spieler liest, muss aus derselben Quelle stammen wie die Zahl, nach
 der das Spiel rechnet.
+
+
+==============================================================================
+# TEIL 1L - SIEBTE RUNDE UPGRADES (23.09.2026)
+==============================================================================
+
+Aus 15 Vorschlaegen hat der Auftraggeber sechs ausgewaehlt. Eingebaut sind:
+
+  [nachspiel] Nachspielzeit          3 Stufen  1/2/3 Takte nach Dienstschluss
+  [ablage]    Ablagekorb             3 Stufen  8/10/12 Vorgaenge liegen schon da
+  [praemie]   Leistungspraemie       5 Stufen  0,20-1,00 EUR je Kombo-Stufe
+  [ordnung]   Ordnungsliebe          1 Stufe   voller Tisch: Kombo waechst doppelt
+  [kritdurch] Doppelter Durchschlag  1 Stufe   Volltreffer loest immer Durchschlag
+  [sammel]    Sammelakte             4 Stufen  Zuschlag je Vorgang im selben Abdruck
+
+WAS DIESE SECHS GEMEINSAM HABEN
+Fuenf von sechs veraendern eine ENTSCHEIDUNG, nicht nur eine Zahl:
+  - Nachspielzeit belohnt einen vollen Tisch bei Dienstschluss, statt ihn
+    leerzuraeumen. Kein Nachschub mehr - es zaehlt nur, was noch liegt.
+  - Ordnungsliebe gibt zum ersten Mal einen Grund, NICHT zu stempeln.
+  - Sammelakte belohnt das Warten auf eine gute Konstellation.
+  - Leistungspraemie macht den Kombo-Ast weniger Alles-oder-nichts: bezahlt
+    wird die hoechste Stufe des Tages, nicht die, auf der man am Ende steht.
+  - Doppelter Durchschlag schaltet zwei ausgebaute Aeste zusammen.
+Nur der Ablagekorb ist eine reine Zahl - und der repariert ein konkretes
+Problem des 20-Sekunden-Tages (Teil 1K).
+
+EINE IDEE WURDE NICHT GEBAUT: "ZWISCHENABLAGE"
+Vorgeschlagen war: "Ein Leerschlag bricht die Kombo nicht mehr." Beim Einbauen
+stellte sich heraus, dass das im Spiel gar nichts tut. Die Kombo kennt heute
+nur zwei Abbruchgruende - falscher Stempel (deckt "Beharrlichkeit" ab) und
+Stempelwechsel (deckt "Der kurze Dienstweg" ab). Ein Fehldruck laesst sie in
+Ruhe (CONFIG.missBreaksCombo = false, bewusst so entschieden), ein trockener
+Stempel ebenfalls. Der Knoten waere ein Placebo gewesen.
+
+REGEL DARAUS: Bevor ein Schutz-Upgrade gebaut wird, erst nachsehen, WOVOR es
+schuetzt. Steht die Gefahr nicht im Code, ist das Upgrade leer - und ein leeres
+Upgrade ist schlimmer als keines, weil der Spieler dafuer bezahlt.
+
+GEFUNDENER FEHLER: hidden HAT NIE FUNKTIONIERT
+.veil, #home und #stamp setzen selbst ein display (grid bzw. flex). Jede
+Autoren-Regel schlaegt das display:none, das der Browser an [hidden] haengt -
+die Overlays blieben also sichtbar, egal was der Code setzte. Im Artifact-
+Rahmen faellt das nicht auf, weil der eine eigene !important-Regel mitliefert.
+Direkt von der Platte geoeffnet war die Datei dadurch unbenutzbar.
+
+Aufgefallen ist es nicht im Spiel, sondern beim Screenshot: das DOM sagte
+"Fortbildungsplan offen", das Bild zeigte die Dienstanweisung. Erst der
+Widerspruch zwischen beiden hat den Fehler sichtbar gemacht.
+
+REGEL DARAUS: Was eine Umgebung stillschweigend mitliefert, muss die Datei
+selbst mitbringen. Und: ein Screenshot ist kein Luxus - er prueft etwas
+anderes als das DOM.

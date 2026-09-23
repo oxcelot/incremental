@@ -33,6 +33,12 @@
     --good:#4E9C77; --bad:#D05A4C;
   }
 
+  /* Ohne diese Regel greift hidden nicht: .veil und #home setzen selbst ein
+     display, und jede Autoren-Regel schlaegt das display:none des Browsers.
+     Im Artifact-Rahmen faellt das nicht auf, weil der eine eigene !important-
+     Regel mitliefert - die Datei muss aber auch allein geoeffnet laufen. */
+  [hidden]{display:none !important;}
+
   html,body{height:100%;}
   body{
     margin:0; background:var(--bg); color:var(--text);
@@ -86,6 +92,12 @@
   }
   .slot{border:1px dashed var(--desk-grid); border-radius:3px; position:relative;}
   .slot.aim{outline:2px solid var(--s-amber); outline-offset:-2px; border-color:transparent;}
+  /* Ordnungsliebe: kein Platz frei - die Kombo waechst doppelt */
+  .desk.full{box-shadow:inset 0 0 0 3px color-mix(in srgb, var(--s-amber) 65%, #0000);}
+  /* Nachspielzeit: die Uhr steht, der Stempel faellt noch */
+  #clock.over{border-color:var(--s-amber);}
+  #clock.over b{color:var(--s-amber);}
+  #clock.over span{color:var(--s-amber);}
 
   .form{
     position:absolute; inset:0; background:var(--paper); color:var(--ink);
@@ -540,6 +552,12 @@ function resetStats(){
   STATS.comboStart   = 0;   // Kombo-Stufe zu Rundenbeginn
   STATS.comboKeepSwap= 0;   // Stempelwechsel bricht die Kombo nicht
   STATS.comboOnWrong = 0;   // Beschwerde halbiert statt zu brechen
+  STATS.comboPayout  = 0;   // Praemie je erreichter Kombo-Stufe am Tagesende
+  STATS.fullDeskBonus= 0;   // voller Tisch: die Kombo waechst doppelt so schnell
+  STATS.extraBeats   = 0;   // Takte, die nach Dienstschluss noch fallen
+  STATS.startForms   = 6;   // Vorgaenge, die zu Dienstbeginn schon liegen
+  STATS.critEcho     = 0;   // Volltreffer loest immer Durchschlagpapier aus
+  STATS.areaBonus    = 0;   // Zuschlag je zusaetzlichem Vorgang unter einem Abdruck
   for(const n of TREE){
     const r = rankOf(n);
     if(r > 0 && n.apply) n.apply(STATS, r);
@@ -548,6 +566,7 @@ function resetStats(){
   STATS.beatMs  = Math.max(800, STATS.beatMs);
   STATS.spawnMs = Math.max(800, STATS.spawnMs);
   STATS.inkCost = Math.max(0.05, STATS.inkCost);
+  STATS.startForms = Math.min(STATS.startForms, STATS.slots);
 }
 
 // ---------------------------------------------------------------- Fortbildungsplan
@@ -587,6 +606,12 @@ const ICONS = {
   stampno:  '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-3 -7l6 6M3 -7l-6 6"/>',
   stampq:   '<rect x="-10" y="5" width="20" height="5" rx="1"/><rect x="-6" y="-10" width="12" height="12" rx="2"/><path d="M-2 -6.5a2.2 2.2 0 1 1 2 3.2v1"/><path d="M0 -0.5v.6"/>',
   stampfwd: '<rect x="-11" y="5" width="22" height="5" rx="1"/><rect x="-9" y="-10" width="11" height="12" rx="2"/><path d="M5 -4h7"/><path d="M9 -7l3 3-3 3"/>',
+  hour:     '<path d="M-8 -11h16M-8 11h16"/><path d="M-7 -11c0 7 7 8 7 11 0-3 7-4 7-11"/><path d="M-7 11c0-7 7-8 7-11 0 3 7 4 7 11"/>',
+  stackin:  '<rect x="-11" y="6" width="22" height="5" rx="1"/><rect x="-8" y="-1" width="16" height="5" rx="1"/><rect x="-8" y="-9" width="16" height="5" rx="1"/>',
+  gridfull: '<rect x="-11" y="-11" width="22" height="22" rx="2"/><path d="M-11 -3.7h22M-11 3.7h22M-3.7 -11v22M3.7 -11v22"/>',
+  medal:    '<circle cx="0" cy="3.5" r="7.5"/><path d="M-6 -3.5l-3.5-8M6 -3.5l3.5-8"/><path d="M-3.5 3.5h7"/>',
+  sparkcpy: '<rect x="-12" y="-10" width="13" height="15" rx="2"/><path d="M-7 9h12V-2"/><path d="M8 -12l1.5 4 4 1.5-4 1.5L8 -1 6.5-5l-4-1.5 4-1.5z"/>',
+  sammel:   '<rect x="-12" y="-9" width="10" height="18" rx="1.5"/><rect x="2" y="-9" width="10" height="18" rx="1.5"/><path d="M-9 -4h4M-9 0h4M5 -4h4M5 0h4"/>',
   coin2:    '<circle cx="-3" cy="-1" r="8.5"/><path d="M-6 -4h6M-6 1h6M-3 -7v12"/><path d="M6 6l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/>',
 };
 
@@ -644,6 +669,12 @@ const TREE = [
     valueAt:r => num(2.5 + 2.5 * r, 1) + ' %',
     apply:(st, r) => st.echoChance = 0.025 + 0.025 * r },
 
+  // Wo Volltreffer und Durchschlagpapier zusammenlaufen
+  { id:'kritdurch', hx:770, hy:-530, icon:'sparkcpy', cost:900, needsMaxParent:true,
+    name:'Doppelter Durchschlag',
+    eff:'Ein Volltreffer sitzt so satt, dass er sich durchdr\u00fcckt: er l\u00f6st IMMER einen Durchschlag aus.',
+    apply:st => st.critEcho = 1 },
+
   // Kombo-Ast: Deckel
   { id:'kmerk', hx:320, hy:-255, icon:'chain', cost:150, ranks:4,
     name:'Aktenzeichen-Ged\u00e4chtnis',
@@ -667,6 +698,18 @@ const TREE = [
     valueAt:r => 'Stufe ' + r,
     apply:(st, r) => st.comboStart = r },
 
+  // Kombo-Ast: was die Serie am Tagesende wert war
+  { id:'praemie', hx:185, hy:-40, icon:'medal', cost:170, ranks:5,
+    name:'Leistungspr\u00e4mie',
+    eff:'Am Dienstschluss zahlt die H\u00d6CHSTE Kombo-Stufe des Tages eine Pr\u00e4mie \u2013 auch dann, wenn die Serie danach gerissen ist.',
+    valueAt:r => eur(0.20 * r) + ' \u20ac je Stufe',
+    apply:(st, r) => st.comboPayout += 0.20 * r },
+
+  { id:'ordnung', hx:620, hy:-30, icon:'gridfull', cost:260,
+    name:'Ordnungsliebe',
+    eff:'Solange kein Tischplatz frei ist, w\u00e4chst die Kombo doppelt so schnell. Ein Grund, den Tisch nicht leerzur\u00e4umen.',
+    apply:st => st.fullDeskBonus = 1 },
+
   // Kombo-Ast: Abschluss beider Kombo-Zweige
   { id:'kurz', hx:620, hy:-180, icon:'swap2', cost:260, needsMaxParent:true,
     name:'Der kurze Dienstweg',
@@ -681,6 +724,12 @@ const TREE = [
     eff:'Ein Abdruck deckt vier Vorg\u00e4nge ab. Vorsicht: falsch gestempelte z\u00e4hlen mit.',
     apply:st => st.hitCount = 4 },
 
+  { id:'sammel', a:30, r:450, o:-95, icon:'sammel', cost:150, ranks:4,
+    name:'Sammelakte',
+    eff:'Erledigt ein Abdruck mehrere Vorg\u00e4nge auf einmal, gibt es f\u00fcr jeden ausser dem ersten einen Zuschlag.',
+    valueAt:r => '+' + eur(0.50 * r) + ' \u20ac je Vorgang',
+    apply:(st, r) => st.areaBonus += 0.50 * r },
+
   { id:'bote1', a:30, r:300, o:95, icon:'tray1', cost:40, ranks:4,
     name:'Flinker Bote',
     eff:'Wie schnell Vorg\u00e4nge vom Stapel nachr\u00fccken.',
@@ -691,6 +740,11 @@ const TREE = [
     eff:'Ein zweiter Bote holt noch mehr heran. Der Tisch bleibt voll.',
     valueAt:r => num((1200 - 100 * r) / 1000, 2) + ' s',
     apply:(st, r) => st.spawnMs -= 100 * r },
+  { id:'ablage', a:30, r:600, o:95, icon:'stackin', cost:90, ranks:3,
+    name:'Ablagekorb',
+    eff:'Wie viele Vorg\u00e4nge schon auf dem Tisch liegen, wenn der Dienst beginnt.',
+    valueAt:r => (6 + 2 * r) + ' von 12 Pl\u00e4tzen',
+    apply:(st, r) => st.startForms += 2 * r },
 
   // ---- Ergonomie am Stempelhalter (unten links) --------------------------
   { id:'hand', a:150, r:150, icon:'rot', cost:80, name:'Handgelenkdrehung',
@@ -722,6 +776,11 @@ const TREE = [
     eff:'Noch einmal 2 Sekunden mehr Dienstzeit je Stufe.',
     valueAt:r => num((30000 + 2000 * r) / 1000) + ' s',
     apply:(st, r) => st.roundMs += 2000 * r },
+  { id:'nachspiel', a:-90, r:600, o:95, icon:'hour', cost:150, ranks:3,
+    name:'Nachspielzeit',
+    eff:'Nach Dienstschluss f\u00e4llt der Stempel noch einmal. Nachschub kommt dann keiner mehr \u2013 es z\u00e4hlt nur, was noch liegt.',
+    valueAt:r => r + (r === 1 ? ' Takt' : ' Takte'),
+    apply:(st, r) => st.extraBeats += r },
 
   // ---- Amtsautorit\u00e4t (oben links) --------------------------------------
   { id:'vorsc', a:210, r:150, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
@@ -778,12 +837,17 @@ const LINKS = [
   ['start','serie'],
   ['serie','krit1'],   ['krit1','krit2'], ['krit2','glueck'],
                        ['krit1','krit3'], ['krit3','durch'],
+  ['krit3','kritdurch'], ['durch','kritdurch'],
+  ['serie','praemie'],
   ['serie','kmerk'],   ['kmerk','beharr'],  ['beharr','kurz'],
   ['serie','schwung'], ['schwung','warm'],  ['warm','kurz'],
+  ['warm','ordnung'],
   ['start','flach1'],['flach1','flach2'],
-                     ['flach1','bote1'],['bote1','bote2'],
+                     ['flach2','sammel'],
+                     ['flach1','bote1'],['bote1','bote2'],['bote2','ablage'],
   ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
   ['start','routi'], ['routi','blind'], ['routi','ueber'], ['ueber','gleit'],
+                     ['gleit','nachspiel'],
   ['start','vorsc'], ['vorsc','gebuehr'],['gebuehr','saeum'],
                      ['vorsc','ablehn'], ['ablehn','nachford'],
                      ['vorsc','weiter'],
@@ -813,6 +877,8 @@ const el = {
   veil: document.getElementById('veil'),
   sheet: document.getElementById('sheet'),
   clock: document.querySelector('#clock b'),
+  clockBox: document.getElementById('clock'),
+  clockLbl: document.querySelector('#clock span'),
   clockBar: document.querySelector('#clock .timebar i'),
   beats: document.querySelector('#beats b'),
   combo: document.querySelector('#combo b'),
@@ -895,6 +961,7 @@ const SFX = {
   swap(){ noise(0.05, 1800, 3, 0.11); tone(560, 0.05, 'square', 0.06); },
   pretick(){ tone(2100, 0.022, 'square', 0.022); },
   bell(){ tone(880,0.5,'sine',0.14,440); tone(1320,0.5,'sine',0.07,660); },
+  overtime(){ tone(523,0.14,'square',0.09); setTimeout(()=>tone(784,0.20,'square',0.09),120); },
 };
 
 // ---------------------------------------------------------------- Aufbau
@@ -1015,9 +1082,11 @@ function startRound(){
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
+    extraLeft:STATS.extraBeats, extraUsed:0, overSeen:false,
+    comboBonus:0, areaBonus:0,
   };
   buildDesk(); buildRack(); renderRack(); renderQueue();
-  for(let i=0;i<6;i++) spawnForm();
+  for(let i=0;i<STATS.startForms;i++) spawnForm();
   el.veil.hidden = true;
   el.home.hidden = true;
   el.stamp.hidden = false;
@@ -1049,6 +1118,13 @@ function tick(dt, now){
   ensureMeasured();
   S.t += dt;
   const left = Math.max(0, STATS.roundMs - S.t);
+  // Dienstschluss: die Uhr steht, aber die Nachspielzeit laesst den Stempel
+  // noch ein paar Mal fallen. Nachschub kommt dann keiner mehr.
+  const over = left <= 0;
+  if(over && !S.overSeen){
+    S.overSeen = true;
+    if(S.extraLeft > 0){ SFX.overtime(); float('Nachspielzeit', 'var(--s-amber)'); }
+  }
 
   if(S.graceLeft > 0){
     S.graceLeft = Math.max(0, S.graceLeft - dt);
@@ -1059,8 +1135,10 @@ function tick(dt, now){
   S.accSpawn += dt;
   S.accInflow += dt;
 
-  if(S.accInflow >= STATS.inflowMs){ S.accInflow -= STATS.inflowMs; S.queue++; renderQueue(); }
-  if(S.accSpawn  >= STATS.spawnMs ){ S.accSpawn  -= STATS.spawnMs;  spawnForm(); renderQueue(); }
+  if(!over){
+    if(S.accInflow >= STATS.inflowMs){ S.accInflow -= STATS.inflowMs; S.queue++; renderQueue(); }
+    if(S.accSpawn  >= STATS.spawnMs ){ S.accSpawn  -= STATS.spawnMs;  spawnForm(); renderQueue(); }
+  }
 
   const p = S.graceLeft > 0
     ? 1 - S.graceLeft / STATS.startDelayMs
@@ -1069,6 +1147,7 @@ function tick(dt, now){
   if(S.graceLeft === 0 && S.accBeat >= STATS.beatMs){
     S.accBeat -= STATS.beatMs; S.preticked = false;
     strike(now);
+    if(over){ S.extraLeft--; S.extraUsed++; }
   }
 
   // Taktring - laeuft auch waehrend der Aufwaermphase, damit der erste
@@ -1090,6 +1169,8 @@ function tick(dt, now){
       : STAMPS.find(st => st.id === S.stamp).name;
   }
 
+  el.desk.classList.toggle('full', !!STATS.fullDeskBonus && onDesk() >= STATS.slots);
+
   // Zeigen, welche Plaetze der Abdruck gerade abdeckt
   for(const sl of el.desk.children) sl.classList.remove('aim');
   if(!lifted && STATS.hitCount > 1){
@@ -1104,14 +1185,17 @@ function tick(dt, now){
     + ':' + String(secs%60).padStart(2,'0');
   el.clockBar.style.transform = 'scaleX(' + (left/(STATS.roundMs)) + ')';
   const untilNext = S.graceLeft > 0 ? S.graceLeft : (STATS.beatMs - S.accBeat);
-  el.beats.textContent = left < untilNext
-    ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs);
+  el.beats.textContent = over
+    ? Math.max(0, S.extraLeft)
+    : (left < untilNext ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs));
+  el.clockBox.classList.toggle('over', over);
+  el.clockLbl.textContent = over ? 'Nachspielzeit' : 'Dienstzeit';
   el.combo.textContent = '×' + multFor().toFixed(1).replace('.',',');
   el.earned.textContent = eur(S.earned);
   el.ink.textContent = eur(S.inkSpent);
   el.backlog.textContent = S.queue + onDesk();
 
-  if(left <= 0) endRound();
+  if(over && S.extraLeft <= 0) endRound();
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
@@ -1125,7 +1209,10 @@ const multFor = () =>
 
 function bumpCombo(){
   if(!STATS.comboOn) return;
-  S.combo++;
+  // Ordnungsliebe: solange kein Platz frei ist, zaehlt jeder Vorgang doppelt.
+  // Gemessen wird im Moment des Abdrucks - der eben erledigte Vorgang liegt
+  // noch da, die Ausblende laeuft erst danach.
+  S.combo += (STATS.fullDeskBonus && onDesk() >= STATS.slots) ? 2 : 1;
   S.bestCombo = Math.max(S.bestCombo, S.combo);
 }
 function cutCombo(){
@@ -1183,12 +1270,22 @@ function strike(now){
   if(under.length){
     charge(); wear();
     const critsBefore = S.crits;
-    let any = false;
-    for(const f of under) any = resolveForm(f) || any;
-    if(STATS.critFree && S.crits > critsBefore){
+    let hits = 0;
+    for(const f of under) if(resolveForm(f)) hits++;
+    const crit = S.crits > critsBefore;
+    if(STATS.critFree && crit){
       S.freshness = Math.min(STATS.freshnessMax, S.freshness + 1);
     }
-    if(any && Math.random() < STATS.echoChance) echoBonus();
+    // Sammelakte: jeder Vorgang ueber den ersten hinaus, den derselbe Abdruck
+    // richtig erledigt hat. Richtig erledigt heisst automatisch gleiche Art -
+    // jede Vorgangsart will genau einen der vier Stempel.
+    if(hits > 1 && STATS.areaBonus){
+      const bonus = (hits - 1) * STATS.areaBonus;
+      S.earned += bonus; S.areaBonus += bonus;
+      float('Sammelakte +' + eur(bonus), 'var(--s-amber)');
+    }
+    // Ein Volltreffer sitzt so satt, dass er sich durchdrueckt
+    if(hits && ((STATS.critEcho && crit) || Math.random() < STATS.echoChance)) echoBonus();
     renderRack(); return;
   }
   // 4) Tisch -> Fehldruck
@@ -1292,7 +1389,10 @@ function endRound(){
   const backlog = S.queue + onDesk();
   const inkTotal = S.inkSpent;
   const complaints = S.wrongs * STATS.wrongPenalty;
-  const raw = S.earned - inkTotal - complaints;
+  // Leistungspraemie: bezahlt wird die HOECHSTE Stufe des Tages, nicht die,
+  // auf der man gerade steht. Eine gerissene Serie ist damit nicht umsonst.
+  const bonus = S.bestCombo * STATS.comboPayout;
+  const raw = S.earned - inkTotal - complaints + bonus;
   const net = CONFIG.floorAtZero ? Math.max(0, raw) : raw;
   meta.best = Math.max(meta.best, net);
   meta.account += net;
@@ -1303,12 +1403,15 @@ function endRound(){
   + '<table class="ledger">'
   + row('Bearbeitete Vorg&auml;nge (' + S.done + ')', '+' + eur(S.earned))
   + sub('beste Kombo &times;' + Math.min(1 + S.bestCombo*STATS.comboStep, STATS.comboCap).toFixed(1).replace('.',','), '')
+  + (S.areaBonus ? sub('davon Sammelakte: ' + eur(S.areaBonus) + ' &euro;', '') : '')
+  + (bonus ? row('Leistungspr&auml;mie (Stufe ' + S.bestCombo + ')', '+' + eur(bonus)) : '')
   + row('Tintenverbrauch (' + S.presses + ' Drucke)', '−' + eur(inkTotal))
   + sub('davon Fehldrucke: ' + S.misses + ' &middot; Stempelwechsel: ' + S.swaps + ' &middot; nachgetintet: ' + S.reinks, '')
   + row('Beschwerden (' + S.wrongs + ')', '−' + eur(complaints))
   + (S.crits ? row('davon Volltreffer (' + S.crits + ')', '—') : '')
   + (S.echoes ? row('davon Durchschl&auml;ge (' + S.echoes + ')', '—') : '')
   + (S.dryBeats ? row('Leerschl&auml;ge ohne Tinte (' + S.dryBeats + ')', '—') : '')
+  + (S.extraUsed ? row('Nachspielzeit (' + S.extraUsed + ' Takte)', '—') : '')
   + '<tr class="sum"><td>Tagesbilanz</td><td>' + eur(net) + ' &euro;</td></tr>'
   + '</table>'
   + '<div class="note">'

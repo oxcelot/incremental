@@ -139,6 +139,32 @@ Lesehilfe:
     Stellschraube: comboKeepSwap = 1
     Vorgaenger: Beharrlichkeit UND Warmgelaufen (beide vollstaendig ausgebaut)
 
+[praemie]  Leistungspraemie
+    5 Stufen   170 / 272 / 435 / 696 / 1114 EUR
+    Wirkung: Am Dienstschluss zahlt die HOECHSTE Kombo-Stufe des Tages eine
+    Praemie - auch dann, wenn die Serie danach gerissen ist.
+    Stufenwerte: 0,20 / 0,40 / 0,60 / 0,80 / 1,00 EUR je Stufe
+    Stellschraube: comboPayout += 0.20 * r  (je Stufe), verrechnet in endRound()
+    Vorgaenger: Sammelbearbeitung
+
+[ordnung]  Ordnungsliebe
+    1 Stufe    260 EUR
+    Wirkung: Solange kein Tischplatz frei ist, waechst die Kombo doppelt so
+    schnell. Ein Grund, den Tisch nicht leerzuraeumen.
+    Stellschraube: fullDeskBonus = 1, ausgewertet in bumpCombo()
+    Vorgaenger: Warmgelaufen
+    Der volle Tisch bekommt einen goldenen Innenrand - sonst waere nicht zu
+    sehen, wann der Bonus greift.
+
+[kritdurch]  Doppelter Durchschlag
+    1 Stufe    900 EUR
+    Wirkung: Ein Volltreffer sitzt so satt, dass er sich durchdrueckt: er
+    loest IMMER einen Durchschlag aus.
+    Stellschraube: critEcho = 1, ausgewertet in strike()
+    Vorgaenger: Sechster Sinn UND Durchschlagpapier (beide vollstaendig
+                ausgebaut) - der teuerste Knoten im Baum, weil er zwei
+                ausgebaute Aeste zusammenschaltet.
+
 ##############################################################################
 # FLAECHE UND NACHSCHUB
 ##############################################################################
@@ -170,6 +196,25 @@ Lesehilfe:
     Stufenwerte: 1,10 s / 1,00 s / 0,90 s / 0,80 s
     Stellschraube: spawnMs -= 100 * r  (je Stufe)
     Vorgaenger: Flinker Bote (beide vollstaendig ausgebaut)
+
+[sammel]  Sammelakte
+    4 Stufen   150 / 240 / 384 / 614 EUR
+    Wirkung: Erledigt ein Abdruck mehrere Vorgaenge auf einmal, gibt es fuer
+    jeden ausser dem ersten einen Zuschlag.
+    Stufenwerte: +0,50 / +1,00 / +1,50 / +2,00 EUR je Vorgang
+    Stellschraube: areaBonus += 0.50 * r  (je Stufe), ausgewertet in strike()
+    Vorgaenger: Amtsstempel XXL
+    Richtig erledigt heisst automatisch gleiche Art: jede Vorgangsart will
+    genau einen der vier Stempel, also kann ein Abdruck nie zwei verschiedene
+    Arten richtig erledigen.
+
+[ablage]  Ablagekorb
+    3 Stufen   90 / 144 / 230 EUR
+    Wirkung: Wie viele Vorgaenge schon auf dem Tisch liegen, wenn der Dienst
+    beginnt. Ohne Fortbildung sind es 6 von 12 Plaetzen.
+    Stufenwerte: 8 / 10 / 12 von 12 Plaetzen
+    Stellschraube: startForms += 2 * r  (je Stufe), gedeckelt auf slots
+    Vorgaenger: Zweiter Bote
 
 ##############################################################################
 # ERGONOMIE AM STEMPELHALTER
@@ -225,6 +270,16 @@ Lesehilfe:
     Stufenwerte: 32 s / 34 s / 36 s / 38 s / 40 s
     Stellschraube: roundMs += 2000 * r  (je Stufe)
     Vorgaenger: Überstunden (vollstaendig ausgebaut)
+
+[nachspiel]  Nachspielzeit
+    3 Stufen   150 / 240 / 384 EUR
+    Wirkung: Nach Dienstschluss faellt der Stempel noch einmal. Nachschub
+    kommt dann keiner mehr - es zaehlt nur, was noch liegt.
+    Stufenwerte: 1 / 2 / 3 Takte
+    Stellschraube: extraBeats += r  (je Stufe), ausgewertet in tick()
+    Vorgaenger: Gleitzeit
+    Die Uhr-Anzeige wird gold und heisst waehrenddessen "Nachspielzeit", die
+    Takte-Anzeige zaehlt die Zugabe herunter.
 
 ##############################################################################
 # AMTSAUTORITAET UND ERTRAG
@@ -334,11 +389,13 @@ sonst nichts.
     roundMs        Laenge eines Arbeitstages in Millisekunden      (20000)
     beatMs         Stempeltakt, Untergrenze 800                    (2000)
     startDelayMs   Aufwaermphase vor dem ersten Schlag             (2000)
+    extraBeats     Takte, die nach Dienstschluss noch fallen       (0)
 
   NACHSCHUB
     spawnMs        Abstand, in dem Vorgaenge nachruecken, min. 800 (1600)
     inflowMs       Zulauf in den Posteingang                       (1000)
     slots          Tischplaetze                                    (12)
+    startForms     Vorgaenge zu Dienstbeginn, gedeckelt auf slots  (6)
 
   TINTE UND KISSEN
     inkCost        Kosten je Stempeldruck, Untergrenze 0,05        (0,50)
