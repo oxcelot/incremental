@@ -1,0 +1,438 @@
+==============================================================================
+VERBESSERUNGEN - ALLE UPGRADES MIT IHREN STUFEN
+Stand: 23.09.2026, ausgelesen aus prototyp/index.html
+==============================================================================
+
+Diese Liste wird aus dem Spiel selbst erzeugt und stimmt daher mit dem Code
+ueberein. Eigene Ideen gehoeren in den Abschnitt EIGENE IDEEN ganz unten -
+dort steht auch, was man braucht, damit ein Eintrag im Spiel landet.
+
+Lesehilfe:
+  [kennung]  Name                        Stufen   Preise
+    Wirkung:     was der Spieler liest
+    Stufenwerte: was jede Stufe konkret bedeutet
+    Stellschraube: welcher Wert im Code veraendert wird
+    Vorgaenger:  was vorher freigeschaltet sein muss
+
+
+##############################################################################
+# WURZEL
+##############################################################################
+
+[start]  Dienstantritt
+    1 Stufe    kostenlos
+    Wirkung: Ein Tisch, vier Stempel und keine Wahl.
+    Stellschraube: -
+    Vorgaenger: keiner
+
+##############################################################################
+# KISSEN UND TINTE
+##############################################################################
+
+[voll]  Volles Kissen
+    1 Stufe    40 EUR
+    Wirkung: Das Stempelkissen trägt zwei Vorgänge statt einem.
+    Stellschraube: freshnessMax = 2
+    Vorgaenger: Dienstantritt
+
+[xxl]  Stempelkissen XXL
+    1 Stufe    150 EUR
+    Wirkung: Vier Vorgänge pro Füllung. Nachtinten wird zur Nebensache.
+    Stellschraube: freshnessMax = 4
+    Vorgaenger: Volles Kissen
+
+[fass]  Fasspumpe
+    1 Stufe    320 EUR
+    Wirkung: Sechs Vorgänge pro Füllung.
+    Stellschraube: freshnessMax = 6
+    Vorgaenger: Stempelkissen XXL
+
+[spar]  Sparsames Kissen
+    1 Stufe    40 EUR
+    Wirkung: Ein Stempeldruck kostet 0,35 € Tinte statt 0,50 €.
+    Stellschraube: inkCost = 0.35
+    Vorgaenger: Volles Kissen
+
+[gross]  Großbestellung
+    1 Stufe    180 EUR
+    Wirkung: Tinte im Gebinde: 0,22 € pro Druck.
+    Stellschraube: inkCost = 0.22
+    Vorgaenger: Sparsames Kissen
+
+##############################################################################
+# SAMMELBEARBEITUNG: KOMBO UND VOLLTREFFER
+##############################################################################
+
+[serie]  Sammelbearbeitung
+    1 Stufe    70 EUR
+    Wirkung: Gleichartige Vorgänge nacheinander bearbeitet bauen ab jetzt
+    eine Kombo auf. Ohne diese Fortbildung zerfällt jede Serie sofort.
+    Stellschraube: comboOn = 1
+    Vorgaenger: Dienstantritt
+
+[krit1]  Geübter Blick
+    1 Stufe    60 EUR
+    Wirkung: Jeder fünfte Abdruck sitzt perfekt: 20 % Volltreffer mit
+    doppeltem Ertrag.
+    Stellschraube: critChance = 0.20; critMult = 2
+    Vorgaenger: Sammelbearbeitung
+
+[krit2]  Routiniertes Auge
+    5 Stufen   140 / 224 / 358 / 573 / 918 EUR
+    Wirkung: Wie viel ein Volltreffer einbringt.
+    Stufenwerte: ×2,5 / ×3,0 / ×3,5 / ×4,0 / ×4,5
+    Stellschraube: critMult += 0.5 * r  (je Stufe)
+    Vorgaenger: Geübter Blick
+
+[glueck]  Glückliche Hand
+    1 Stufe    300 EUR
+    Wirkung: Ein Volltreffer nutzt das Kissen nicht ab – der Abdruck sass ja
+    perfekt.
+    Stellschraube: critFree = 1
+    Vorgaenger: Routiniertes Auge
+
+[krit3]  Sechster Sinn
+    5 Stufen   130 / 208 / 333 / 532 / 852 EUR
+    Wirkung: Wie oft ein Abdruck perfekt sitzt.
+    Stufenwerte: 25 % / 30 % / 35 % / 40 % / 45 %
+    Stellschraube: critChance += 0.05 * r  (je Stufe)
+    Vorgaenger: Geübter Blick
+
+[durch]  Durchschlagpapier
+    5 Stufen   260 / 416 / 666 / 1.065 / 1.704 EUR
+    Wirkung: Wie oft ein Abdruck nebenbei einen zweiten, zufälligen Vorgang
+    erledigt.
+    Stufenwerte: 5,0 % / 7,5 % / 10,0 % / 12,5 % / 15,0 %
+    Stellschraube: echoChance = 0.025 + 0.025 * r  (je Stufe)
+    Vorgaenger: Sechster Sinn
+
+[kmerk]  Aktenzeichen-Gedächtnis
+    4 Stufen   150 / 240 / 384 / 614 EUR
+    Wirkung: Wie hoch die Kombo steigen kann.
+    Stufenwerte: ×3,5 / ×4,0 / ×4,5 / ×5,0
+    Stellschraube: comboCap += 0.5 * r  (je Stufe)
+    Vorgaenger: Sammelbearbeitung
+
+[beharr]  Beharrlichkeit
+    1 Stufe    180 EUR
+    Wirkung: Eine Beschwerde halbiert die Kombo, statt sie zu brechen.
+    Stellschraube: comboOnWrong = 1
+    Vorgaenger: Aktenzeichen-Gedächtnis
+
+[schwung]  Schwung
+    5 Stufen   120 / 192 / 307 / 492 / 786 EUR
+    Wirkung: Wie stark die Kombo mit jedem Vorgang wächst.
+    Stufenwerte: +0,11 je Vorgang / +0,12 je Vorgang / +0,13 je Vorgang / +0,14 je Vorgang / +0,15 je Vorgang
+    Stellschraube: comboStep += 0.01 * r  (je Stufe)
+    Vorgaenger: Sammelbearbeitung
+
+[warm]  Warmgelaufen
+    5 Stufen   110 / 176 / 282 / 451 / 721 EUR
+    Wirkung: Auf welcher Stufe die Kombo jeden Morgen startet.
+    Stufenwerte: Stufe 1 / Stufe 2 / Stufe 3 / Stufe 4 / Stufe 5
+    Stellschraube: comboStart = r
+    Vorgaenger: Schwung
+
+[kurz]  Der kurze Dienstweg
+    1 Stufe    260 EUR
+    Wirkung: Ein Stempelwechsel bricht die Kombo nicht mehr.
+    Stellschraube: comboKeepSwap = 1
+    Vorgaenger: Beharrlichkeit UND Warmgelaufen (beide vollstaendig ausgebaut)
+
+##############################################################################
+# FLAECHE UND NACHSCHUB
+##############################################################################
+
+[flach1]  Breiter Stempel
+    1 Stufe    120 EUR
+    Wirkung: Ein Abdruck trifft zwei nebeneinander liegende Vorgänge – und
+    kostet nur einmal Tinte.
+    Stellschraube: hitCount = 2
+    Vorgaenger: Dienstantritt
+
+[flach2]  Amtsstempel XXL
+    1 Stufe    340 EUR
+    Wirkung: Ein Abdruck deckt vier Vorgänge ab. Vorsicht: falsch
+    gestempelte zählen mit.
+    Stellschraube: hitCount = 4
+    Vorgaenger: Breiter Stempel
+
+[bote1]  Flinker Bote
+    4 Stufen   40 / 64 / 102 / 164 EUR
+    Wirkung: Wie schnell Vorgänge vom Stapel nachrücken.
+    Stufenwerte: 1,50 s / 1,40 s / 1,30 s / 1,20 s
+    Stellschraube: spawnMs -= 100 * r  (je Stufe)
+    Vorgaenger: Breiter Stempel
+
+[bote2]  Zweiter Bote
+    4 Stufen   110 / 176 / 282 / 451 EUR
+    Wirkung: Ein zweiter Bote holt noch mehr heran. Der Tisch bleibt voll.
+    Stufenwerte: 1,10 s / 1,00 s / 0,90 s / 0,80 s
+    Stellschraube: spawnMs -= 100 * r  (je Stufe)
+    Vorgaenger: Flinker Bote (beide vollstaendig ausgebaut)
+
+##############################################################################
+# ERGONOMIE AM STEMPELHALTER
+##############################################################################
+
+[hand]  Handgelenkdrehung
+    1 Stufe    80 EUR
+    Wirkung: Der Stempelwechsel kostet nur noch einen halben Takt.
+    Stellschraube: swapCost = 0.5
+    Vorgaenger: Dienstantritt
+
+[trocken]  Trockenwechsel
+    1 Stufe    70 EUR
+    Wirkung: Der Stempelwechsel verbraucht keine Tinte mehr.
+    Stellschraube: swapInk = 0
+    Vorgaenger: Handgelenkdrehung
+
+[vorbei]  Nachtinten im Vorbeigehen
+    1 Stufe    90 EUR
+    Wirkung: Auch das Nachtinten kostet nur noch einen halben Takt.
+    Stellschraube: reinkCost = 0.5
+    Vorgaenger: Handgelenkdrehung
+
+##############################################################################
+# TAKT UND DIENSTZEIT
+##############################################################################
+
+[routi]  Routine
+    1 Stufe    60 EUR
+    Wirkung: Der Stempeltakt sinkt von 1,50 s auf 1,35 s.
+    Stellschraube: beatMs -= 150
+    Vorgaenger: Dienstantritt
+
+[blind]  Blindstempeln
+    1 Stufe    140 EUR
+    Wirkung: Der Takt sinkt um weitere 0,20 s. Mehr Schläge, mehr Tinte,
+    weniger Bedenkzeit.
+    Stellschraube: beatMs -= 200
+    Vorgaenger: Routine
+
+[ueber]  Überstunden
+    1 Stufe    90 EUR
+    Wirkung: Der Arbeitstag dauert 6 Sekunden länger.
+    Stellschraube: roundMs += 6000
+    Vorgaenger: Routine
+
+[gleit]  Gleitzeit
+    1 Stufe    200 EUR
+    Wirkung: Noch einmal 8 Sekunden mehr Dienstzeit.
+    Stellschraube: roundMs += 8000
+    Vorgaenger: Überstunden
+
+##############################################################################
+# AMTSAUTORITAET UND ERTRAG
+##############################################################################
+
+[vorsc]  Dienst nach Vorschrift
+    1 Stufe    90 EUR
+    Wirkung: Eine Beschwerde kostet nur noch 1,00 € statt 2,00 €.
+    Stellschraube: wrongPenalty = 1
+    Vorgaenger: Dienstantritt
+
+[gebuehr]  Verwaltungsgebühr
+    1 Stufe    160 EUR
+    Wirkung: Jeder erledigte Vorgang bringt zusätzlich 0,60 €.
+    Stellschraube: bonusPerForm = 0.60
+    Vorgaenger: Dienst nach Vorschrift
+
+[saeum]  Säumniszuschlag
+    1 Stufe    380 EUR
+    Wirkung: Der Zuschlag steigt auf 1,40 € je Vorgang.
+    Stellschraube: bonusPerForm = 1.40
+    Vorgaenger: Verwaltungsgebühr
+
+[ablehn]  Ablehnungsbescheid
+    5 Stufen   90 / 144 / 230 / 369 / 590 EUR
+    Wirkung: Zuschlag auf jeden abgelehnten Vorgang.
+    Stufenwerte: +0,50 € / +1,00 € / +1,50 € / +2,00 € / +2,50 €
+    Stellschraube: stampBonus.abl += 0.5 * r  (je Stufe)
+    Vorgaenger: Dienst nach Vorschrift
+
+[nachford]  Nachforderungsgebühr
+    4 Stufen   100 / 160 / 256 / 410 EUR
+    Wirkung: Zuschlag auf jede Nachforderung.
+    Stufenwerte: +0,50 € / +1,00 € / +1,50 € / +2,00 €
+    Stellschraube: stampBonus.nach += 0.5 * r  (je Stufe)
+    Vorgaenger: Ablehnungsbescheid
+
+[weiter]  Weiterleitungspauschale
+    4 Stufen   80 / 128 / 205 / 328 EUR
+    Wirkung: Zuschlag auf jede Weiterleitung. Die billigste Aktion wird zur
+    echten Alternative.
+    Stufenwerte: +0,60 € / +1,20 € / +1,80 € / +2,40 €
+    Stellschraube: stampBonus.weit += 0.6 * r  (je Stufe)
+    Vorgaenger: Dienst nach Vorschrift
+
+##############################################################################
+# VORGESCHLAGEN, ABER NOCH NICHT GEBAUT
+##############################################################################
+Diese Ideen stammen aus dem Vorschlag vom 22.09.2026 und sind bewusst nicht
+eingebaut. Sie sind vollstaendig durchdacht - wer sie will, findet unten bei
+EINBAUEN alles, was dafuer noetig ist.
+
+[registrat]  Registratur-Erweiterung
+    3 Stufen   200 / 320 / 512 EUR
+    Wirkung: Der Tisch bekommt zwei Plaetze mehr.
+    Stufenwerte: 14 / 16 / 18 Plaetze
+    Stellschraube: slots += 2 je Stufe
+    ACHTUNG: Das Raster im CSS ist auf 4 Spalten und 3 Zeilen festgelegt.
+             Bei mehr Plaetzen muss grid-template-rows mitwachsen.
+
+[vorsort]  Vorsortierung
+    1 Stufe    240 EUR
+    Wirkung: Neue Vorgaenge landen bevorzugt neben gleichartigen.
+    Stellschraube: neue Regel in spawnForm()
+    Heimlich stark: fuettert gleichzeitig den Flaechenstempel UND die Kombo.
+
+[aktenkunde]  Aktenkunde
+    1 Stufe    70 EUR
+    Wirkung: Eine farbige Ecke zeigt auf jedem Vorgang den Sollstempel.
+    Stellschraube: Darstellung in spawnForm()
+    WARNUNG: Nimmt dem Spiel das Lernen der Vorgangstypen ab - also genau die
+             Wissensachse, auf der der Kern-Skill beruht. Gut ueberlegen.
+
+[ermessen]  Ermessensspielraum
+    4 Stufen   220 / 352 / 563 / 901 EUR
+    Wirkung: Ein Fehlstempel bringt einen Teil des Wertes statt einer Beschwerde.
+    Stufenwerte: 25 % / 50 % / 75 % / 100 %
+    Stellschraube: neuer Wert wrongPayout, ausgewertet in resolveForm()
+    WARNUNG: Auf der letzten Stufe wird der Amtsstempel XXL risikofrei - dann
+             gibt es keinen Grund mehr, nicht staendig vierfach zu stempeln.
+             Besser bei 75 % deckeln.
+
+[amtsschimmel]  Amtsschimmel
+    5 Stufen   190 / 304 / 486 / 778 / 1245 EUR
+    Wirkung: Manche Vorgaenge kommen schon vorgestempelt auf den Tisch.
+    Stufenwerte: 3 % / 6 % / 9 % / 12 % / 15 %
+    Stellschraube: neuer Wert preStamped, ausgewertet in spawnForm()
+
+[feierabend]  Feierabendbonus
+    5 Stufen   130 / 208 / 333 / 532 / 852 EUR
+    Wirkung: Liegengebliebene Vorgaenge bringen am Tagesende eine Pauschale.
+    Stufenwerte: 0,20 / 0,40 / 0,60 / 0,80 / 1,00 EUR je Vorgang
+    Stellschraube: neuer Wert deskPayout, ausgewertet in endRound()
+    WARNUNG: Arbeitet GEGEN den Rueckstand, also gegen die zentrale
+             Druckquelle des Spiels. Reizvoll als Gegenbewegung, veraendert
+             aber den Charakter.
+
+
+##############################################################################
+# STELLSCHRAUBEN - WAS EIN UPGRADE VERAENDERN KANN
+##############################################################################
+Jeder dieser Werte liegt in STATS und wird bei jedem Rundenstart neu aus
+CONFIG plus allen gekauften Stufen aufgebaut. Ein Upgrade schreibt hinein,
+sonst nichts.
+
+  RUNDE UND TAKT
+    roundMs        Laenge eines Arbeitstages in Millisekunden      (40000)
+    beatMs         Stempeltakt, Untergrenze 800                    (1500)
+    startDelayMs   Aufwaermphase vor dem ersten Schlag             (2000)
+
+  NACHSCHUB
+    spawnMs        Abstand, in dem Vorgaenge nachruecken, min. 800 (1600)
+    inflowMs       Zulauf in den Posteingang                       (1000)
+    slots          Tischplaetze                                    (12)
+
+  TINTE UND KISSEN
+    inkCost        Kosten je Stempeldruck, Untergrenze 0,05        (0,50)
+    freshnessMax   Vorgaenge, die eine Kissenfuellung traegt       (1)
+    swapInk        1 = Stempelwechsel kostet Tinte, 0 = kostenlos  (1)
+
+  HANDGRIFFE
+    swapCost       Anteil eines Taktes fuer den Stempelwechsel     (1)
+    reinkCost      Anteil eines Taktes fuers Nachtinten            (1)
+
+  ERTRAG
+    wrongPenalty   Kosten einer Beschwerde                         (2,00)
+    bonusPerForm   Zuschlag auf JEDEN erledigten Vorgang           (0)
+    stampBonus     Zuschlag je Stempelart: gen/abl/weit/nach       (je 0)
+
+  VOLLTREFFER
+    critChance     Wahrscheinlichkeit, 0 = keine Volltreffer       (0)
+    critMult       Multiplikator eines Volltreffers                (2)
+    critFree       1 = Volltreffer nutzt das Kissen nicht ab       (0)
+
+  FLAECHE UND ZUFALL
+    hitCount       Vorgaenge, die ein Abdruck gleichzeitig trifft  (1)
+    echoChance     Durchschlagpapier: zweiter Vorgang gratis       (0)
+
+  KOMBO
+    comboOn        0 = es entsteht gar keine Kombo                 (0)
+    comboStep      Zuwachs je Vorgang                              (0,10)
+    comboCap       Deckel des Multiplikators                       (3,00)
+    comboStart     Stufe, auf der die Kombo morgens startet        (0)
+    comboKeepSwap  1 = Stempelwechsel bricht die Kombo nicht       (0)
+    comboOnWrong   1 = Beschwerde halbiert statt zu brechen        (0)
+
+
+##############################################################################
+# EINBAUEN - WAS EIN NEUER EINTRAG BRAUCHT
+##############################################################################
+Alles steht in prototyp/index.html im Feld TREE. Ein Knoten sieht so aus:
+
+  { id:'kennung', hx:320, hy:-255, icon:'chain', cost:150, ranks:4,
+    name:'Aktenzeichen-Gedaechtnis',
+    eff:'Wie hoch die Kombo steigen kann.',
+    valueAt:r => 'x' + num(3 + 0.5 * r, 1),
+    apply:(st, r) => st.comboCap += 0.5 * r },
+
+  id        eindeutige Kennung, wird in LINKS verwendet
+  hx / hy   Lage relativ zum Zentrum, ungedehnt. Alternativ a/r/o fuer die
+            radialen Speichen (Winkel / Abstand / seitlicher Versatz)
+  icon      Name aus der Liste ICONS. Neue Icons werden dort im Bereich
+            -12 bis +12 um den Nullpunkt gezeichnet
+  cost      Preis der ERSTEN Stufe; jede weitere kostet das 1,6-fache
+  ranks     Anzahl der Stufen. Weglassen = eine Stufe
+  valueAt   Text, den die Detailkarte je Stufe zeigt. Nur bei mehreren Stufen
+  apply     schreibt in STATS. Bei mehreren Stufen als (st, r)
+
+Dann die Verbindung in LINKS eintragen:
+
+  ['vorgaenger','kennung'],
+
+Mehrere Vorgaenger sind erlaubt - einfach mehrere Zeilen. Soll der Knoten
+erst aufgehen, wenn die Vorgaenger VOLLSTAENDIG ausgebaut sind, kommt
+needsMaxParent:true an den Knoten.
+
+DREI REGELN, DIE MAN LEICHT UEBERSIEHT
+  1. Bei zwei Knoten, die denselben Wert ABSOLUT setzen (z. B. freshnessMax
+     = 2 und = 4), muss der schwaechere in TREE VOR dem staerkeren stehen.
+     Sonst schaltet ein spaeterer Kauf des schwaecheren zurueck.
+     Bei += oder -= ist die Reihenfolge egal.
+  2. Werte, die ins Bodenlose laufen koennen, gehoeren in die
+     Sicherheitsgrenzen am Ende von resetStats().
+  3. Nach jeder Verschiebung im Baum die drei Layout-Pruefungen laufen
+     lassen: Kaestchen duerfen sich nicht beruehren (80 px waagerecht ODER
+     106 px senkrecht), Verbindungen duerfen sich nicht kreuzen, und keine
+     Verbindung darf durch ein fremdes Kaestchen laufen.
+
+SCHALTER ODER REGLER?
+  Stufen passen zu REGLERN - Wahrscheinlichkeiten, Zuschlaege, Zeiten.
+  Sie passen NICHT zu SCHALTERN: "2,4 Vorgaenge gleichzeitig" oder ein halb
+  freigeschalteter Volltreffer ergeben keinen Sinn. Im Zweifel eine Stufe.
+
+
+##############################################################################
+# EIGENE IDEEN
+##############################################################################
+Hier ist Platz. Vorlage zum Kopieren:
+
+[kennung]  Name des Upgrades
+    N Stufen   Preis der ersten Stufe
+    Wirkung: Ein Satz, den der Spieler in der Detailkarte liest.
+    Stufenwerte: Wert je Stufe
+    Stellschraube: welcher STATS-Wert wie veraendert wird
+    Vorgaenger: an welchem Knoten es haengt
+    Notiz: offene Fragen, Balancing-Bedenken, Warum
+
+
+[ ]  ...
+
+
+[ ]  ...
+
+
+[ ]  ...

@@ -87,8 +87,13 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 Kombo und Volltreffer hängen in **einem** zusammenhängenden Zweig rechts vom
 Zentrum. Seine Wurzel schaltet die Kombo überhaupt erst frei:
 
-**Serienbearbeitung** (70 €) — *„Erst jetzt entstehen überhaupt Kombos. Vorher
-wird jede Serie sofort wieder verworfen."*
+**Sammelbearbeitung** (70 €) — *„Gleichartige Vorgänge nacheinander bearbeitet
+bauen ab jetzt eine Kombo auf. Ohne diese Fortbildung zerfällt jede Serie
+sofort."*
+
+Der Name benennt die Bedingung: Die Kombo wächst, solange **gleichartige**
+Vorgänge aufeinander folgen — ein Stempelwechsel setzt sie zurück, bis „Der
+kurze Dienstweg" das aufhebt.
 
 Ohne diesen Knoten bleibt `STATS.comboOn` auf 0: `bumpCombo()` zählt gar nicht
 hoch und `multFor()` gibt konstant ×1,0 zurück. Die Kopfzeile zeigt dem Spieler
@@ -297,3 +302,14 @@ sich der Zeiger seit dem `pointerdown` um mehr als 5 px bewegt hat. Wenn nicht,
 war es ein Tippen — dann sucht `document.elementFromPoint()` den Knoten unter
 dem Zeiger und kauft ihn. Der Zeiger wird außerdem erst eingefangen, **nachdem**
 die 5-px-Schwelle überschritten ist, nicht schon beim Drücken.
+
+## Wo die Upgrades dokumentiert sind
+
+`verbesserungen.txt` im Projektstamm listet **alle 34 eingebauten Upgrades** mit
+Stufen, Stufenwerten, Preisstaffel, Stellschraube und Vorgängern — dazu die
+sechs vorgeschlagenen, aber nicht gebauten, eine Übersicht aller 25
+Stellschrauben in `STATS`, eine Anleitung zum Einbauen und Platz für eigene
+Ideen.
+
+Die Liste wird **aus dem laufenden Spiel ausgelesen**, nicht von Hand gepflegt.
+Nach größeren Änderungen am Baum gehört sie neu erzeugt, sonst driftet sie.

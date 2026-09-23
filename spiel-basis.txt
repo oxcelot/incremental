@@ -1075,9 +1075,11 @@ Kombo UND Volltreffer haengen jetzt in EINEM zusammenhaengenden Zweig rechts
 vom Zentrum. Vorher lag die Kombo an der Ergonomie-Speiche und die Volltreffer
 an einer eigenen - das war zwei Zweige fuer denselben Gedanken.
 
-DIE WURZEL: SERIENBEARBEITUNG (70 EUR)
-"Erst jetzt entstehen ueberhaupt Kombos. Vorher wird jede Serie sofort wieder
-verworfen." Ohne diesen Knoten bleibt STATS.comboOn auf 0: bumpCombo() zaehlt
+DIE WURZEL: SAMMELBEARBEITUNG (70 EUR)  [umbenannt 23.09.2026]
+"Gleichartige Vorgaenge nacheinander bearbeitet bauen ab jetzt eine Kombo auf.
+Ohne diese Fortbildung zerfaellt jede Serie sofort."
+Der Name benennt die Bedingung: die Kombo waechst, solange GLEICHARTIGE
+Vorgaenge aufeinander folgen. Ohne diesen Knoten bleibt STATS.comboOn auf 0: bumpCombo() zaehlt
 gar nicht hoch, multFor() gibt konstant x1,0 zurueck.
 => Die Kopfzeile zeigt dem Spieler von Beginn an eine Kombo-Anzeige, die sich
    NIE bewegt. Das ist Absicht: der Koeder steht von der ersten Sekunde an auf
@@ -1136,3 +1138,16 @@ Vor dieser Runde streifte die Linie "Dienst nach Vorschrift ->
 Weiterleitungspauschale" das Kaestchen "Blindstempeln" auf ZWEI Pixel, und
 "Serienbearbeitung" stand 11 px neben "Ueberstunden" - beides im Ueberblick
 unsichtbar. Augenmass reicht bei 34 Knoten nicht mehr.
+
+
+################################################################################
+# TEIL 1J - VERBESSERUNGEN.TXT (23.09.2026)
+################################################################################
+Im Projektstamm liegt verbesserungen.txt: alle eingebauten Upgrades mit Stufen,
+Stufenwerten, Preisstaffel, Stellschraube und Vorgaengern; dazu die sechs
+vorgeschlagenen, aber nicht gebauten, eine Uebersicht aller Stellschrauben in
+STATS, eine Anleitung zum Einbauen und Platz fuer eigene Ideen.
+
+WICHTIG: Die Liste wird AUS DEM LAUFENDEN SPIEL AUSGELESEN, nicht von Hand
+gepflegt. Eine handgepflegte Liste weicht nach drei Aenderungen vom Code ab und
+ist dann schlimmer als keine. Nach groesseren Umbauten am Baum neu erzeugen.

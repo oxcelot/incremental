@@ -534,7 +534,7 @@ function resetStats(){
   STATS.bonusPerForm = 0;   // Verwaltungsgebuehr je erledigtem Vorgang
   STATS.critFree     = 0;   // Volltreffer nutzen das Kissen nicht ab
   STATS.stampBonus   = { gen:0, abl:0, weit:0, nach:0 };  // Ertrag je Stempelart
-  STATS.comboOn      = 0;   // ohne Serienbearbeitung entsteht gar keine Kombo
+  STATS.comboOn      = 0;   // ohne Sammelbearbeitung entsteht gar keine Kombo
   STATS.comboStep    = CONFIG.comboStep;
   STATS.comboCap     = CONFIG.comboCap;
   STATS.comboStart   = 0;   // Kombo-Stufe zu Rundenbeginn
@@ -616,8 +616,8 @@ const TREE = [
   // ---- Kombo und Volltreffer (rechts, ein zusammenhaengender Zweig) -------
   // Von Hand gesetzte Koordinaten: der Zweig ist zu gross fuer das Radialschema.
   { id:'serie', hx:185, hy:-190, icon:'series', cost:70,
-    name:'Serienbearbeitung',
-    eff:'Erst jetzt entstehen \u00fcberhaupt Kombos. Vorher wird jede Serie sofort wieder verworfen.',
+    name:'Sammelbearbeitung',
+    eff:'Gleichartige Vorg\u00e4nge nacheinander bearbeitet bauen ab jetzt eine Kombo auf. Ohne diese Fortbildung zerf\u00e4llt jede Serie sofort.',
     apply:st => st.comboOn = 1 },
 
   // Volltreffer-Ast
@@ -1107,7 +1107,7 @@ function tick(dt, now){
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
-// Ohne "Serienbearbeitung" wird jede Serie sofort wieder verworfen: die
+// Ohne "Sammelbearbeitung" zerfaellt jede Serie sofort: die
 // Kombo zaehlt nicht hoch und der Multiplikator bleibt bei x1,0.
 const STAMP_TYPE = {};
 for(const t of TYPES) STAMP_TYPE[t.want] = t.id;
