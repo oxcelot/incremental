@@ -132,6 +132,25 @@
   .form.gold .rare{color:var(--gold);}
   .form.dia   .rare{color:var(--dia);}
   .form.gold .value{color:var(--gold); font-weight:700;}
+  /* Fristbalken: laeuft oben ueber die ganze Karte ab, wie eine brennende
+     Lunte. Im letzten Drittel wird er rot - die Entscheidung wird dringend. */
+  .form .frist{
+    position:absolute; left:0; right:0; top:0; height:5px;
+    background:color-mix(in srgb, var(--gold-edge) 28%, #0000);
+  }
+  .form .frist i{
+    display:block; height:100%; width:100%;
+    background:var(--gold); transform-origin:left;
+  }
+  .form.knapp .frist i{background:var(--bad);}
+  .form.knapp .rare{color:var(--bad); animation:knapp .5s ease-in-out infinite;}
+  @keyframes knapp{0%,100%{opacity:1}50%{opacity:.45}}
+  /* Kurzes Aufblitzen in dem Moment, in dem die Frist verfaellt */
+  .form.verfallen{animation:verfallen .42s ease-out;}
+  @keyframes verfallen{
+    0%{box-shadow:0 2px 0 rgba(0,0,0,.18), inset 0 0 0 3px var(--bad);}
+    100%{box-shadow:0 2px 0 rgba(0,0,0,.18), inset 0 0 0 3px #0000;}
+  }
   .form.dia   .value{color:var(--dia);}
   .form .az{font-size:9px; color:#7A7362; letter-spacing:.04em;}
   .form .betreff{font-size:11px; font-weight:700; line-height:1.2; text-wrap:balance;}
@@ -517,6 +536,8 @@ const CONFIG = {
                           // muss, damit er als getroffen zaehlt (Anteil der
                           // Stempelflaeche). Verhindert, dass ein Pixel
                           // Beruehrung schon einen Vorgang mitnimmt.
+  goldMs:         3000,   // Frist eines Eilvermerks, danach ist er ein
+                          // normaler Vorgang derselben Art
   demoCheapUpgrades: true, // DEMO: jede Fortbildung kostet 1 EUR.
                            // Auf false setzen fuer die echten Preise.
   floorAtZero:    true,   // Tagesbilanz nicht negativ werden lassen
@@ -589,6 +610,7 @@ function resetStats(){
   STATS.critEcho     = 0;   // Volltreffer loest immer Durchschlagpapier aus
   STATS.areaBonus    = 0;   // Zuschlag je zusaetzlichem Vorgang unter einem Abdruck
   STATS.goldChance   = 0;   // Eilvermerk: Vorgang ist das Dreifache wert
+  STATS.goldMs       = CONFIG.goldMs;   // wie lange die Frist laeuft
   STATS.diaChance    = 0;   // Sammelverfuegung: reisst die acht Nachbarn mit
   for(const n of TREE){
     const r = rankOf(n);
@@ -1003,6 +1025,7 @@ const SFX = {
   crit(){ tone(880,0.10,'triangle',0.15,1760); tone(1320,0.16,'sine',0.09,2640); },
   echo(){ tone(660,0.12,'sine',0.10,990); noise(0.06,900,1.6,0.06); },
   dia(){ tone(1046,0.09,'sine',0.11,1568); setTimeout(()=>tone(1568,0.22,'sine',0.09,2093),70); },
+  lapse(){ tone(330,0.16,'triangle',0.07,196); noise(0.05,240,0.9,0.05); },
   miss(){ noise(0.07, 130, 0.5, 0.14); },
   dry(){ noise(0.05, 190, 1.1, 0.07); tone(120, 0.05, 'sine', 0.05); },
   reink(){ noise(0.16, 700, 1.4, 0.13); tone(200, 0.13, 'sine', 0.09, 300); },
@@ -1107,8 +1130,10 @@ function spawnForm(){
     f.dataset.dia = '1'; f.classList.add('dia');
     rare = '<div class="rare">&#9670; SAMMEL</div>';
   } else if(Math.random() < STATS.goldChance){
-    f.dataset.gold = '1'; f.classList.add('gold');
-    rare = '<div class="rare">EILT &times;3</div>';
+    f.dataset.gold = '1'; f.dataset.goldLeft = STATS.goldMs;
+    f.classList.add('gold');
+    rare = '<div class="rare">EILT &times;3</div>'
+         + '<div class="frist"><i></i></div>';
   }
   let extra = '';
   let rows = '<div class="row"></div><div class="row"></div><div class="row"></div>';
@@ -1139,7 +1164,7 @@ function startRound(){
     wasDry:null,
     combo:STATS.comboStart, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
-    golds:0, dias:0, diaForms:0,
+    golds:0, dias:0, diaForms:0, goldLost:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
     extraLeft:STATS.extraBeats, extraUsed:0, overSeen:false,
@@ -1194,6 +1219,10 @@ function tick(dt, now){
   }
   S.accSpawn += dt;
   S.accInflow += dt;
+
+  // Waehrend der Aufwaermphase laeuft keine Frist: in dieser Zeit kann der
+  // Spieler gar nicht stempeln, eine Frist waere also nicht zu halten.
+  if(S.graceLeft === 0) ageUrgent(dt);
 
   if(!over){
     if(S.accInflow >= STATS.inflowMs){ S.accInflow -= STATS.inflowMs; S.queue++; renderQueue(); }
@@ -1262,6 +1291,38 @@ const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).leng
 // Ein Eilvermerk verdreifacht den Grundwert. Zuschlaege und Kombo kommen wie
 // gehabt obendrauf - sonst wuerde Gold spaete Upgrades unsinnig verstaerken.
 const baseValue = (t, f) => t.value * (f.dataset.gold ? 3 : 1);
+
+// Der Eilvermerk gilt nur fuer STATS.goldMs. Die Frist laeuft ueber DIESELBE
+// Uhr wie der Stempeltakt (dt aus tick), nicht ueber eine CSS-Animation -
+// sonst laufen Balken und Ablauf auseinander, sobald der Browser bremst.
+function ageUrgent(dt){
+  for(const f of el.desk.querySelectorAll('[data-gold]')){
+    if(!f.dataset.form) continue;          // schon gestempelt, blendet gerade aus
+    const left = (+f.dataset.goldLeft || 0) - dt;
+    if(left <= 0){ lapseUrgent(f); continue; }
+    f.dataset.goldLeft = left;
+    const bar = f.querySelector('.frist i');
+    if(bar) bar.style.transform = 'scaleX(' + (left / STATS.goldMs) + ')';
+    if(left < 1000) f.classList.add('knapp');
+  }
+}
+
+// Frist abgelaufen: aus dem Eilvermerk wird ein ganz normaler Vorgang
+// derselben Art - gleiche Sorte, gleicher Sollstempel, nur eben zum
+// Grundwert. Der Vorgang bleibt liegen, er verschwindet nicht.
+function lapseUrgent(f){
+  delete f.dataset.gold; delete f.dataset.goldLeft;
+  f.classList.remove('gold', 'knapp');
+  const bar = f.querySelector('.frist'); if(bar) bar.remove();
+  const tag = f.querySelector('.rare');  if(tag) tag.remove();
+  const t = TYPES.find(x => x.id === f.dataset.form);
+  const v = f.querySelector('.value');
+  if(t && v) v.textContent = eur(t.value);
+  f.classList.add('verfallen');
+  setTimeout(() => f.classList.remove('verfallen'), 420);
+  S.goldLost++;
+  SFX.lapse();
+}
 // Ohne "Sammelbearbeitung" zerfaellt jede Serie sofort: die
 // Kombo zaehlt nicht hoch und der Multiplikator bleibt bei x1,0.
 const STAMP_TYPE = {};
@@ -1512,6 +1573,7 @@ function endRound(){
   + (S.crits ? row('davon Volltreffer (' + S.crits + ')', '—') : '')
   + (S.echoes ? row('davon Durchschl&auml;ge (' + S.echoes + ')', '—') : '')
   + (S.golds ? row('davon Eilvermerke (' + S.golds + ')', '—') : '')
+  + (S.goldLost ? row('Eilvermerke verfallen (' + S.goldLost + ')', '—') : '')
   + (S.dias ? row('Sammelverf&uuml;gungen (' + S.dias + ')', '—') : '')
   + (S.dias ? sub('dadurch mitbearbeitet: ' + S.diaForms + ' Vorg&auml;nge', '') : '')
   + (S.dryBeats ? row('Leerschl&auml;ge ohne Tinte (' + S.dryBeats + ')', '—') : '')

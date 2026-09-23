@@ -113,6 +113,12 @@ Lesehilfe:
     Stufenwerte: 2 % / 4 % / 6 % / 8 %
     Stellschraube: goldChance += 0.02 * r  (je Stufe), gewuerfelt in spawnForm()
     Vorgaenger: Geuebter Blick
+    FRIST: Ein Eilvermerk gilt nur CONFIG.goldMs lang (3 Sekunden). Oben auf
+    der Karte laeuft ein Balken ab, in der letzten Sekunde wird er rot. Laeuft
+    er aus, wird der Vorgang ein ganz normaler Vorgang DERSELBEN ART - gleiche
+    Sorte, gleicher Sollstempel, nur zum Grundwert. Er verschwindet nicht.
+    Waehrend der Aufwaermphase steht die Frist still; in dieser Zeit kann der
+    Spieler gar nicht stempeln.
     Verdreifacht wird der GRUNDWERT des Vorgangs. Verwaltungsgebuehr,
     Stempelzuschlag und Kombo kommen danach obendrauf - sonst wuerde Gold
     jedes spaete Ertrags-Upgrade doppelt verstaerken.
@@ -428,6 +434,7 @@ sonst nichts.
 
   SELTENE VORGAENGE
     goldChance     Anteil Vorgaenge mit Eilvermerk (dreifacher Wert) (0)
+    goldMs         Frist eines Eilvermerks in Millisekunden         (3000)
     diaChance      Anteil Sammelverfuegungen (reissen 8 Nachbarn mit) (0)
 
   TINTE UND KISSEN
