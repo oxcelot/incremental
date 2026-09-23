@@ -540,7 +540,6 @@ function resetStats(){
   STATS.comboStart   = 0;   // Kombo-Stufe zu Rundenbeginn
   STATS.comboKeepSwap= 0;   // Stempelwechsel bricht die Kombo nicht
   STATS.comboOnWrong = 0;   // Beschwerde halbiert statt zu brechen
-  STATS.comboPerType = 0;   // jede Aktenart fuehrt ihre eigene Kombo
   for(const n of TREE){
     const r = rankOf(n);
     if(r > 0 && n.apply) n.apply(STATS, r);
@@ -616,67 +615,63 @@ const TREE = [
 
   // ---- Kombo und Volltreffer (rechts, ein zusammenhaengender Zweig) -------
   // Von Hand gesetzte Koordinaten: der Zweig ist zu gross fuer das Radialschema.
-  { id:'serie', x:1020, y:430, icon:'series', cost:70,
+  { id:'serie', hx:185, hy:-190, icon:'series', cost:70,
     name:'Serienbearbeitung',
     eff:'Erst jetzt entstehen \u00fcberhaupt Kombos. Vorher wird jede Serie sofort wieder verworfen.',
     apply:st => st.comboOn = 1 },
 
   // Volltreffer-Ast
-  { id:'krit1', x:1230, y:190, icon:'spark', cost:60, name:'Ge\u00fcbter Blick',
+  { id:'krit1', hx:320, hy:-520, icon:'spark', cost:60, name:'Ge\u00fcbter Blick',
     eff:'Jeder f\u00fcnfte Abdruck sitzt perfekt: 20 % Volltreffer mit doppeltem Ertrag.',
     apply:st => { st.critChance = 0.20; st.critMult = 2; } },
-  { id:'krit2', x:1450, y:90, icon:'spark2', cost:140, ranks:5,
+  { id:'krit2', hx:470, hy:-660, icon:'spark2', cost:140, ranks:5,
     name:'Routiniertes Auge',
     eff:'Wie viel ein Volltreffer einbringt.',
     valueAt:r => '\u00d7' + num(2 + 0.5 * r, 1),
     apply:(st, r) => st.critMult += 0.5 * r },
-  { id:'glueck', x:1670, y:90, icon:'spark3', cost:300,
+  { id:'glueck', hx:620, hy:-660, icon:'spark3', cost:300,
     name:'Gl\u00fcckliche Hand',
     eff:'Ein Volltreffer nutzt das Kissen nicht ab \u2013 der Abdruck sass ja perfekt.',
     apply:st => st.critFree = 1 },
-  { id:'krit3', x:1450, y:290, icon:'eye', cost:130, ranks:5,
+  { id:'krit3', hx:470, hy:-400, icon:'eye', cost:130, ranks:5,
     name:'Sechster Sinn',
     eff:'Wie oft ein Abdruck perfekt sitzt.',
     valueAt:r => num(20 + 5 * r) + ' %',
     apply:(st, r) => st.critChance += 0.05 * r },
-  { id:'durch', x:1670, y:290, icon:'copy', cost:260, ranks:5,
+  { id:'durch', hx:620, hy:-400, icon:'copy', cost:260, ranks:5,
     name:'Durchschlagpapier',
     eff:'Wie oft ein Abdruck nebenbei einen zweiten, zuf\u00e4lligen Vorgang erledigt.',
     valueAt:r => num(2.5 + 2.5 * r, 1) + ' %',
     apply:(st, r) => st.echoChance = 0.025 + 0.025 * r },
 
   // Kombo-Ast: Deckel
-  { id:'kmerk', x:1230, y:400, icon:'chain', cost:150, ranks:4,
+  { id:'kmerk', hx:320, hy:-255, icon:'chain', cost:150, ranks:4,
     name:'Aktenzeichen-Ged\u00e4chtnis',
     eff:'Wie hoch die Kombo steigen kann.',
     valueAt:r => '\u00d7' + num(3 + 0.5 * r, 1),
     apply:(st, r) => st.comboCap += 0.5 * r },
-  { id:'beharr', x:1450, y:400, icon:'anchor', cost:180,
+  { id:'beharr', hx:470, hy:-255, icon:'anchor', cost:180,
     name:'Beharrlichkeit',
     eff:'Eine Beschwerde halbiert die Kombo, statt sie zu brechen.',
     apply:st => st.comboOnWrong = 1 },
 
   // Kombo-Ast: Zuwachs
-  { id:'schwung', x:1230, y:520, icon:'bars', cost:120, ranks:5,
+  { id:'schwung', hx:320, hy:-105, icon:'bars', cost:120, ranks:5,
     name:'Schwung',
     eff:'Wie stark die Kombo mit jedem Vorgang w\u00e4chst.',
     valueAt:r => '+' + num(0.10 + 0.01 * r, 2) + ' je Vorgang',
     apply:(st, r) => st.comboStep += 0.01 * r },
-  { id:'warm', x:1450, y:520, icon:'flame', cost:110, ranks:5,
+  { id:'warm', hx:470, hy:-105, icon:'flame', cost:110, ranks:5,
     name:'Warmgelaufen',
     eff:'Auf welcher Stufe die Kombo jeden Morgen startet.',
     valueAt:r => 'Stufe ' + r,
     apply:(st, r) => st.comboStart = r },
 
-  // Kombo-Ast: Wechsel
-  { id:'kurz', x:1230, y:960, icon:'swap2', cost:260,
+  // Kombo-Ast: Abschluss beider Kombo-Zweige
+  { id:'kurz', hx:620, hy:-180, icon:'swap2', cost:260, needsMaxParent:true,
     name:'Der kurze Dienstweg',
     eff:'Ein Stempelwechsel bricht die Kombo nicht mehr.',
     apply:st => st.comboKeepSwap = 1 },
-  { id:'registr', x:1450, y:960, icon:'drawer', cost:900,
-    name:'Getrennte Registratur',
-    eff:'Jede Aktenart f\u00fchrt ihre eigene Kombo \u2013 und die h\u00e4lt bis Dienstschluss.',
-    apply:st => st.comboPerType = 1 },
 
   // ---- Fl\u00e4chenstempel und Nachschub (unten rechts) --------------------
   { id:'flach1', a:30, r:150, icon:'two', cost:120, name:'Breiter Stempel',
@@ -734,17 +729,17 @@ const TREE = [
     apply:st => st.bonusPerForm = 1.40 },
 
   // ---- Ertrag nach Stempelart (an der Amtsautoritaet) --------------------
-  { id:'ablehn', x:470, y:330, icon:'stampno', cost:90, ranks:5,
+  { id:'ablehn', hx:-250, hy:-330, icon:'stampno', cost:90, ranks:5,
     name:'Ablehnungsbescheid',
     eff:'Zuschlag auf jeden abgelehnten Vorgang.',
     valueAt:r => '+' + eur(0.5 * r) + ' \u20ac',
     apply:(st, r) => st.stampBonus.abl += 0.5 * r },
-  { id:'nachford', x:300, y:230, icon:'stampq', cost:100, ranks:4,
+  { id:'nachford', hx:-395, hy:-470, icon:'stampq', cost:100, ranks:4,
     name:'Nachforderungsgeb\u00fchr',
     eff:'Zuschlag auf jede Nachforderung.',
     valueAt:r => '+' + eur(0.5 * r) + ' \u20ac',
     apply:(st, r) => st.stampBonus.nach += 0.5 * r },
-  { id:'weiter', x:620, y:250, icon:'stampfwd', cost:80, ranks:4,
+  { id:'weiter', hx:-150, hy:-480, icon:'stampfwd', cost:80, ranks:4,
     name:'Weiterleitungspauschale',
     eff:'Zuschlag auf jede Weiterleitung. Die billigste Aktion wird zur echten Alternative.',
     valueAt:r => '+' + eur(0.6 * r) + ' \u20ac',
@@ -752,15 +747,23 @@ const TREE = [
 
 ];
 
-// Radialkoordinaten in Bildpunkte umrechnen. Der Baum wird dabei elliptisch
-// in die Breite gezogen, weil die Anzeige breiter als hoch ist - so werden die
-// Kaestchen bei eingepasster Ansicht groesser.
-const SPREAD_X = 1.4, SPREAD_Y = 0.78;
+// Knoten liegen entweder radial (a/r/o) oder von Hand gesetzt (hx/hy) - beide
+// im selben Raster relativ zum Zentrum. Erst zum Schluss wird alles elliptisch
+// in die Breite gezogen, weil die Anzeige breiter als hoch ist. Dadurch wirken
+// Abstaende in beiden Systemen gleich, und eine Aenderung an SPREAD zieht den
+// ganzen Baum mit.
+const SPREAD_X = 1.7, SPREAD_Y = 0.85;
 for(const n of TREE){
-  if(n.x !== undefined) continue;          // von Hand gesetzt
-  const t = (n.a || 0) * Math.PI / 180, o = n.o || 0, r = n.r || 0;
-  n.x = 800 + SPREAD_X * (r * Math.cos(t) + o * Math.cos(t + Math.PI/2));
-  n.y = 600 + SPREAD_Y * (r * Math.sin(t) + o * Math.sin(t + Math.PI/2));
+  let dx, dy;
+  if(n.hx !== undefined){
+    dx = n.hx; dy = n.hy;
+  } else {
+    const t = (n.a || 0) * Math.PI / 180, o = n.o || 0, r = n.r || 0;
+    dx = r * Math.cos(t) + o * Math.cos(t + Math.PI/2);
+    dy = r * Math.sin(t) + o * Math.sin(t + Math.PI/2);
+  }
+  n.x = 800 + SPREAD_X * dx;
+  n.y = 600 + SPREAD_Y * dy;
 }
 
 const LINKS = [
@@ -769,9 +772,8 @@ const LINKS = [
   ['start','serie'],
   ['serie','krit1'],   ['krit1','krit2'], ['krit2','glueck'],
                        ['krit1','krit3'], ['krit3','durch'],
-  ['serie','kmerk'],   ['kmerk','beharr'],
-  ['serie','schwung'], ['schwung','warm'],
-  ['serie','kurz'],    ['kurz','registr'],
+  ['serie','kmerk'],   ['kmerk','beharr'],  ['beharr','kurz'],
+  ['serie','schwung'], ['schwung','warm'],  ['warm','kurz'],
   ['start','flach1'],['flach1','flach2'],
                      ['flach1','bote1'],['bote1','bote2'],
   ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
@@ -1000,13 +1002,12 @@ function startRound(){
   resetStats();
   S = {
     t:0, queue:CONFIG.startQueue, stamp:'gen', freshness:STATS.freshnessMax,
-    wasDry:null, comboByType:{},
+    wasDry:null,
     combo:STATS.comboStart, earned:0, inkSpent:0, presses:0, misses:0, wrongs:0, done:0,
     swaps:0, reinks:0, bestCombo:0, dryBeats:0, crits:0, echoes:0,
     accBeat:0, accSpawn:0, accInflow:0, preticked:false,
     graceLeft:STATS.startDelayMs,
   };
-  for(const t of TYPES) S.comboByType[t.id] = STATS.comboStart;
   buildDesk(); buildRack(); renderRack(); renderQueue();
   for(let i=0;i<6;i++) spawnForm();
   el.veil.hidden = true;
@@ -1097,7 +1098,7 @@ function tick(dt, now){
   const untilNext = S.graceLeft > 0 ? S.graceLeft : (STATS.beatMs - S.accBeat);
   el.beats.textContent = left < untilNext
     ? 0 : 1 + Math.floor((left - untilNext) / STATS.beatMs);
-  el.combo.textContent = '×' + multFor(STAMP_TYPE[S.stamp]).toFixed(1).replace('.',',');
+  el.combo.textContent = '×' + multFor().toFixed(1).replace('.',',');
   el.earned.textContent = eur(S.earned);
   el.ink.textContent = eur(S.inkSpent);
   el.backlog.textContent = S.queue + onDesk();
@@ -1106,28 +1107,21 @@ function tick(dt, now){
 }
 
 const onDesk = () => [...el.desk.children].filter(s => s.firstElementChild).length;
-// Ohne "Getrennte Registratur" gibt es eine einzige Kombo; mit ihr fuehrt
-// jede Aktenart ihre eigene, die bis Dienstschluss haelt.
+// Ohne "Serienbearbeitung" wird jede Serie sofort wieder verworfen: die
+// Kombo zaehlt nicht hoch und der Multiplikator bleibt bei x1,0.
 const STAMP_TYPE = {};
 for(const t of TYPES) STAMP_TYPE[t.want] = t.id;
 
-const comboOf = tid =>
-  STATS.comboPerType ? (S.comboByType[tid] || 0) : S.combo;
-// Ohne "Serienbearbeitung" wird jede Serie sofort wieder verworfen: die
-// Kombo zaehlt nicht hoch und der Multiplikator bleibt bei x1,0.
-const multFor = tid =>
-  STATS.comboOn ? Math.min(1 + comboOf(tid) * STATS.comboStep, STATS.comboCap) : 1;
+const multFor = () =>
+  STATS.comboOn ? Math.min(1 + S.combo * STATS.comboStep, STATS.comboCap) : 1;
 
-function bumpCombo(tid){
+function bumpCombo(){
   if(!STATS.comboOn) return;
-  if(STATS.comboPerType) S.comboByType[tid] = (S.comboByType[tid] || 0) + 1;
-  else S.combo++;
-  S.bestCombo = Math.max(S.bestCombo, comboOf(tid));
+  S.combo++;
+  S.bestCombo = Math.max(S.bestCombo, S.combo);
 }
-function cutCombo(tid){
-  const keep = STATS.comboOnWrong ? 0.5 : 0;
-  if(STATS.comboPerType) S.comboByType[tid] = Math.floor((S.comboByType[tid] || 0) * keep);
-  else S.combo = Math.floor(S.combo * keep);
+function cutCombo(){
+  S.combo = STATS.comboOnWrong ? Math.floor(S.combo * 0.5) : 0;
 }
 
 function isLifted(now){
@@ -1167,7 +1161,7 @@ function strike(now){
   if(pad){
     if(STATS.swapInk) charge();
     S.stamp = pad.dataset.pad; S.swaps++;
-    if(!STATS.comboKeepSwap && !STATS.comboPerType) S.combo = 0;
+    if(!STATS.comboKeepSwap) S.combo = 0;
     S.freshness = STATS.freshnessMax;   // lag auf seinem eigenen Kissen
     S.accBeat += STATS.beatMs * (1 - STATS.swapCost);
     setStampColor(); SFX.swap();
@@ -1192,7 +1186,7 @@ function strike(now){
   // 4) Tisch -> Fehldruck
   charge(); wear();
   S.misses++;
-  if(CONFIG.missBreaksCombo) cutCombo(STAMP_TYPE[S.stamp]);
+  if(CONFIG.missBreaksCombo) cutCombo();
   SFX.miss(); float('daneben', 'var(--muted)');
   renderRack();
 }
@@ -1202,15 +1196,15 @@ function resolveForm(f){
   const t = TYPES.find(x => x.id === f.dataset.form);
   if(!t) return false;
   if(t.want !== S.stamp){
-    S.wrongs++; cutCombo(t.id);
+    S.wrongs++; cutCombo();
     SFX.wrong(); float('Beschwerde', 'var(--bad)');
     finish(f, false);
     return false;
   }
   const crit = Math.random() < STATS.critChance;
-  let gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor(t.id);
+  let gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
   if(crit){ gain *= STATS.critMult; S.crits++; }
-  S.earned += gain; S.done++; bumpCombo(t.id);
+  S.earned += gain; S.done++; bumpCombo();
   if(crit){ SFX.crit(); float('VOLLTREFFER +' + eur(gain), 'var(--s-amber)'); }
   else     { SFX.correct(Math.min(S.combo, 14)); float('+' + eur(gain), 'var(--good)'); }
   finish(f, true);
@@ -1225,7 +1219,7 @@ function echoBonus(){
   const f = rest[Math.random() * rest.length | 0];
   const t = TYPES.find(x => x.id === f.dataset.form);
   if(!t) return;
-  const gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor(t.id);
+  const gain = (t.value + STATS.bonusPerForm + STATS.stampBonus[t.want]) * multFor();
   S.earned += gain; S.done++; S.echoes++;
   // Immer die RICHTIGE Aktion - der Durchschlag kann keine Beschwerde ausloesen
   finish(f, true, STAMPS.find(x => x.id === t.want).name);
@@ -1330,7 +1324,17 @@ const sub = (k)   => '<tr class="sub"><td colspan="2">' + k + '</td></tr>';
 // ---------------------------------------------------------------- Homescreen
 const BOX = 76, HALF = BOX/2;
 const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
-const PARENT = Object.fromEntries(LINKS.map(([a,b]) => [b,a]));
+// Ein Knoten kann mehrere Vorgaenger haben - "Der kurze Dienstweg" haengt am
+// Ende BEIDER Kombo-Zweige und verlangt, dass beide voll ausgebaut sind.
+const PARENTS = {};
+for(const [a, b] of LINKS) (PARENTS[b] = PARENTS[b] || []).push(a);
+// Welche Vorgaenger fehlen noch?
+function missingParents(n){
+  return (PARENTS[n.id] || []).filter(pid => {
+    const p = byId[pid];
+    return rankOf(p) < (n.needsMaxParent ? maxRank(p) : 1);
+  });
+}
 
 // Im Demo-Modus kostet jede Fortbildung 1 EUR. Die echten Preise bleiben in
 // TREE stehen - CONFIG.demoCheapUpgrades auf false setzen und sie gelten wieder.
@@ -1430,11 +1434,7 @@ document.getElementById('zFit').onclick = resetView;
 // sich eine Kette wie Flinker Bote -> Zweiter Bote nicht ueberspringen.
 function nodeState(n){
   if(rankOf(n) >= maxRank(n)) return 'owned';
-  const par = PARENT[n.id];
-  if(par){
-    const p = byId[par];
-    if(rankOf(p) < (n.needsMaxParent ? maxRank(p) : 1)) return 'locked';
-  }
+  if(missingParents(n).length) return 'locked';
   return meta.account >= costOf(n) ? 'afford' : 'short';
 }
 
@@ -1521,10 +1521,10 @@ function showDetail(n){
     stufe = '<div class="dr">Stufe ' + r + ' / ' + max + val + '</div>';
   }
 
-  const par = PARENT[n.id] && byId[PARENT[n.id]];
+  const fehlt = missingParents(n).map(pid => byId[pid].name);
   const status =
       st === 'owned'  ? (max > 1 ? 'Vollst\u00e4ndig ausgebaut.' : 'Freigeschaltet.')
-    : st === 'locked' ? 'Gesperrt \u2014 erst ' + par.name
+    : st === 'locked' ? 'Gesperrt \u2014 erst ' + fehlt.join(' und ')
                         + (n.needsMaxParent ? ' vollst\u00e4ndig ausbauen.' : ' freischalten.')
     : st === 'afford' ? eur(costOf(n)) + ' \u20ac \u2014 klicken f\u00fcr '
                         + (max > 1 ? 'Stufe ' + (r + 1) : 'das Upgrade') + '.'

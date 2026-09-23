@@ -32,7 +32,7 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 | Kombo | ×1,1 pro Stufe, Deckel ×3 |
 | Formulartypen | 4, jeweils mit eigenem sichtbarem Merkmal |
 | Abrechnungsbogen | Ertrag, Tinte, Fehldrucke, Beschwerden, Rückstand, Punkte |
-| Homescreen | Fortbildungsplan: 35 Icon-Knoten, zoom- und verschiebbar |
+| Homescreen | Fortbildungsplan: 34 Icon-Knoten, zoom- und verschiebbar |
 | Voraussetzungen | Ring 2 ist gesperrt, bis der Knoten davor freigeschaltet ist |
 | Währung | **Euro** — Upgrades werden vom eigenen Kontostand bezahlt |
 
@@ -99,15 +99,35 @@ Von der Wurzel gehen vier Äste ab:
 | Ast | Knoten |
 |---|---|
 | Volltreffer | Geübter Blick → **Routiniertes Auge ×5** → Glückliche Hand · **Sechster Sinn ×5** → **Durchschlagpapier ×5** |
-| Kombo-Deckel | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit |
-| Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** |
-| Kombo-Wechsel | Der kurze Dienstweg → Getrennte Registratur |
+| Kombo-Deckel | **Aktenzeichen-Gedächtnis ×4** → Beharrlichkeit ⟶ |
+| Kombo-Zuwachs | **Schwung ×5** → **Warmgelaufen ×5** ⟶ |
+| Abschluss | **Der kurze Dienstweg** — hängt an **beiden** Ästen |
+
+**Der kurze Dienstweg** schließt die zwei Kombo-Äste zusammen: Er wird erst
+kaufbar, wenn Beharrlichkeit *und* Warmgelaufen **vollständig** ausgebaut sind.
+Dafür kann ein Knoten mehrere Vorgänger haben (`PARENTS` statt eines einzelnen
+Elternteils); `missingParents()` liefert die noch fehlenden, und die Detailkarte
+nennt sie beim Namen.
 
 Dieser Zweig ist zu groß für das Radialschema und wird deshalb **von Hand
-gesetzt**: Knoten mit eigenem `x`/`y` überspringen die Polarberechnung. Dasselbe
-gilt für die drei Ertragsknoten oben links. Nach jeder Verschiebung prüft ein
-Testlauf alle Knotenpaare auf Überlappung — Kästchen 76 px, Preisschild 27 px
-darunter, also mindestens 80 px waagerecht oder 106 px senkrecht Abstand.
+gesetzt** — über `hx`/`hy` im **selben Raster** wie die radialen Knoten, nicht
+in fertigen Bildpunkten. Erst zum Schluss zieht `SPREAD_X`/`SPREAD_Y` alles
+elliptisch in die Breite. Dadurch wirken Abstände in beiden Systemen gleich,
+und eine Änderung am Spreizfaktor zieht den ganzen Baum mit.
+
+### Layout-Prüfungen
+
+Nach jeder Verschiebung laufen drei Tests über den gesamten Baum:
+
+| Prüfung | Grenzwert | Stand |
+|---|---|---|
+| Kästchen überlappen sich | 80 px waagerecht **oder** 106 px senkrecht | engster Abstand 47 px Rand zu Rand |
+| Verbindungen kreuzen sich | keine | keine |
+| Verbindung läuft durch fremdes Kästchen | keine, Ziel ≥ 30 px Abstand | engste 32 px |
+
+Alle drei sind nötig: Beim letzten Umbau streifte die Linie *Dienst nach
+Vorschrift → Weiterleitungspauschale* das Kästchen *Blindstempeln* auf **2 px**,
+ohne dass es im Überblick auffiel.
 
 ### Ertrag nach Stempelart
 

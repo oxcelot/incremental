@@ -1098,3 +1098,41 @@ Ertragsknoten oben links.
    Kaestchen 76 px, Preisschild 27 px darunter - also mindestens 80 px
    waagerecht ODER 106 px senkrecht Abstand. Beim ersten Umbau kollidierten
    fuenf Paare, ohne dass es im Ueberblick auffiel.
+
+
+################################################################################
+# TEIL 1I - KOMBO-ZWEIG ZUSAMMENGEFUEHRT (23.09.2026)
+################################################################################
+GETRENNTE REGISTRATUR ENTFERNT
+Der Knoten "jede Aktenart fuehrt ihre eigene Kombo" ist raus, und mit ihm die
+Mechanik dahinter (STATS.comboPerType, S.comboByType). Sie war nur ueber diesen
+einen Knoten erreichbar - haette man ihn stehen lassen, waere eine komplette
+Mechanik im Code geblieben, die nichts mehr einschalten kann.
+=> Falls sie zurueck soll: comboOf/bumpCombo/cutCombo brauchen wieder ein
+   Typ-Argument, S.comboByType wird je Aktenart gefuehrt, und die Kopfzeile
+   zeigt die Kombo der Art, deren Stempel in der Hand liegt.
+
+DER KURZE DIENSTWEG SCHLIESST BEIDE AESTE AB
+Er haengt jetzt am Ende von Beharrlichkeit UND Warmgelaufen und wird erst
+kaufbar, wenn BEIDE vollstaendig ausgebaut sind. Dafuer kann ein Knoten
+mehrere Vorgaenger haben: PARENTS[id] ist eine Liste, missingParents() liefert
+die noch fehlenden, und die Detailkarte nennt sie beim Namen.
+=> Das gibt dem Kombo-Zweig ein echtes Ziel: zwei Aeste, die zusammenlaufen,
+   statt drei, die nebeneinander auslaufen.
+
+LAYOUT: EIN RASTER FUER BEIDE ARTEN VON KNOTEN
+Von Hand gesetzte Knoten tragen jetzt hx/hy im SELBEN ungedehnten Raster wie
+die radialen (a/r/o). Erst zum Schluss zieht SPREAD_X/SPREAD_Y alles in die
+Breite. Vorher standen die Handkoordinaten in fertigen Bildpunkten - eine
+Aenderung am Spreizfaktor haette die beiden Gruppen auseinanderlaufen lassen.
+Spreizung von 1,4/0,78 auf 1,7/0,85 erhoeht: der Baum misst jetzt 1726 x 944.
+
+DREI LAYOUT-PRUEFUNGEN, DIE IMMER LAUFEN MUESSEN
+  1. Kaestchen ueberlappen sich    (80 px waagerecht ODER 106 px senkrecht)
+  2. Verbindungen kreuzen sich     (Segment-Schnitttest ueber alle Paare)
+  3. Verbindung laeuft durch ein fremdes Kaestchen (Abstand >= 30 px)
+Stand: engster Knotenabstand 47 px, engste Linie 32 px, null Kreuzungen.
+Vor dieser Runde streifte die Linie "Dienst nach Vorschrift ->
+Weiterleitungspauschale" das Kaestchen "Blindstempeln" auf ZWEI Pixel, und
+"Serienbearbeitung" stand 11 px neben "Ueberstunden" - beides im Ueberblick
+unsichtbar. Augenmass reicht bei 34 Knoten nicht mehr.
