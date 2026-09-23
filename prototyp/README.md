@@ -16,12 +16,12 @@ Unter Windows reicht ein Doppelklick auf die Datei.
 
 | System | Umsetzung |
 |---|---|
-| Runden-Uhr | 40 Sekunden Echtzeit |
+| Runden-Uhr | 20 Sekunden Echtzeit zu Dienstbeginn, per Fortbildung bis 40 s |
 | Aufwärmphase | 2 s — erst schauen, dann schlägt der Stempel zu |
-| Stempeltakt | 1,5 s, **automatisch** — der Spieler steuert nur die Position |
-| Takte pro Tag | 26 |
+| Stempeltakt | 2,0 s zu Dienstbeginn, per Fortbildung bis 1,0 s — **automatisch**, der Spieler steuert nur die Position |
+| Takte pro Tag | 10 zu Dienstbeginn, 39 bei vollem Ausbau von Takt und Dienstzeit |
 | Tisch | 12 Plätze, Formulare rücken alle 1,6 s vom Stapel nach |
-| Posteingang | wächst um 1 Vorgang pro Sekunde — schneller als 40 Takte schaffen |
+| Posteingang | wächst um 1 Vorgang pro Sekunde — schneller, als die Takte des Tages schaffen |
 | Stempel | GENEHMIGT, NACHFORDERUNG, WEITERLEITEN, ABGELEHNT |
 | Stempelwechsel | auf das fremde Kissen stempeln — kostet einen Takt und die Kombo |
 | Nachtinten | auf das eigene Kissen stempeln — kostet einen Takt, **hält** die Kombo |
@@ -45,6 +45,9 @@ Sämtliche Stellschrauben stehen im `CONFIG`-Block ganz oben im `<script>`.
 Nichts anderes muss angefasst werden. Die interessantesten Werte:
 
 - `beatMs` — der Takt. Das Spiel fühlt sich bei 1200 völlig anders an als bei 1800.
+  Startwert 2000; `routi` und `blind` ziehen ihn in 0,10-s-Stufen bis 1000 herunter.
+- `roundSeconds` — der Arbeitstag. Startwert 20; `ueber` und `gleit` hängen in
+  2-Sekunden-Stufen bis zu 20 s an.
 - `inflowMs` — der Zulauf. Bestimmt, wie aussichtslos sich der Rückstand anfühlt.
 - `inkCost` — aktuell 12,5 % eines Standardvorgangs.
 - `startDelayMs` — die Aufwärmphase. Reicht sie, um den Tisch zu erfassen?
@@ -59,7 +62,7 @@ Nichts anderes muss angefasst werden. Die interessantesten Werte:
 3. Ist der Stempelwechsel eine echte Abwägung oder immer offensichtlich?
 4. Funktioniert Nachtinten als Denkpause, oder fühlt es sich wie Strafe an?
 5. Ist der automatische Takt angenehm oder hetzt er?
-6. Reichen 26 Takte, oder ist der Tag vorbei, bevor er angefangen hat?
+6. Reichen 10 Takte am ersten Tag, oder ist er vorbei, bevor er angefangen hat?
 7. Machen die Namen im Fortbildungsplan Lust auf den nächsten Tag?
 8. Fühlt sich ein Leerschlag nach eigenem Fehler an oder nach Gemeinheit?
 
@@ -267,9 +270,9 @@ wird keine Tinte berechnet, der Vorgang bleibt liegen. Wer das Nachtinten nicht
 einplant, setzt schlicht aus. Die Abrechnung zählt diese Leerschläge und rechnet
 vor, was sie gekostet haben.
 
-**Effektiver Durchsatz** bei 26 Takten und Kissenkapazität C: `26·C/(C+1)`
-— also 13 Vorgänge bei C=1, 17 bei C=2, 21 bei C=4. Deshalb ist „Volles
-Kissen" für 40 € der stärkste erste Kauf im Spiel.
+**Effektiver Durchsatz** bei T Takten und Kissenkapazität C: `T·C/(C+1)`
+— am ersten Tag (T=10) also 5 Vorgänge bei C=1, 7 bei C=2, 8 bei C=4. Deshalb
+ist „Volles Kissen" für 40 € der stärkste erste Kauf im Spiel.
 
 **Kosten pro Vorgang** bei C=1: ein Stempeldruck plus ein Nachtinten, also
 1,00 € Tinte auf einen Vorgang im Wert von rund 4,00 €. Bei C=2 sinkt das auf

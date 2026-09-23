@@ -45,6 +45,7 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
 
 --- ENTSCHIEDEN AM 22.09.2026 (Runde 2) ---
 0.12 Runden-Uhr:        [REVIDIERT am 22.09.2026 - siehe Teil 1C]
+                        [STARTWERTE REVIDIERT am 23.09.2026 - Teil 1K]
                         Ausloesung: AUTOMATISCH IM TAKT (entschieden).
                         ECHTZEIT-UHR (Arbeitstag zaehlt herunter) plus fester
                         STEMPELTAKT von 1,5 s. Ein 60-Sekunden-Tag hat damit
@@ -70,6 +71,7 @@ spaeter Wochen, weil man nie zweimal dieselbe Diskussion fuehrt.
 
 --- ENTSCHIEDEN AM 22.09.2026 (Runde 3) ---
 0.17 Rundenlaenge:      [REVIDIERT 22.09.2026 nach dem ersten Spieltest]
+                        [STARTWERTE REVIDIERT am 23.09.2026 - Teil 1K]
                         Start 40 Sekunden inkl. 2 Sekunden Aufwaermphase.
                         Waechst ueber Fortbildungspunkte. Die wachsende
                         Rundenlaenge ist selbst ein spuerbares
@@ -469,10 +471,10 @@ Fehler an.
    ----------------------------------------------
    Tagesbilanz                      111,00 EUR
 
---- ZAHLEN-SKIZZE TAG 1 (Stand Prototyp, 22.09.2026) ---
-Rundendauer            40 s   (aufruestbar)
+--- ZAHLEN-SKIZZE TAG 1 (Stand Prototyp, 23.09.2026) ---
+Rundendauer            20 s   (aufruestbar bis 40 s)
 Aufwaermphase          2 s    (erst schauen, dann schlaegt der Stempel zu)
-Takt                   1,5 s  -> 26 Takte pro Tag
+Takt                   2,0 s  -> 10 Takte pro Tag (voll ausgebaut 39)
 Tischplaetze           12
 Nachrueckrate          alle 1,6 s ein Formular auf einen freien Platz
                               (aufruestbar) -> ca. 25 Vorgaenge pro Tag
@@ -1151,3 +1153,48 @@ STATS, eine Anleitung zum Einbauen und Platz fuer eigene Ideen.
 WICHTIG: Die Liste wird AUS DEM LAUFENDEN SPIEL AUSGELESEN, nicht von Hand
 gepflegt. Eine handgepflegte Liste weicht nach drei Aenderungen vom Code ab und
 ist dann schlimmer als keine. Nach groesseren Umbauten am Baum neu erzeugen.
+
+
+==============================================================================
+# TEIL 1K - KLEINER ANFANG: TAKT 2,0 s, TAG 20 s (23.09.2026)
+==============================================================================
+
+ENTSCHEIDUNG
+Der Stempeltakt beginnt bei 2,0 Sekunden, der Arbeitstag bei 20 Sekunden.
+Beides ist ueber den Fortbildungsplan aufruestbar. Vorher: 1,5 s und 40 s als
+feste Startwerte, an denen zwei Einmal-Kaeufe herumgeschoben haben.
+
+WARUM
+Der erste Tag war gleichzeitig der schnellste und der laengste Tag des Spiels.
+Wer neu anfaengt, bekommt 26 Takte in einem Tempo, das er noch nicht lesen
+kann - und kann an beidem nichts verbessern, weil Takt und Dienstzeit nach
+zwei Kaeufen ausgereizt waren. Ein langsamer, kurzer erster Tag dreht das um:
+man hat Zeit, den Tisch zu lesen, und beide Achsen bleiben ueber das ganze
+Spiel hinweg kaufbar.
+
+DIE ZWEI LEITERN
+  Takt      routi "Routine"       5 Stufen  2,00 -> 1,50 s  (-0,10 s je Stufe)
+            blind "Blindstempeln" 5 Stufen  1,50 -> 1,00 s  (-0,10 s je Stufe)
+                                            blind erst, wenn routi gemaxt ist
+  Dienstzeit ueber "Ueberstunden" 5 Stufen  20 -> 30 s      (+2 s je Stufe)
+            gleit "Gleitzeit"     5 Stufen  30 -> 40 s      (+2 s je Stufe)
+                                            gleit erst, wenn ueber gemaxt ist
+
+TAKTE PRO TAG
+  Dienstbeginn      10 Takte   (20 s Tag, 2 s Aufwaermphase, 2,0 s Takt)
+  voll ausgebaut    39 Takte   (40 s Tag, 1,0 s Takt)
+Die Kurve laeuft also fast um den Faktor 4 - frueher lag zwischen erstem und
+letztem Tag nur der Faktor 2.
+
+REGEL, DIE SICH DARAUS ERGIBT
+Ein Startwert, der schon nahe am Endwert liegt, verschenkt eine ganze
+Fortschrittsachse. Lieber niedrig anfangen und die Strecke dazwischen mit
+Stufen fuellen, als hoch anfangen und nichts mehr zu verkaufen haben.
+
+ZWEITE REGEL: KEINE ZAHL ZWEIMAL SCHREIBEN
+Die Dienstanweisung auf dem Startbildschirm nannte "1,5 Sekunden" und
+"60 Sekunden - also 40 Takte" als festen Text. Beide Zahlen waren schon vor
+dieser Aenderung falsch und niemandem aufgefallen. Sie werden jetzt aus STATS
+berechnet (`beatsPerRound()`), genau wie die Takt-Anzeige im HUD. Jede Zahl,
+die der Spieler liest, muss aus derselben Quelle stammen wie die Zahl, nach
+der das Spiel rechnet.

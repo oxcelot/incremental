@@ -198,29 +198,33 @@ Lesehilfe:
 ##############################################################################
 
 [routi]  Routine
-    1 Stufe    60 EUR
-    Wirkung: Der Stempeltakt sinkt von 1,50 s auf 1,35 s.
-    Stellschraube: beatMs -= 150
+    5 Stufen   60 / 96 / 154 / 246 / 393 EUR
+    Wirkung: Die Hand wird sicherer: der Stempeltakt sinkt je Stufe um 0,10 s.
+    Stufenwerte: 1,90 s / 1,80 s / 1,70 s / 1,60 s / 1,50 s
+    Stellschraube: beatMs -= 100 * r  (je Stufe)
     Vorgaenger: Dienstantritt
 
 [blind]  Blindstempeln
-    1 Stufe    140 EUR
-    Wirkung: Der Takt sinkt um weitere 0,20 s. Mehr Schläge, mehr Tinte,
-    weniger Bedenkzeit.
-    Stellschraube: beatMs -= 200
-    Vorgaenger: Routine
+    5 Stufen   140 / 224 / 358 / 573 / 918 EUR
+    Wirkung: Der Takt sinkt um weitere 0,10 s je Stufe. Mehr Schläge, mehr
+    Tinte, weniger Bedenkzeit.
+    Stufenwerte: 1,40 s / 1,30 s / 1,20 s / 1,10 s / 1,00 s
+    Stellschraube: beatMs -= 100 * r  (je Stufe)
+    Vorgaenger: Routine (vollstaendig ausgebaut)
 
 [ueber]  Überstunden
-    1 Stufe    90 EUR
-    Wirkung: Der Arbeitstag dauert 6 Sekunden länger.
-    Stellschraube: roundMs += 6000
+    5 Stufen   90 / 144 / 230 / 369 / 590 EUR
+    Wirkung: Der Arbeitstag dauert je Stufe 2 Sekunden länger.
+    Stufenwerte: 22 s / 24 s / 26 s / 28 s / 30 s
+    Stellschraube: roundMs += 2000 * r  (je Stufe)
     Vorgaenger: Routine
 
 [gleit]  Gleitzeit
-    1 Stufe    200 EUR
-    Wirkung: Noch einmal 8 Sekunden mehr Dienstzeit.
-    Stellschraube: roundMs += 8000
-    Vorgaenger: Überstunden
+    5 Stufen   200 / 320 / 512 / 819 / 1311 EUR
+    Wirkung: Noch einmal 2 Sekunden mehr Dienstzeit je Stufe.
+    Stufenwerte: 32 s / 34 s / 36 s / 38 s / 40 s
+    Stellschraube: roundMs += 2000 * r  (je Stufe)
+    Vorgaenger: Überstunden (vollstaendig ausgebaut)
 
 ##############################################################################
 # AMTSAUTORITAET UND ERTRAG
@@ -327,8 +331,8 @@ CONFIG plus allen gekauften Stufen aufgebaut. Ein Upgrade schreibt hinein,
 sonst nichts.
 
   RUNDE UND TAKT
-    roundMs        Laenge eines Arbeitstages in Millisekunden      (40000)
-    beatMs         Stempeltakt, Untergrenze 800                    (1500)
+    roundMs        Laenge eines Arbeitstages in Millisekunden      (20000)
+    beatMs         Stempeltakt, Untergrenze 800                    (2000)
     startDelayMs   Aufwaermphase vor dem ersten Schlag             (2000)
 
   NACHSCHUB

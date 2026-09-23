@@ -386,7 +386,7 @@
 <div id="app">
   <div class="hud">
     <div class="gauge wide" id="clock"><span>Dienstzeit</span><b>00:60</b><div class="timebar"><i></i></div></div>
-    <div class="gauge" id="beats"><span>Takte</span><b>40</b></div>
+    <div class="gauge" id="beats"><span>Takte</span><b>10</b></div>
     <div class="gauge" id="combo"><span>Kombo</span><b>&times;1,0</b></div>
     <div class="gauge" id="earned"><span>Ertrag</span><b>0,00</b></div>
     <div class="gauge" id="ink"><span>Tinte</span><b>0,00</b></div>
@@ -455,8 +455,8 @@
 // ============================================================================
 
 const CONFIG = {
-  roundSeconds:   40,     // Laenge eines Arbeitstages (spaeter aufruestbar)
-  beatMs:         1500,   // Stempeltakt - der Stempel schlaegt von selbst zu
+  roundSeconds:   20,     // Laenge eines Arbeitstages (spaeter aufruestbar)
+  beatMs:         2000,   // Stempeltakt - der Stempel schlaegt von selbst zu
   startDelayMs:   2000,   // Aufwaermphase: erst schauen, dann schlaegt er zu
   spawnMs:        1600,   // Nachrueckrate vom Stapel (spaeter aufruestbar)
   inflowMs:       1000,   // Zulauf in den Posteingang
@@ -704,18 +704,24 @@ const TREE = [
     apply:st => st.reinkCost = 0.5 },
 
   // ---- Takt und Dienstzeit (oben) ----------------------------------------
-  { id:'routi', a:-90, r:150, icon:'chev', cost:60, name:'Routine',
-    eff:'Der Stempeltakt sinkt von 1,50 s auf 1,35 s.',
-    apply:st => st.beatMs -= 150 },
-  { id:'blind', a:-90, r:300, o:-95, icon:'chev3', cost:140, name:'Blindstempeln',
-    eff:'Der Takt sinkt um weitere 0,20 s. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
-    apply:st => st.beatMs -= 200 },
-  { id:'ueber', a:-90, r:300, o:95, icon:'clock', cost:90, name:'\u00dcberstunden',
-    eff:'Der Arbeitstag dauert 6 Sekunden l\u00e4nger.',
-    apply:st => st.roundMs += 6000 },
-  { id:'gleit', a:-90, r:450, o:95, icon:'clockp', cost:200, name:'Gleitzeit',
-    eff:'Noch einmal 8 Sekunden mehr Dienstzeit.',
-    apply:st => st.roundMs += 8000 },
+  { id:'routi', a:-90, r:150, icon:'chev', cost:60, ranks:5, name:'Routine',
+    eff:'Die Hand wird sicherer: der Stempeltakt sinkt je Stufe um 0,10 s.',
+    valueAt:r => num((2000 - 100 * r) / 1000, 2) + ' s',
+    apply:(st, r) => st.beatMs -= 100 * r },
+  { id:'blind', a:-90, r:300, o:-95, icon:'chev3', cost:140, ranks:5, needsMaxParent:true,
+    name:'Blindstempeln',
+    eff:'Der Takt sinkt um weitere 0,10 s je Stufe. Mehr Schl\u00e4ge, mehr Tinte, weniger Bedenkzeit.',
+    valueAt:r => num((1500 - 100 * r) / 1000, 2) + ' s',
+    apply:(st, r) => st.beatMs -= 100 * r },
+  { id:'ueber', a:-90, r:300, o:95, icon:'clock', cost:90, ranks:5, name:'\u00dcberstunden',
+    eff:'Der Arbeitstag dauert je Stufe 2 Sekunden l\u00e4nger.',
+    valueAt:r => num((20000 + 2000 * r) / 1000) + ' s',
+    apply:(st, r) => st.roundMs += 2000 * r },
+  { id:'gleit', a:-90, r:450, o:95, icon:'clockp', cost:200, ranks:5, needsMaxParent:true,
+    name:'Gleitzeit',
+    eff:'Noch einmal 2 Sekunden mehr Dienstzeit je Stufe.',
+    valueAt:r => num((30000 + 2000 * r) / 1000) + ' s',
+    apply:(st, r) => st.roundMs += 2000 * r },
 
   // ---- Amtsautorit\u00e4t (oben links) --------------------------------------
   { id:'vorsc', a:210, r:150, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
@@ -830,6 +836,8 @@ let meta = { day:1, best:0, account:0, owned:{ start:1 } };
 
 const eur = n => n.toFixed(2).replace('.', ',');
 const num = (v, d = 0) => v.toFixed(d).replace('.', ',');
+const beatsPerRound = () =>
+  1 + Math.max(0, Math.floor((STATS.roundMs - STATS.startDelayMs) / STATS.beatMs));
 
 function pickType(){
   const total = TYPES.reduce((s,t)=>s+t.weight,0);
@@ -1561,8 +1569,8 @@ function showIntro(){
   + '<div class="sub">Dienstanweisung &middot; Prototyp</div>'
   + '<h2>Der Stempel</h2>'
   + '<ul>'
-  + '<li>Der Stempel schl&auml;gt <b>von selbst alle 1,5 Sekunden</b> zu. Du steuerst nur, wo er landet.</li>'
-  + '<li>Ein Arbeitstag dauert 60 Sekunden &ndash; also <b>40 Takte</b>. Mehr bekommst du nicht.</li>'
+  + '<li>Der Stempel schl&auml;gt <b>von selbst alle ' + num(STATS.beatMs / 1000, 1) + ' Sekunden</b> zu. Du steuerst nur, wo er landet.</li>'
+  + '<li>Ein Arbeitstag dauert ' + num(STATS.roundMs / 1000) + ' Sekunden &ndash; also <b>' + beatsPerRound() + ' Takte</b>. Mehr bekommst du nicht.</li>'
   + '<li>Jeder Druck kostet Tinte. Abgerechnet wird bei Dienstschluss.</li>'
   + '</ul>'
   + '<h2>Die Kissen</h2>'
