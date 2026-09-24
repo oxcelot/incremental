@@ -392,7 +392,16 @@ vor, was sie gekostet haben.
 
 **Effektiver Durchsatz** bei T Takten und Kissenkapazität C: `T·C/(C+1)`
 — am ersten Tag (T=10) also 5 Vorgänge bei C=1, 7 bei C=2, 8 bei C=4. Deshalb
-ist „Volles Kissen" für 40 € der stärkste erste Kauf im Spiel.
+ist „Volles Kissen" der stärkste erste Kauf im Spiel. Es kostet **25 €** und
+ist damit der einzige Knoten, der früh überhaupt erreichbar ist — alle anderen
+Ring-1-Knoten liegen bei 60–120 €. Der Einstieg führt also über das Kissen,
+ohne dass ihn eine Regel dorthin zwingt.
+
+**Gemessen** (Bot, der jeden Takt entweder einen passenden Vorgang stempelt
+oder nachtintet, fünf Durchläufe): ein erster Tag bringt **11,50–15,50 €**,
+im Schnitt 13,90 €. Bei 25 € ist der Kauf also **nach dem zweiten Tag** drin,
+nicht nach dem ersten. Soll er direkt nach der Tutorial-Runde möglich sein,
+müsste der Preis bei rund 12 € liegen.
 
 **Kosten pro Vorgang** bei C=1: ein Stempeldruck plus ein Nachtinten, also
 1,00 € Tinte auf einen Vorgang im Wert von rund 4,00 €. Bei C=2 sinkt das auf

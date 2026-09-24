@@ -30,7 +30,7 @@ Lesehilfe:
 ##############################################################################
 
 [voll]  Volles Kissen
-    1 Stufe    40 EUR
+    1 Stufe    25 EUR
     Wirkung: Das Stempelkissen trägt zwei Vorgänge statt einem.
     Stellschraube: freshnessMax = 2
     Vorgaenger: Dienstantritt

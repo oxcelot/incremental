@@ -1489,3 +1489,27 @@ ZWEITE REGEL: Ein Schalter, der Zahlen aendert, muss alles neu zeichnen, was
 Zahlen zeigt. Hier: der Baum UND die Detailkarte. Die Karte merkt sich dafuer
 den zuletzt gezeigten Knoten (detailNode) - sonst steht nach dem Umschalten
 der alte Preis da, und das ist schlimmer als gar keiner.
+
+NACHTRAG 24.09.2026: "Volles Kissen" kostet 25 EUR statt 40.
+
+GEMESSEN, nicht geschaetzt: ein Bot, der jeden Takt entweder einen passenden
+Vorgang stempelt oder nachtintet, bringt an Tag 1 zwischen 11,50 und 15,50 EUR,
+im Schnitt 13,90. (Rechnerisch passt das: 4 bis 5 Vorgaenge zu 4 EUR minus
+10 Drucke zu 0,50 EUR Tinte.) Bei 40 EUR waren es drei Tage bis zum ersten
+Kauf, bei 25 EUR sind es zwei.
+
+ACHTUNG, OFFENER PUNKT: Der Wunsch war, dass der Kauf direkt nach der
+Tutorial-Runde moeglich ist. Dafuer muesste der Preis bei rund 12 EUR liegen -
+25 EUR reichen fuer Tag 2, nicht fuer Tag 1. Der Wert steht so, wie er
+bestellt wurde; die Entscheidung liegt beim Auftraggeber.
+
+Das ist bewusst an die geplante Tutorial-Runde gekoppelt: Tag 1 wird spaeter
+gefuehrt, danach soll sofort ein Kauf moeglich sein. Der erste Knoten ist
+damit nicht nur der staerkste (er verdoppelt den Durchsatz), sondern auch der
+einzige, der nach einem einzigen Tag erreichbar ist - alle anderen Ring-1-
+Knoten liegen bei 40 bis 120 EUR. Der Einstieg fuehrt also ueber das Kissen,
+ohne dass ihn eine Regel dorthin zwingt.
+
+REGEL DARAUS: Der erste Preis im Spiel ist keine Oekonomie, sondern
+Dramaturgie. Er gehoert an die Laenge der ersten Runde gekoppelt, nicht an
+die Staerke des Upgrades.
