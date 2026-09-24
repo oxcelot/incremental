@@ -64,7 +64,7 @@ Lesehilfe:
 ##############################################################################
 
 [serie]  Sammelbearbeitung
-    1 Stufe    70 EUR
+    1 Stufe    45 EUR
     Wirkung: Gleichartige Vorgänge nacheinander bearbeitet bauen ab jetzt
     eine Kombo auf. Ohne diese Fortbildung zerfällt jede Serie sofort.
     Stellschraube: comboOn = 1
@@ -281,11 +281,14 @@ Lesehilfe:
 ##############################################################################
 
 [routi]  Routine
-    5 Stufen   60 / 96 / 154 / 246 / 393 EUR
+    5 Stufen   12 / 28 / 63 / 146 / 336 EUR   (Wachstum 2,3 statt 1,6)
     Wirkung: Die Hand wird sicherer: der Stempeltakt sinkt je Stufe um 0,10 s.
     Stufenwerte: 1,90 s / 1,80 s / 1,70 s / 1,60 s / 1,50 s
     Stellschraube: beatMs -= 100 * r  (je Stufe)
     Vorgaenger: Dienstantritt
+    Die ERSTE Stufe kostet 12 EUR und ist damit nach einem einzigen Tag drin.
+    Dafuer steigt die Leiter steiler als ueberall sonst (Faktor 2,3): billig
+    hineinkommen, teuer ausbauen. Das Feld growth im TREE-Eintrag steuert das.
 
 [blind]  Blindstempeln
     5 Stufen   140 / 224 / 358 / 573 / 918 EUR
@@ -339,23 +342,27 @@ Lesehilfe:
 # AMTSAUTORITAET UND ERTRAG
 ##############################################################################
 
+[gebuehr]  Verwaltungsgebühr
+    1 Stufe    35 EUR
+    Wirkung: Jeder erledigte Vorgang bringt zusätzlich 0,50 €. Wirkt vom
+    ersten Tag an auf alles, was du schaffst.
+    Stellschraube: bonusPerForm = 0.50
+    Vorgaenger: Dienstantritt
+    Sitzt bewusst GANZ VORN: ein Ertrags-Upgrade, dessen Wirkung man sofort
+    auf dem Abrechnungsbogen sieht, ohne dass sich das Spielgefuehl aendert.
+
 [vorsc]  Dienst nach Vorschrift
     1 Stufe    90 EUR
     Wirkung: Eine Beschwerde kostet nur noch 1,00 € statt 2,00 €.
     Stellschraube: wrongPenalty = 1
-    Vorgaenger: Dienstantritt
-
-[gebuehr]  Verwaltungsgebühr
-    1 Stufe    160 EUR
-    Wirkung: Jeder erledigte Vorgang bringt zusätzlich 0,60 €.
-    Stellschraube: bonusPerForm = 0.60
-    Vorgaenger: Dienst nach Vorschrift
+    Vorgaenger: Verwaltungsgebühr
 
 [saeum]  Säumniszuschlag
     1 Stufe    380 EUR
     Wirkung: Der Zuschlag steigt auf 1,40 € je Vorgang.
     Stellschraube: bonusPerForm = 1.40
-    Vorgaenger: Verwaltungsgebühr
+    Vorgaenger: Dienst nach Vorschrift
+    Die zweite, spaete Fassung der Verwaltungsgebuehr.
 
 [ablehn]  Ablehnungsbescheid
     5 Stufen   90 / 144 / 230 / 369 / 590 EUR

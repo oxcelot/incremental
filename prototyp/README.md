@@ -83,7 +83,7 @@ Sechs Speichen, an fünf davon gabelt sich der Weg — man muss wählen.
 | Fläche & Nachschub | Breiter Stempel (2 Vorgänge) | Amtsstempel XXL (4) → **Sammelakte ×4** | **Flinker Bote ×4** → **Zweiter Bote ×4** → **Ablagekorb ×3** |
 | Ergonomie | Handgelenkdrehung (Wechsel ½ Takt) | Trockenwechsel (Wechsel ohne Tinte) | Nachtinten im Vorbeigehen (½ Takt) |
 | Takt & Dienstzeit | **Routine ×5** (2,00 → 1,50 s) | **Blindstempeln ×5** (→ 1,00 s) | **Überstunden ×5** (→ 30 s) → **Gleitzeit ×5** (→ 40 s) · **Nachspielzeit ×3** → **Nachtschicht ×3** (→ 6 Takte) |
-| Amtsautorität | Dienst nach Vorschrift (Beschwerde 1,00 €) | Verwaltungsgebühr → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
+| Amtsautorität | **Verwaltungsgebühr** (+0,50 € je Vorgang, 35 €) | Dienst nach Vorschrift → Säumniszuschlag | **Ablehnungsbescheid ×5** → **Nachforderungsgebühr ×4**, **Weiterleitungspauschale ×4** |
 
 ### Der Serien-Zweig
 
@@ -263,6 +263,38 @@ gerade zurückgesetzt wurde. Gemessen, alle Ausbaustufen:
 | Runde + Takt voll | 39 | 39 |
 | dazu Nachtschicht ×3 | 39 + 6 | 45 |
 
+### Die ersten fünf Runden
+
+Der Einstieg war zu leer: nach „Volles Kissen" (25 €) kam lange nichts, was
+man haben *wollte* — „Sparsames Kissen" spart Centbeträge, alles andere lag
+bei 60–120 € oder tief im Baum. Deshalb wurde der Ring 1 umgebaut:
+
+| | Preis | warum früh |
+|---|---|---|
+| **Routine** (1. Stufe) | **12 €** | Takt 2,00 → 1,90 s, spürbar mehr Durchsatz; die Leiter steigt danach mit Faktor **2,3** statt 1,6 |
+| **Volles Kissen** | 25 € | verdoppelt den Durchsatz |
+| **Verwaltungsgebühr** | 35 € | +0,50 € je Vorgang, wirkt sofort auf alles — war vorher 160 € und hinter „Dienst nach Vorschrift" |
+| Sammelbearbeitung | 45 € | schaltet die Kombo überhaupt erst frei (war 70 €) |
+| Handgelenkdrehung | 80 € | |
+| Breiter Stempel | 120 € | |
+
+Das `growth`-Feld im `TREE`-Eintrag (Standard 1,6) macht das möglich: **billig
+hineinkommen, teuer ausbauen**, ohne die Gesamtstärke des Astes zu verändern.
+
+**Gemessener Verlauf** (derselbe Bot, greedy einkaufend, billigstes zuerst):
+
+| Tag | Ertrag | gekauft |
+|---|---|---|
+| 1 | 19,00 € | Routine 1 (12 €) |
+| 2 | 18,50 € | Volles Kissen (25 €) |
+| 3 | 19,50 € | — (spart) |
+| 4 | 21,50 € | Routine 2 (28 €) |
+| 5 | 22,00 € | Verwaltungsgebühr (35 €) |
+
+Nach fünf Runden: **3 verschiedene Upgrades, 4 Stufen**, und an vier von fünf
+Tagen gibt es etwas zu kaufen. Der Ertrag wächst dabei von 19 auf 30,50 € am
+sechsten Tag.
+
 ### Layout-Prüfungen
 
 Nach jeder Verschiebung laufen drei Tests über den gesamten Baum:
@@ -426,11 +458,13 @@ ist damit der einzige Knoten, der früh überhaupt erreichbar ist — alle ander
 Ring-1-Knoten liegen bei 60–120 €. Der Einstieg führt also über das Kissen,
 ohne dass ihn eine Regel dorthin zwingt.
 
-**Gemessen** (Bot, der jeden Takt entweder einen passenden Vorgang stempelt
-oder nachtintet, fünf Durchläufe): ein erster Tag bringt **11,50–15,50 €**,
-im Schnitt 13,90 €. Bei 25 € ist der Kauf also **nach dem zweiten Tag** drin,
-nicht nach dem ersten. Soll er direkt nach der Tutorial-Runde möglich sein,
-müsste der Preis bei rund 12 € liegen.
+**Gemessen** mit einem Bot, der spielt wie ein vernünftiger Mensch — passenden
+Vorgang stempeln, Stempel wechseln wenn eine andere Sorte häufiger liegt, nur
+sonst nachtinten: ein erster Tag bringt **rund 19 €**. Volles Kissen ist damit
+nach dem zweiten Tag drin.
+
+(Ein früherer Bot, der statt zu wechseln nachtintete, kam nur auf 13,90 € —
+die Zahl steht noch in älteren Commit-Texten und ist zu niedrig.)
 
 **Kosten pro Vorgang** bei C=1: ein Stempeldruck plus ein Nachtinten, also
 1,00 € Tinte auf einen Vorgang im Wert von rund 4,00 €. Bei C=2 sinkt das auf

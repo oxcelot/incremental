@@ -791,7 +791,7 @@ const TREE = [
 
   // ---- Kombo und Volltreffer (rechts, ein zusammenhaengender Zweig) -------
   // Von Hand gesetzte Koordinaten: der Zweig ist zu gross fuer das Radialschema.
-  { id:'serie', hx:185, hy:-190, icon:'series', cost:70,
+  { id:'serie', hx:185, hy:-190, icon:'series', cost:45,
     name:'Sammelbearbeitung',
     eff:'Gleichartige Vorg\u00e4nge nacheinander bearbeitet bauen ab jetzt eine Kombo auf. Ohne diese Fortbildung zerf\u00e4llt jede Serie sofort.',
     apply:st => st.comboOn = 1 },
@@ -921,7 +921,7 @@ const TREE = [
     apply:st => st.reinkCost = 0.5 },
 
   // ---- Takt und Dienstzeit (oben) ----------------------------------------
-  { id:'routi', a:-90, r:150, icon:'chev', cost:60, ranks:5, name:'Routine',
+  { id:'routi', a:-90, r:150, icon:'chev', cost:12, ranks:5, growth:2.3, name:'Routine',
     eff:'Die Hand wird sicherer: der Stempeltakt sinkt je Stufe um 0,10 s.',
     valueAt:r => num((2000 - 100 * r) / 1000, 2) + ' s',
     apply:(st, r) => st.beatMs -= 100 * r },
@@ -951,12 +951,12 @@ const TREE = [
     apply:(st, r) => st.extraBeats += r },
 
   // ---- Amtsautorit\u00e4t (oben links) --------------------------------------
-  { id:'vorsc', a:210, r:150, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
+  { id:'gebuehr', a:210, r:150, icon:'coin', cost:35, name:'Verwaltungsgeb\u00fchr',
+    eff:'Jeder erledigte Vorgang bringt zus\u00e4tzlich 0,50 \u20ac. Wirkt vom ersten Tag an auf alles, was du schaffst.',
+    apply:st => st.bonusPerForm = 0.50 },
+  { id:'vorsc', a:210, r:300, icon:'shield', cost:90, name:'Dienst nach Vorschrift',
     eff:'Eine Beschwerde kostet nur noch 1,00 \u20ac statt 2,00 \u20ac.',
     apply:st => st.wrongPenalty = 1 },
-  { id:'gebuehr', a:210, r:300, icon:'coin', cost:160, name:'Verwaltungsgeb\u00fchr',
-    eff:'Jeder erledigte Vorgang bringt zus\u00e4tzlich 0,60 \u20ac.',
-    apply:st => st.bonusPerForm = 0.60 },
   { id:'saeum', a:210, r:450, icon:'coin2', cost:380, name:'S\u00e4umniszuschlag',
     eff:'Der Zuschlag steigt auf 1,40 \u20ac je Vorgang.',
     apply:st => st.bonusPerForm = 1.40 },
@@ -1017,9 +1017,9 @@ const LINKS = [
   ['start','hand'],  ['hand','trocken'],['hand','vorbei'],
   ['start','routi'], ['routi','blind'], ['routi','ueber'], ['ueber','gleit'],
                      ['ueber','nachspiel'], ['nachspiel','nachtschicht'],
-  ['start','vorsc'], ['vorsc','gebuehr'],['gebuehr','saeum'],
-                     ['vorsc','ablehn'], ['ablehn','nachford'],
-                     ['vorsc','weiter'],
+  ['start','gebuehr'], ['gebuehr','vorsc'], ['vorsc','saeum'],
+                       ['vorsc','ablehn'], ['ablehn','nachford'],
+                       ['vorsc','weiter'],
 ];
 
 // ---------------------------------------------------------------- Elemente

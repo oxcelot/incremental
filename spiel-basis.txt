@@ -1552,3 +1552,63 @@ ZWEITE REGEL: Eine Zahl, die das Spiel dem Spieler NENNT (hier: "10 Takte" in
 der Dienstanweisung), ist eine Zusage. Sie gehoert gegen das tatsaechliche
 Verhalten geprueft, nicht nur gegen die Formel, aus der sie stammt - beide
 kamen hier aus derselben Quelle und waren trotzdem verschieden.
+
+
+==============================================================================
+# TEIL 1R - DIE ERSTEN FUENF RUNDEN (24.09.2026)
+==============================================================================
+
+BEFUND DES AUFTRAGGEBERS
+"Der Anfang fuehlt sich so langsam an. Sparsames Kissen will man sich nicht
+als erstes kaufen und die Alternativen sind zu teuer oder im Baum weiter
+hinten."
+
+Das stimmte. Ring 1 sah vorher so aus: Volles Kissen 25, Routine 60,
+Sammelbearbeitung 70, Handgelenkdrehung 80, Dienst nach Vorschrift 90,
+Breiter Stempel 120. Nach dem Kissen kam also zwei bis drei Tage lang nichts.
+Und die Verwaltungsgebuehr - das Upgrade, dessen Wirkung man am schnellsten
+auf dem Abrechnungsbogen sieht - lag mit 160 EUR hinter Dienst nach
+Vorschrift, war also fruehestens am zehnten Tag erreichbar.
+
+UMBAU
+  Routine           60 -> 12 EUR, dafuer growth 2,3 statt 1,6
+                    Leiter: 12 / 28 / 63 / 146 / 336 (Summe 585 statt 949)
+  Verwaltungsgebuehr 160 -> 35 EUR, an die Wurzel gehaengt, +0,50 statt 0,60
+  Dienst nach Vorschrift  rueckt hinter die Verwaltungsgebuehr
+  Saeumniszuschlag        rueckt hinter Dienst nach Vorschrift
+  Sammelbearbeitung  70 -> 45 EUR
+
+Ring 1 jetzt: 12 / 25 / 35 / 45 / 80 / 120 - eine Rampe statt einer Mauer.
+
+DAS WERKZEUG: growth
+Das Feld growth im TREE-Eintrag (Standard 1,6) steuert, wie steil eine Leiter
+steigt. Damit laesst sich "billig hineinkommen, teuer ausbauen" bauen, ohne
+die Gesamtstaerke eines Astes zu veraendern. Genau das wollte der Auftraggeber
+fuer den Takt: erste Stufe frueh, die anderen spaeter.
+
+GEMESSEN (Bot, greedy einkaufend)
+  Tag 1: +19,00 -> Routine 1 (12)
+  Tag 2: +18,50 -> Volles Kissen (25)
+  Tag 3: +19,50 -> spart
+  Tag 4: +21,50 -> Routine 2 (28)
+  Tag 5: +22,00 -> Verwaltungsgebuehr (35)
+Nach fuenf Runden: 3 verschiedene Upgrades, 4 Stufen, an vier von fuenf Tagen
+gibt es etwas zu kaufen. Der Ertrag waechst von 19 auf 30,50 EUR am Tag 6.
+
+KORREKTUR EINER FRUEHEREN MESSUNG
+Die 13,90 EUR fuer Tag 1 aus Teil 1-Nachtrag (24.09.) waren zu niedrig. Der
+damalige Bot tintete nach, wenn kein passender Vorgang lag, statt den Stempel
+zu WECHSELN - er verhungerte, sobald die Vorgaenge seiner Sorte weg waren. Ein
+Bot, der wechselt, kommt auf rund 19 EUR.
+
+REGEL DARAUS: Ein Bot, der das Spiel schlechter spielt als ein Mensch, misst
+nicht das Spiel, sondern den Bot. Bevor eine Zahl aus einer Simulation eine
+Entscheidung traegt, muss die Strategie des Bots gegen die offensichtlichen
+Handlungen geprueft werden, die ein Mensch haette. Hier fehlte genau eine:
+der Stempelwechsel - also die zentrale Entscheidung des ganzen Spiels.
+
+ZWEITE REGEL: "Zu wenig zu kaufen" ist kein Preisproblem einzelner Knoten,
+sondern ein Problem der VERTEILUNG im Ring 1. Der erste Ring braucht eine
+Rampe: etwas nach einem Tag, etwas nach zweien, etwas nach dreien. Sonst
+sammelt der Spieler auf ein fernes Ziel hin und hat dazwischen keine
+Entscheidung - und Entscheidungen sind das, was das Spiel verkauft.
