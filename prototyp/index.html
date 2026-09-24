@@ -623,6 +623,11 @@ const CONFIG = {
                           // Beruehrung schon einen Vorgang mitnimmt.
   goldMs:         7000,   // Frist eines Eilvermerks, danach ist er ein
                           // normaler Vorgang derselben Art
+  roundTailMs:    100,    // Technischer Nachlauf: die Runde laeuft 0,1 s
+                          // laenger, als die Uhr anzeigt, damit der Schlag
+                          // GENAU auf der Schlusssekunde noch faellt. Ohne
+                          // ihn verspricht die Dienstanweisung 10 Takte und
+                          // das Spiel liefert 9.
   outroMs:        2000,   // Nach dem letzten Takt bleibt der Tisch noch
                           // sichtbar, bevor der Abrechnungsbogen kommt
   demoStart:      false,  // Startzustand des Demo-Schalters im Fortbildungs-
@@ -1303,10 +1308,13 @@ function setStampColor(){
 function tick(dt, now){
   ensureMeasured();
   S.t += dt;
+  // left treibt nur die ANZEIGE - Uhr und Balken stehen bei 00:00, sobald die
+  // Dienstzeit um ist. Gearbeitet wird noch roundTailMs laenger, damit der
+  // Schlag auf der Schlusssekunde nicht unter den Tisch faellt.
   const left = Math.max(0, STATS.roundMs - S.t);
   // Dienstschluss: die Uhr steht, aber die Nachspielzeit laesst den Stempel
   // noch ein paar Mal fallen. Nachschub kommt dann keiner mehr.
-  const over = left <= 0;
+  const over = S.t >= STATS.roundMs + CONFIG.roundTailMs;
   // Abspann: gearbeitet wird nicht mehr, aber der Tisch bleibt noch eine
   // Sekunde stehen. Man soll sehen, was liegen geblieben ist, bevor der
   // Abrechnungsbogen daraus eine Zahl macht.

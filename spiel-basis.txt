@@ -1513,3 +1513,42 @@ ohne dass ihn eine Regel dorthin zwingt.
 REGEL DARAUS: Der erste Preis im Spiel ist keine Oekonomie, sondern
 Dramaturgie. Er gehoert an die Laenge der ersten Runde gekoppelt, nicht an
 die Staerke des Upgrades.
+
+
+==============================================================================
+# TEIL 1Q - DER NACHLAUF (24.09.2026)
+==============================================================================
+
+GEFUNDENER FEHLER: DIE RUNDE WAR EINEN TAKT ZU KURZ
+Bei 20 s Runde, 2 s Aufwaermphase und 2 s Takt fallen die Schlaege auf
+2, 4, ... 20 Sekunden - der letzte GENAU auf die Schlusssekunde. Der wurde
+verschluckt: over wurde wahr, sobald S.t >= roundMs, und der Schlag im selben
+Frame fiel weg.
+
+Die Dienstanweisung versprach also 10 Takte und das Spiel lieferte 9. Bei
+aktiver Nachspielzeit war es schlimmer: der verlorene regulaere Schlag frass
+zusaetzlich einen aus der Zugabe, weil ab over jeder Schlag als Zugabe zaehlt.
+Gemessen vorher: 9 statt 10, und mit Nachspielzeit 2 nur 12 statt 13.
+
+DIE LOESUNG: ANZEIGE UND ABLAUF TRENNEN
+  const left = Math.max(0, STATS.roundMs - S.t);           // Uhr und Balken
+  const over = S.t >= STATS.roundMs + CONFIG.roundTailMs;  // das Spiel
+CONFIG.roundTailMs betraegt 0,1 s. Die Uhr steht also einen Sekundenbruchteil
+auf 00:00, waehrend der letzte Schlag noch faellt - unsichtbar, weil die
+Anzeige ohnehin schon bei null steht. Fuer einen ZWEITEN Schlag reicht der
+Nachlauf nie, weil accBeat gerade zurueckgesetzt wurde.
+
+Gemessen nachher, ueber alle Ausbaustufen: 10/10, 11/11, 19/19, 39/39 und
+39+6=45 mit Nachtschicht. Jede Stufe liefert genau, was beatsPerRound()
+verspricht.
+
+REGEL DARAUS: Wo ein Takt und eine Uhr auf dieselbe Grenze fallen, entscheidet
+die Reihenfolge im Code, ob der Spieler den Schlag bekommt - und sie
+entscheidet unsichtbar. Solche Grenzen gehoeren gezaehlt, nicht angeschaut:
+der Fehler war acht Runden lang da und ist niemandem aufgefallen, weil 9 und
+10 sich beim Spielen gleich anfuehlen.
+
+ZWEITE REGEL: Eine Zahl, die das Spiel dem Spieler NENNT (hier: "10 Takte" in
+der Dienstanweisung), ist eine Zusage. Sie gehoert gegen das tatsaechliche
+Verhalten geprueft, nicht nur gegen die Formel, aus der sie stammt - beide
+kamen hier aus derselben Quelle und waren trotzdem verschieden.

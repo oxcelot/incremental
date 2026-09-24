@@ -444,6 +444,7 @@ sonst nichts.
     beatMs         Stempeltakt, Untergrenze 800                    (2000)
     startDelayMs   Aufwaermphase vor dem ersten Schlag             (2000)
     extraBeats     Takte, die nach Dienstschluss noch fallen       (0)
+    roundTailMs    unsichtbarer Nachlauf fuer den letzten Schlag   (100)
     outroMs        Tisch bleibt nach dem letzten Takt sichtbar      (2000)
 
   NACHSCHUB

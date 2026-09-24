@@ -203,10 +203,11 @@ zeigt den verdreifachten Betrag direkt an, damit die Rechnung sichtbar ist.
 
 ### Dienstschluss in drei Schritten
 
-Das Rundenende läuft nicht mehr in einem Sprung, sondern in drei Phasen:
+Das Rundenende läuft nicht mehr in einem Sprung, sondern in mehreren Phasen:
 
 | Phase | Was passiert | Was man sieht |
 |---|---|---|
+| **Nachlauf** (`CONFIG.roundTailMs`, 0,1 s) | Unsichtbar. Der Schlag, der genau auf die Schlusssekunde fällt, kommt noch durch. | Nichts — die Uhr steht schon auf 00:00 |
 | **Nachspielzeit** | Die Uhr steht, der Stempel fällt noch `extraBeats` mal (bis zu 6). Kein Zulauf, kein Nachrücken. | Banner über dem Tisch, geschlossener Posteingang, goldene Uhr |
 | **Abspann** (`CONFIG.outroMs`, 2 s) | Nichts mehr. Kein Takt, keine Frist. | Der Tisch, so wie er liegen geblieben ist |
 | **Abrechnungsbogen** | — | Der Bogen |
@@ -233,6 +234,34 @@ Der **Abspann** existiert, weil der Abrechnungsbogen sonst den Tisch in dem
 Moment verdeckt, in dem der letzte Abdruck fällt. Zwei Sekunden reichen, um
 den Tisch abzusuchen — und erst dann macht der Bogen eine Zahl daraus. Die
 Glocke läutet zu Beginn des Abspanns, nicht beim Bogen.
+
+#### Der Nachlauf
+
+Bei 20 s Runde, 2 s Aufwärmphase und 2 s Takt fallen die Schläge auf
+2, 4, … 20 s — der letzte **genau** auf die Schlusssekunde. Der wurde
+verschluckt: `over` wurde wahr, sobald `S.t >= roundMs`, und der Schlag
+im selben Frame fiel weg. Die Dienstanweisung versprach 10 Takte, das Spiel
+lieferte 9, und bei aktiver Nachspielzeit fraß der verlorene reguläre Schlag
+zusätzlich einen aus der Zugabe.
+
+`CONFIG.roundTailMs` (0,1 s) trennt deshalb **Anzeige** und **Ablauf**:
+
+```js
+const left = Math.max(0, STATS.roundMs - S.t);        // treibt Uhr und Balken
+const over = S.t >= STATS.roundMs + CONFIG.roundTailMs; // treibt das Spiel
+```
+
+Die Uhr steht also 0,1 s lang auf `00:00`, während der letzte Schlag noch
+fällt. Danach reicht der Nachlauf für keinen zweiten Schlag, weil `accBeat`
+gerade zurückgesetzt wurde. Gemessen, alle Ausbaustufen:
+
+| Ausbau | versprochen | gefallen |
+|---|---|---|
+| Dienstbeginn | 10 | 10 |
+| Takt halb ausgebaut | 11 | 11 |
+| Takt voll ausgebaut | 19 | 19 |
+| Runde + Takt voll | 39 | 39 |
+| dazu Nachtschicht ×3 | 39 + 6 | 45 |
 
 ### Layout-Prüfungen
 
