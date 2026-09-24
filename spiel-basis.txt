@@ -1612,3 +1612,35 @@ sondern ein Problem der VERTEILUNG im Ring 1. Der erste Ring braucht eine
 Rampe: etwas nach einem Tag, etwas nach zweien, etwas nach dreien. Sonst
 sammelt der Spieler auf ein fernes Ziel hin und hat dazwischen keine
 Entscheidung - und Entscheidungen sind das, was das Spiel verkauft.
+
+
+==============================================================================
+# TEIL 1S - DIE DETAILKARTE WIRD EINE SPRECHBLASE (24.09.2026)
+==============================================================================
+
+Die Einzelheiten zum anvisierten Knoten standen unten im Bild. Bei 43 Knoten
+heisst das: der Blick wandert zwischen Kaestchen und Bildrand hin und her, oft
+ueber den halben Bildschirm - und zwar genau dann, wenn man vergleicht, also
+in dem Moment, in dem die Entscheidung faellt.
+
+Jetzt erscheint die Karte als Sprechblase DIREKT UEBER dem Kaestchen, das der
+Zeiger trifft, und verschwindet, sobald er es verlaesst.
+
+DREI REGELN, DAMIT SIE IMMER IM BILD BLEIBT
+  - Passt sie oben nicht hin, klappt sie unter das Kaestchen.
+  - Seitlich wird sie hineingeschoben, der Zipfel bleibt aber am Kaestchen.
+  - Beim Zoomen wird sie nachgefuehrt, beim Schieben des Baums ausgeblendet.
+
+GEMESSEN WIRD AM GEZEICHNETEN KNOTEN
+g.getBoundingClientRect() statt der TREE-Koordinaten: dazwischen liegen
+viewBox, Zoom und Verschiebung. Dieselbe Regel wie bei der Treffererkennung
+auf dem Tisch (Teil 1C) - wer aus Modellkoordinaten Bildschirmpositionen
+rechnet, rechnet frueher oder spaeter falsch.
+
+REGEL DARAUS: Information gehoert dorthin, wo die Entscheidung faellt. Eine
+Leiste am Bildrand ist bequem zu bauen und teuer zu lesen; die Kosten zahlt
+der Spieler bei jedem einzelnen Vergleich.
+
+NEBENBEI: Die Fussleiste traegt jetzt nur noch einen Hinweis und den
+Startknopf. Der Baum hat dadurch spuerbar mehr Platz - das war kein Ziel,
+sondern Zugabe.

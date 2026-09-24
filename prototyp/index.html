@@ -494,10 +494,34 @@
   #tree .nd .box{transform-box:fill-box; transform-origin:center;}
 
   .homefoot{display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;}
+  /* Die Einzelheiten stehen als Sprechblase UEBER dem anvisierten Kaestchen -
+     der Blick muss nicht mehr zwischen Baum und Bildrand wandern. */
   .detail{
-    flex:1 1 260px; min-width:0; max-width:560px; margin-right:auto; background:var(--surface); border:1px solid var(--line);
-    border-left:4px solid var(--c,var(--line)); border-radius:3px; padding:9px 12px;
+    position:fixed; z-index:70; pointer-events:none;
+    width:max-content; max-width:330px;
+    background:var(--surface); border:1px solid var(--line);
+    border-left:4px solid var(--c,var(--line)); border-radius:4px;
+    padding:9px 12px 10px;
+    box-shadow:0 6px 20px rgba(0,0,0,.30);
+    animation:dtin .11s ease-out;
   }
+  @keyframes dtin{from{opacity:0; transform:translateY(4px);}}
+  /* Zeiger zum Kaestchen: unten, wenn die Blase darueber sitzt - sonst oben.
+     Zwei Lagen, damit der Zipfel dieselbe Kante bekommt wie die Blase. */
+  .detail::before, .detail::after{
+    content:''; position:absolute; left:var(--px,50%); border:8px solid #0000;
+  }
+  .detail::before{margin-left:-8px;}
+  .detail::after{margin-left:-7px; border-width:7px;}
+  .detail.oben::before{top:100%; border-top-color:var(--line);}
+  .detail.oben::after{top:100%; border-top-color:var(--surface);}
+  .detail.unten::before{bottom:100%; border-bottom-color:var(--line);}
+  .detail.unten::after{bottom:100%; border-bottom-color:var(--surface);}
+  .hinweis{
+    flex:1 1 auto; margin-right:auto; font-size:11.5px; color:var(--muted);
+    letter-spacing:.03em; align-self:center;
+  }
+  .hinweis b{color:var(--text); font-weight:600;}
   .detail .dn{font-family:var(--font-stamp); font-size:15px; font-weight:700; letter-spacing:.03em;}
   .detail .dr{
     font-family:var(--font-stamp); font-size:11.5px; font-weight:700;
@@ -584,10 +608,12 @@
     </label>
   </div>
   <div class="homefoot">
-    <div class="detail" id="detail"></div>
+    <div class="hinweis"><b>Zeiger auf ein K&auml;stchen</b> f&uuml;r die Einzelheiten &middot; Klick kauft</div>
     <button class="gostart" id="goDay">Dienst antreten</button>
   </div>
 </div>
+
+<div class="detail" id="detail" hidden></div>
 
 <div class="veil" id="veil">
   <div class="sheet" id="sheet"></div>
@@ -1799,6 +1825,7 @@ function zoomAt(cx, cy, k){
   view.y = p.y - (p.y - view.y) * kk;
   view.w = nw; view.h *= kk;
   applyView();
+  if(detailNode) platziereDetail(detailNode);   // Blase bleibt am Kaestchen
 }
 function zoomCentre(k){
   const r = el.tree.getBoundingClientRect();
@@ -1820,6 +1847,7 @@ el.tree.addEventListener('pointermove', e => {
   if(!drag.moved){
     if(Math.abs(dx) < 5 && Math.abs(dy) < 5) return;   // noch ein Tippen
     drag.moved = true;
+    versteckeDetail();                 // waehrend des Schiebens keine Blase
     el.tree.classList.add('drag');
     try { el.tree.setPointerCapture(e.pointerId); } catch(err){}
   }
@@ -1840,6 +1868,8 @@ function endDrag(e){
     if(g) buy(byId[g.dataset.node]);
   }
 }
+el.tree.addEventListener('pointerleave', versteckeDetail);
+addEventListener('resize', () => { if(detailNode) platziereDetail(detailNode); });
 el.tree.addEventListener('pointerup', endDrag);
 el.tree.addEventListener('pointercancel', endDrag);
 document.getElementById('zIn').onclick  = () => zoomCentre(1/1.25);
@@ -1906,7 +1936,9 @@ function renderTree(){
   for(const g of el.tree.querySelectorAll('.nd')){
     const n = byId[g.dataset.node];
     g.addEventListener('mouseenter', () => { if(!drag || !drag.moved) showDetail(n); });
+    g.addEventListener('mouseleave', versteckeDetail);
     g.addEventListener('focus', () => showDetail(n));
+    g.addEventListener('blur', versteckeDetail);
     g.addEventListener('keydown', e => {
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); buy(n); }
     });
@@ -1971,6 +2003,39 @@ function showDetail(n){
                       + stufe
                       + '<div class="de">' + n.eff + '</div>'
                       + '<div class="dc">' + status + '</div>';
+  el.detail.hidden = false;
+  platziereDetail(n);
+}
+
+// Die Blase sitzt ueber dem Kaestchen. Passt sie dort nicht mehr hin, klappt
+// sie darunter; seitlich wird sie in den Bildschirm hineingeschoben. Gemessen
+// wird am gezeichneten Knoten, nicht an den TREE-Koordinaten - dazwischen
+// liegen viewBox, Zoom und Verschiebung.
+const RAND = 10, LUFT = 12;
+function platziereDetail(n){
+  const g = el.tree.querySelector('[data-node="' + n.id + '"]');
+  if(!g){ versteckeDetail(); return; }
+  const k = g.getBoundingClientRect();
+  const b = el.detail.getBoundingClientRect();
+  const mitteX = k.left + k.width / 2;
+
+  const obenPlatz = k.top - LUFT - b.height >= RAND;
+  const top = obenPlatz ? k.top - LUFT - b.height : k.bottom + LUFT;
+  el.detail.classList.toggle('oben', obenPlatz);
+  el.detail.classList.toggle('unten', !obenPlatz);
+
+  let left = mitteX - b.width / 2;
+  left = Math.max(RAND, Math.min(left, innerWidth - b.width - RAND));
+  el.detail.style.left = left + 'px';
+  el.detail.style.top  = Math.max(RAND, Math.min(top, innerHeight - b.height - RAND)) + 'px';
+  // Der Zeiger der Blase bleibt am Kaestchen, auch wenn die Blase verschoben ist
+  el.detail.style.setProperty('--px',
+    Math.max(12, Math.min(mitteX - left, b.width - 12)) + 'px');
+}
+
+function versteckeDetail(){
+  detailNode = null;
+  el.detail.hidden = true;
 }
 
 function showHome(){
@@ -1984,7 +2049,7 @@ function showHome(){
   syncDemo();
   resetView();
   renderTree();
-  showDetail(byId.start);
+  versteckeDetail();
   el.goDay.textContent = 'Tag ' + (meta.day + 1) + ' antreten';
   el.goDay.onclick = () => { meta.day++; startRound(); };
   el.goDay.focus();

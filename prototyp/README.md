@@ -295,6 +295,28 @@ Nach fünf Runden: **3 verschiedene Upgrades, 4 Stufen**, und an vier von fünf
 Tagen gibt es etwas zu kaufen. Der Ertrag wächst dabei von 19 auf 30,50 € am
 sechsten Tag.
 
+### Die Detailkarte als Sprechblase
+
+Die Einzelheiten zum anvisierten Knoten standen früher unten im Bild. Der Blick
+musste damit zwischen Kästchen und Bildrand hin und her — bei 43 Knoten der
+halbe Bildschirm. Jetzt erscheint die Karte als **Sprechblase direkt über dem
+Kästchen**, das der Zeiger trifft, und verschwindet, sobald er es verlässt.
+
+Gemessen wird am **gezeichneten** Knoten (`g.getBoundingClientRect()`), nicht
+an seinen `TREE`-Koordinaten — dazwischen liegen `viewBox`, Zoom und
+Verschiebung. Drei Regeln halten die Blase im Bild:
+
+- Passt sie über dem Kästchen nicht mehr hin, **klappt sie darunter**
+  (`.oben` / `.unten` steuern, auf welcher Seite der Zipfel sitzt).
+- Seitlich wird sie in den Bildschirm hineingeschoben; der **Zipfel bleibt am
+  Kästchen** (`--px`), auch wenn die Blase verschoben ist.
+- Beim Zoomen und beim Fenstergrößenwechsel wird sie nachgeführt, beim
+  Schieben des Baums ausgeblendet.
+
+Sie hat `pointer-events:none`, blockiert also nie einen Klick. Die Fußzeile
+trägt jetzt nur noch den Hinweis „Zeiger auf ein Kästchen" und den Startknopf —
+der Baum hat dadurch spürbar mehr Platz.
+
 ### Layout-Prüfungen
 
 Nach jeder Verschiebung laufen drei Tests über den gesamten Baum:
